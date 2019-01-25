@@ -96,7 +96,7 @@ void RequestHandler::login() {
 
     std::cout << "LOGIN.. " << std::endl;
     Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account=mjonsson&passwd=atc6OxHYFU3qYe2&session=VideoStation&format=sid";
+    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account=TestUser&passwd=xhfypf6C&session=VideoStation&format=sid";
     sendHttpGetRequest(jsonData, url);
 
     if(!jsonData["success"].asBool()) {
