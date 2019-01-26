@@ -7,7 +7,9 @@
 
 #include <ErrorCodes.h>
 #include <curl/curl.h>
+#include <iostream>
 #include <assert.h>
+#include <fstream>
 
 
 std::mutex single;
@@ -88,7 +90,38 @@ void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string
     }
 
     delete reader;
+}
 
+void RequestHandler::getApiInfo() {
+    std::cout << "get API Info.. " << std::endl;
+    Json::Value jsonData;
+    std::string url = "http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all";
+    sendHttpGetRequest(jsonData, url);
+
+    if(!jsonData["success"].asBool()) {
+        int err = jsonData["error"]["code"].asInt();
+        std::string desc;
+        ERROR::get(err, desc);
+        std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
+    }
+
+    std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
+    db_write << jsonData["data"];
+    db_write.close();
+
+//        for (Json::Value::const_iterator it=jsonData["data"].begin(); it!=jsonData["data"].end(); ++it)
+//        {
+//            if(it.key().type() == Json::stringValue){
+//                std::cout << it.key().asString() << ":" << *it << std::endl;
+//
+//            }
+//            for(Json::Value::const_iterator it2 = it->begin(); it2 != it->end(); it2++)
+//            {
+//
+//                std::cout << it2.key().asString() << ":" << *it2 << std::endl;
+//
+//            }
+//        }
 
 }
 
@@ -96,7 +129,7 @@ void RequestHandler::login() {
 
     std::cout << "LOGIN.. " << std::endl;
     Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=2&method=login&account=TestUser&passwd=xhfypf6C&session=VideoStation&format=sid";
+    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=VideoStation&format=sid";
     sendHttpGetRequest(jsonData, url);
 
     if(!jsonData["success"].asBool()) {
