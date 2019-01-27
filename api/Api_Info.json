@@ -3176,14 +3176,16 @@
 		"maxVersion" : 2,
 		"minVersion" : 1,
 		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
+		"requestFormat" : "JSON",
+		"method" : "list_share"
 	},
 	"SYNO.FileStation.List" : 
 	{
 		"maxVersion" : 2,
 		"minVersion" : 1,
 		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
+		"requestFormat" : "JSON",
+		"method" : "list_share"
 	},
 	"SYNO.FileStation.MD5" : 
 	{
@@ -4196,7 +4198,7 @@
 		"path" : "entry.cgi",
 		"requestFormat" : "JSON"
 	},
-	"SYNO.VideoStation.Poster" :
+	"SYNO.VideoStataion.Poster" : 
 	{
 		"maxVersion" : 1,
 		"minVersion" : 1,
@@ -4254,7 +4256,7 @@
 	},
 	"SYNO.VideoStation.Metadata" : 
 	{
-		"maxVersion" : 3,query
+		"maxVersion" : 3,
 		"minVersion" : 1,
 		"path" : "VideoStation/metadata.cgi"
 	},

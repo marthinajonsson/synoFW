@@ -61,39 +61,6 @@ void RequestHandler::parseArgData(const Json::Value &data, std::vector<std::stri
 }
 
 
-void RequestHandler::sendHttpGetRequest2(Json::Value &jsonData, const std::string &url) {
-
-    CURL* curl = curl_easy_init();
-
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    curl_easy_setopt(curl, CURLOPT_HEADER, false);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
-    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
-
-
-    long int httpCode(0);
-    std::unique_ptr<std::string> httpData(new std::string());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, httpData.get());
-    curl_easy_perform(curl);
-    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
-    curl_easy_cleanup(curl);
-
-    Json::CharReaderBuilder builder;
-    Json::CharReader * reader = builder.newCharReader();
-    std::string errors;
-
-    bool result = reader->parse(httpData.get()->c_str(), httpData->end().base(), &jsonData, &errors);
-
-    if(!result) {
-        std::cout << "False request" << std::endl;
-    }
-
-    delete reader;
-}
-
-
 void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string &url) {
 
     CURL* curl = curl_easy_init();
@@ -119,13 +86,7 @@ void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string
 
     std::cout << httpCode << "\n";
 
-
-
     bool result = reader->parse(httpData.get()->c_str(), httpData->end().base(), &jsonData, &errors);
-
-    std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
-    db_write << jsonData;
-    db_write.close();
 
     delete reader;
 }
@@ -144,9 +105,7 @@ void RequestHandler::getApiInfo() {
         std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
     }
 
-    std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
-
- //   std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
+    std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
     db_write << jsonData["data"];
     db_write.close();
 
@@ -157,7 +116,7 @@ void RequestHandler::login() {
     std::cout << "LOGIN.. " << std::endl;
     Json::Value jsonData;
     std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=FileStation&format=sid";
-    sendHttpGetRequest2(jsonData, url);
+    sendHttpGetRequest(jsonData, url);
 
     if(!jsonData["success"].asBool()) {
         int err = jsonData["error"]["code"].asInt();
@@ -173,11 +132,10 @@ void RequestHandler::logoff() {
     std::cout << "LOGOUT.." << std::endl;
     Json::Value jsonData;
     std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=FileStation";
-    sendHttpGetRequest2(jsonData, url);
+    sendHttpGetRequest(jsonData, url);
 
     sid = "undef";
 
-    auto result = jsonData["success"].type();
     if(!jsonData["success"].asBool()) {
         int err = jsonData["error"]["code"].asInt();
         std::string desc;
@@ -202,6 +160,9 @@ void RequestHandler::send(std::string &url) {
 
     std::cout << url << std::endl;
     sendHttpGetRequest(jsonData, url);
+    std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
+    db_write << jsonData;
+    db_write.close();
 //    if(!jsonData["success"].asBool()) {
 //        std::cout << "Request failed" << std::endl;
 //    }

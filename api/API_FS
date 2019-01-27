@@ -1,0 +1,48 @@
+{
+  "SYNO.FileStation.Info" :
+  {
+    "maxVersion" : 2,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "get",
+        "param": ""
+      }
+    ]
+  },
+  "SYNO.FileStation.List" :
+  {
+    "maxVersion" : 2,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "list_share",
+        "param": ""
+      }
+    ]
+  },
+  "SYNO.FileStation.Search" : {
+    "maxVersion": 2,
+    "minVersion": 1,
+    "path": "entry.cgi",
+    "requestFormat": "JSON",
+    "method": [
+      {
+        "name": "start",
+        "param": "folder_path"
+      },
+      {
+        "name": "list",
+        "param" : ""
+      },
+      {
+        "name" : "stop",
+        "param": ""
+      }
+    ]
+  }
+}
