@@ -24,6 +24,7 @@ private:
 
 
     void sendHttpGetRequest(Json::Value &jsonData, const std::string &url);
+    void sendHttpGetRequest2(Json::Value &jsonData, const std::string &url);
     void getApiInfo();
     void send(std::string &url);
     void login();

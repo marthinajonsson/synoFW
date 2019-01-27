@@ -60,7 +60,8 @@ void RequestHandler::parseArgData(const Json::Value &data, std::vector<std::stri
     }
 }
 
-void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string &url) {
+
+void RequestHandler::sendHttpGetRequest2(Json::Value &jsonData, const std::string &url) {
 
     CURL* curl = curl_easy_init();
 
@@ -92,9 +93,47 @@ void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string
     delete reader;
 }
 
+
+void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string &url) {
+
+    CURL* curl = curl_easy_init();
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    curl_easy_setopt(curl, CURLOPT_HEADER, false);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
+    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
+
+
+    long int httpCode(0);
+    std::unique_ptr<std::string> httpData(new std::string());
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, httpData.get());
+    curl_easy_perform(curl);
+    curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
+    curl_easy_cleanup(curl);
+
+    Json::CharReaderBuilder builder;
+    Json::CharReader * reader = builder.newCharReader();
+    std::string errors;
+
+    std::cout << httpCode << "\n";
+
+
+
+    bool result = reader->parse(httpData.get()->c_str(), httpData->end().base(), &jsonData, &errors);
+
+    std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
+    db_write << jsonData;
+    db_write.close();
+
+    delete reader;
+}
+
 void RequestHandler::getApiInfo() {
     std::cout << "get API Info.. " << std::endl;
     Json::Value jsonData;
+    //std::string url = "http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all";
     std::string url = "http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all";
     sendHttpGetRequest(jsonData, url);
 
@@ -105,23 +144,11 @@ void RequestHandler::getApiInfo() {
         std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
     }
 
-    std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
+    std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
+
+ //   std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
     db_write << jsonData["data"];
     db_write.close();
-
-//        for (Json::Value::const_iterator it=jsonData["data"].begin(); it!=jsonData["data"].end(); ++it)
-//        {
-//            if(it.key().type() == Json::stringValue){
-//                std::cout << it.key().asString() << ":" << *it << std::endl;
-//
-//            }
-//            for(Json::Value::const_iterator it2 = it->begin(); it2 != it->end(); it2++)
-//            {
-//
-//                std::cout << it2.key().asString() << ":" << *it2 << std::endl;
-//
-//            }
-//        }
 
 }
 
@@ -129,8 +156,8 @@ void RequestHandler::login() {
 
     std::cout << "LOGIN.. " << std::endl;
     Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=VideoStation&format=sid";
-    sendHttpGetRequest(jsonData, url);
+    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=FileStation&format=sid";
+    sendHttpGetRequest2(jsonData, url);
 
     if(!jsonData["success"].asBool()) {
         int err = jsonData["error"]["code"].asInt();
@@ -139,19 +166,14 @@ void RequestHandler::login() {
         std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
     }
 
-    for (Json::Value::const_iterator it=jsonData["data"].begin(); it!=jsonData["data"].end(); ++it) {
-
-        auto id = *it;
-        sid = id.toStyledString();
-        std::cout << "logged in with sid " << sid << std::endl;
-    }
+    sid = jsonData["data"]["sid"].toStyledString();
 }
 
 void RequestHandler::logoff() {
     std::cout << "LOGOUT.." << std::endl;
     Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=VideoStation";
-    sendHttpGetRequest(jsonData, url);
+    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=FileStation";
+    sendHttpGetRequest2(jsonData, url);
 
     sid = "undef";
 
@@ -171,7 +193,7 @@ void RequestHandler::send(std::string &url) {
         return;
     }
 
-    url+=sid;
+      url+=sid;
     std::string::size_type pos = 0;
     while ( ( pos = url.find ("\n",pos) ) != std::string::npos )
     {
@@ -180,28 +202,34 @@ void RequestHandler::send(std::string &url) {
 
     std::cout << url << std::endl;
     sendHttpGetRequest(jsonData, url);
+//    if(!jsonData["success"].asBool()) {
+//        std::cout << "Request failed" << std::endl;
+//    }
 
-
-    if(!jsonData["success"].asBool()) {
-        int err = jsonData["error"]["code"].asInt();
-        std::string desc;
-        ERROR::get(err, desc);
-        std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
-    }else {
-
-        for (Json::Value::const_iterator it=jsonData["data"].begin(); it!=jsonData["data"].end(); ++it)
-        {
-            if(it.key().type() == Json::stringValue){
-                std::cout << it.key().asString() << ":" << *it << std::endl;
-
-            }
-            for(Json::Value::const_iterator it2 = it->begin(); it2 != it->end(); it2++)
-            {
-
-                std::cout << it2.key().asString() << ":" << *it2 << std::endl;
-
-            }
-        }
-    }
+//    if(!jsonData["success"].asBool()) {
+//        int err = jsonData["error"]["code"].asInt();
+//        std::string desc;
+//        ERROR::get(err, desc);
+//        std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
+//    }else {
+//        std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
+//
+//        //   std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
+//        db_write << jsonData;
+//        db_write.close();
+//        for (Json::Value::const_iterator it=jsonData["data"].begin(); it!=jsonData["data"].end(); ++it)
+//        {
+//            if(it.key().type() == Json::stringValue){
+//                std::cout << it.key().asString() << ":" << *it << std::endl;
+//
+//            }
+//            for(Json::Value::const_iterator it2 = it->begin(); it2 != it->end(); it2++)
+//            {
+//
+//                std::cout << it2.key().asString() << ":" << *it2 << std::endl;
+//
+//            }
+//        }
+    //}
 }
 
