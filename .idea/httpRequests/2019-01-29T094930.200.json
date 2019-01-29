@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": 120,
+    "errors": {
+      "name": "limit",
+      "reason": "required"
+    }
+  },
+  "success": false
+}

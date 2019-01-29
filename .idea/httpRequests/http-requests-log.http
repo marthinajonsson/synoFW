@@ -1,0 +1,186 @@
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=VideoStation
+
+<> 2019-01-29T100610.200.txt
+
+###
+
+POST http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Movie&version=1&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T100559.200.json
+
+###
+
+POST http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Movie&version=1&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T100551.200.json
+
+###
+
+POST http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Movie&version=1&method=get_info&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T100402.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&library_id=0&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T100241.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&library_id=1&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T095244.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&library_id=&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T095211.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&library_id=-1&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T095155.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&library_id=-1&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T095141.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T095028.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=&4=&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094930.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=&//video=&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094804.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094712.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094632.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=2&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094614.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Info&version=2&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094409.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Info&version=2&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094346.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Movie&version=2&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094334.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Movie.Info&version=2&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094326.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation&version=2&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094308.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.List&version=2&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094259.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Info&version=2&method=list&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094235.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Info&version=1&method=get_info&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094201.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Info&version=1&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094145.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation.Info&version=2&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+
+<> 2019-01-29T094114.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=VideoStation&format=sid
+
+<> 2019-01-29T094055.200.txt
+
+###
+
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=FileStation
+
+<> 2019-01-29T094007.200.txt
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.FileStation.Info&version=2&method=get&_sid=4fVCUvCwe1KVY1660NEN539702
+
+<> 2019-01-29T093952.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=FileStation&format=sid
+
+<> 2019-01-29T093925.200.txt
+
+###
+
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.FileStation.Info&version=2&method=get
+
+<> 2019-01-29T093834.200.json
+
+###
+
+GET http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all
+
+<> 2019-01-29T093402.200.txt
+
+###
+

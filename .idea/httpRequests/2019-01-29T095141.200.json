@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": 120,
+    "errors": {
+      "name": "library_id",
+      "reason": "condition"
+    }
+  },
+  "success": false
+}

@@ -9,11 +9,16 @@ include_directories(inc)
 set(Includes
         #${CMAKE_CURRENT_LIST_DIR}/inc/Cli.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Methods.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/RequestHandler.h inc/ErrorCodes.h inc/FileStationAPI.h inc/Utilities.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/RequestHandler.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ErrorCodes.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/FileStationAPI.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/Utilities.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/RequestHandler.cpp src/FileStationAPI.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/src/RequestHandler.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/FileStationAPI.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/VideoStationAPI.cpp)
 
 
 add_executable(synoFW ${Sources} ${Includes})

@@ -22,6 +22,8 @@ public:
     }
     ~FileStationAPI() = default;
 
+    void setMethod();
+
 private:
 
     void load();

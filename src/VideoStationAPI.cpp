@@ -1,15 +1,19 @@
 //
+// Created by mjonsson on 1/29/19.
+//
+
+//
 // Created by mjonsson on 1/27/19.
 //
 
 #include <iostream>
-#include "FileStationAPI.h"
+#include "VideoStationAPI.h"
 
-void FileStationAPI::load()
+void VideoStationAPI::load()
 {
     Json::Value root;
 
-    std::ifstream json("../api/API_FS", std::ifstream::binary);
+    std::ifstream json("../api/API_VS", std::ifstream::binary);
     json >> root;
     json.close();
 
@@ -27,6 +31,6 @@ void FileStationAPI::load()
     }
 }
 
-void FileStationAPI::setMethod() {
+void VideoStationAPI::setMethod() {
 
 }

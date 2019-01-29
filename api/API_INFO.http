@@ -5,4 +5,31 @@
 # * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
+### Get API info
 GET http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all
+
+### Login
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=FileStation&format=sid
+
+### Logout
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=FileStation
+
+### Get FS INFO
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.FileStation.Info&version=2&method=get&_sid=4fVCUvCwe1KVY1660NEN539702
+
+###
+
+### Login
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=VideoStation&format=sid
+
+### Logout
+GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=VideoStation
+
+### Get VS INFO
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Info&version=2&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+
+### List VS Movie
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&library_id=0&_sid=Q7RTa.944Y99g1660NEN539702
+
+###
+###
