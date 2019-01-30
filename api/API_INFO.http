@@ -29,7 +29,21 @@ GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method
 GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Info&version=2&method=get&_sid=Q7RTa.944Y99g1660NEN539702
 
 ### List VS Movie
-GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=4&library_id=0&_sid=Q7RTa.944Y99g1660NEN539702
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=8&library_id=0&_sid=hNqchTcUxU1xw1660NEN539702
 
-###
+### List VS TVShow
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.TVShow&version=1&method=list&limit=8&library_id=0&_sid=hNqchTcUxU1xw1660NEN539702
+
+### List content in movie folders
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Folder&version=1&method=list&limit=10&library_id=0&type=movie&_sid=hNqchTcUxU1xw1660NEN539702
+
+### List content in tvshow folders
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Folder&version=1&method=list&limit=10&library_id=0&type=tvshow&_sid=hNqchTcUxU1xw1660NEN539702
+
+### List all libraries i.e. movie, tvshow, home video, recording
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Library&version=1&method=list&limit=5&_sid=hNqchTcUxU1xw1660NEN539702
+
+### List Metadata of movie
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Metadata&version=1&method=list&limit=2&library_id=0&category=imdb&type=movie&_sid=hNqchTcUxU1xw1660NEN539702
+
 ###
