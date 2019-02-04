@@ -20,8 +20,12 @@ std::vector<std::string> split(const std::string& s, char delimiter)
 }
 
 void printOptions() {
-    std::cout << "movie:list" << std::endl;
-    std::cout << "series:list" << std::endl;
+
+    std::cout << "info" << std::endl;
+    std::cout << "library" << std::endl;
+    std::cout << "movie" << std::endl;
+    std::cout << "tvshow" << std::endl;
+    std::cout << "folder" << std::endl;
     std::cout << "file:list" << std::endl;
 }
 
@@ -54,7 +58,6 @@ int main(int argc, char* argv []) {
         return result;
     }
 
-    std::string test = ERROR::COMMON::get(103);
     if(parsed.front() == "file") {
         FileStationAPI fs;
         fs.makeRequest(parsed);

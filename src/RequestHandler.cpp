@@ -110,11 +110,12 @@ void RequestHandler::getApiInfo() {
 
 }
 
-void RequestHandler::login() {
+void RequestHandler::login(std::string &session) {
 
     std::cout << "LOGIN.. " << std::endl;
     Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=FileStation&format=sid";
+    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session="+session+"&format=sid";
+    removeEndOfLines(url);
     sendHttpGetRequest(jsonData, url);
 
     if(!jsonData["success"].asBool()) {
@@ -126,10 +127,11 @@ void RequestHandler::login() {
     sid = jsonData["data"]["sid"].toStyledString();
 }
 
-void RequestHandler::logoff() {
+void RequestHandler::logoff(std::string &session) {
     std::cout << "LOGOUT.." << std::endl;
     Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=FileStation";
+    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session="+session;
+    removeEndOfLines(url);
     sendHttpGetRequest(jsonData, url);
 
     sid = "undef";
@@ -148,13 +150,8 @@ void RequestHandler::send(std::string &url) {
         return;
     }
 
-      url+=sid;
-    std::string::size_type pos = 0;
-    while ( ( pos = url.find ("\n",pos) ) != std::string::npos )
-    {
-        url.erase(pos,2);
-    }
-
+    url+=sid;
+    removeEndOfLines(url);
     std::cout << url << std::endl;
     sendHttpGetRequest(jsonData, url);
     std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);

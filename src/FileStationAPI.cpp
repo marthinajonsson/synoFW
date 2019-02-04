@@ -36,7 +36,7 @@ std::string FileStationAPI::loadMethod(std::string& api)
     json >> root;
     json.close();
 
-    auto method = root[api]["method"]["name"];
+    auto method = root[api]["method"][0]["name"];
     return method.asString();
 }
 

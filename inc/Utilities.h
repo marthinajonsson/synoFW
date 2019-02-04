@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <assert.h>
+#include <sstream>
 
 typedef std::pair<int,std::string> PAIR;
 
@@ -18,6 +19,28 @@ enum FS_methods {
     Download,
     Upload
 };
+
+static void removeEndOfLines(std::string &str) {
+    std::string::size_type pos = 0;
+    while ( ( pos = str.find ("\n",pos) ) != std::string::npos )
+    {
+        str.erase(pos,2);
+    }
+}
+
+static std::vector<std::string> split(std::string &input, char delim) {
+    std::stringstream m_stream(input);
+    std::vector<std::string> seglist;
+    std::string segment;
+    seglist.reserve(50);
+    seglist.clear();
+
+    while(std::getline(m_stream, segment, delim))
+    {
+        seglist.push_back(std::move(segment));
+    }
+    return seglist;
+}
 
 
 template<typename T>

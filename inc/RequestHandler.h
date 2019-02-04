@@ -26,8 +26,8 @@ private:
     void sendHttpGetRequest(Json::Value &jsonData, const std::string &url);
     void getApiInfo();
     void send(std::string &url);
-    void login();
-    void logoff();
+    void login(std::string&);
+    void logoff(std::string&);
 
 public:
 
@@ -35,12 +35,13 @@ public:
     RequestHandler(RequestHandler const&) = delete;
     void operator=(RequestHandler const&) = delete;
 
-    void make(std::string &url)
+    void make(std::string &url, std::string&& session)
     {
-        //getApiInfo();
-        login();
-        send(url);
-        logoff();
+        std::cout << url << std::endl;
+        std::cout << session << std::endl;
+//        login(session);
+//        send(url);
+//        logoff(session);
     }
 };
 
