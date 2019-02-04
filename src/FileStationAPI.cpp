@@ -3,10 +3,11 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include "FileStationAPI.h"
 
-void FileStationAPI::load()
-{
+std::string FileStationAPI::loadAPI(std::string &api) {
+
     Json::Value root;
 
     std::ifstream json("../api/API_FS", std::ifstream::binary);
@@ -14,19 +15,43 @@ void FileStationAPI::load()
     json.close();
 
     for (Json::Value::const_iterator its=root.begin(); its!=root.end(); ++its) {
-        auto api = *its;
-        auto type = api.type();
-        auto version = api["maxVersion"].asString();
-        auto methods = api["method"].type();
-        auto t = 1;
-        for (Json::ArrayIndex i = 0; api["method"].isValidIndex(i); i++) {
-            auto name = api["method"][i]["name"].asString();
-            auto param = api["method"][i]["param"].asString();
-            std::cout << name << " " << param << std::endl;
+        auto key = its.key().asString();
+        std::string API = key;
+
+        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+        auto found = key.find(api);
+        if(found != std::string::npos) {
+            return API;
         }
     }
+    return "NO_API_FOUND";
+
 }
 
-void FileStationAPI::setMethod() {
+std::string FileStationAPI::loadMethod(std::string& api)
+{
+    Json::Value root;
+
+    std::ifstream json("../api/API_FS", std::ifstream::binary);
+    json >> root;
+    json.close();
+
+    auto method = root[api]["method"]["name"];
+    return method.asString();
+}
+
+std::string FileStationAPI::loadParams(std::string &api, std::string &method) {
+
+    Json::Value root;
+
+    std::ifstream json("../api/API_FS", std::ifstream::binary);
+    json >> root;
+    json.close();
+
+    auto params = root[api]["method"]["param"];
+    return params.asString();
+}
+
+void FileStationAPI::makeRequest(std::vector<std::string>& parsed) {
 
 }

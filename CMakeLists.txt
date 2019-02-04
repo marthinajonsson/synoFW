@@ -12,7 +12,8 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/RequestHandler.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/ErrorCodes.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/FileStationAPI.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/Utilities.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/Utilities.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/HttpRequests.h inc/API.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp

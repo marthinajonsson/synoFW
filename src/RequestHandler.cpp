@@ -99,10 +99,9 @@ void RequestHandler::getApiInfo() {
     sendHttpGetRequest(jsonData, url);
 
     if(!jsonData["success"].asBool()) {
-        int err = jsonData["error"]["code"].asInt();
-        std::string desc;
-        ERROR::get(err, desc);
-        std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
+        int errCode = jsonData["error"]["code"].asInt();
+        std::string desc = ERROR::COMMON::get(errCode);
+        std::cout << "Request failed" << " - " << errCode << " - " << desc << std::endl;
     }
 
     std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
@@ -119,10 +118,9 @@ void RequestHandler::login() {
     sendHttpGetRequest(jsonData, url);
 
     if(!jsonData["success"].asBool()) {
-        int err = jsonData["error"]["code"].asInt();
-        std::string desc;
-        ERROR::get(err, desc);
-        std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
+        int errCode = jsonData["error"]["code"].asInt();
+        std::string desc = ERROR::COMMON::get(errCode);
+        std::cout << "Request failed" << " - " << errCode << " - " << desc << std::endl;
     }
 
     sid = jsonData["data"]["sid"].toStyledString();
@@ -137,10 +135,9 @@ void RequestHandler::logoff() {
     sid = "undef";
 
     if(!jsonData["success"].asBool()) {
-        int err = jsonData["error"]["code"].asInt();
-        std::string desc;
-        ERROR::get(err, desc);
-        std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
+        int errCode = jsonData["error"]["code"].asInt();
+        std::string desc = ERROR::COMMON::get(errCode);
+        std::cout << "Request failed" << " - " << errCode << " - " << desc << std::endl;
     }
 }
 

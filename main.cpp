@@ -5,6 +5,7 @@
 #include <RequestHandler.h>
 #include <FileStationAPI.h>
 #include <VideoStationAPI.h>
+#include <ErrorCodes.h>
 
 std::vector<std::string> split(const std::string& s, char delimiter)
 {
@@ -18,30 +19,49 @@ std::vector<std::string> split(const std::string& s, char delimiter)
     return tokens;
 }
 
+void printOptions() {
+    std::cout << "movie:list" << std::endl;
+    std::cout << "series:list" << std::endl;
+    std::cout << "file:list" << std::endl;
+}
+
+
+int process(std::vector<std::string> &parsed)
+{
+    for (std::string line; std::cout << "SYNO > " && std::getline(std::cin, line); )
+    {
+        if (line.find("help") != std::string::npos) {
+            printOptions();
+        }
+        else if (line.find("exit") != std::string::npos) {
+            return 0;
+        }
+        else if (!line.empty()) {
+            parsed = split(line, ':');
+            return 0;
+        }
+    }
+    return -1;
+}
+
+
 int main(int argc, char* argv []) {
 
-    std::vector<std::string> args;
-    std::vector<std::string> TOPIC = {"movie", "series", "file"};
+    std::vector<std::string> parsed;
+    int result = process(parsed);
 
-    for (int i = 1; i < argc; ++i) { // Remember argv[0] is the path to the program, we want from argv[1] onwards
-        args.push_back(argv[i]); // Add all but the last argument to the vector.
-
-    };
-
-    auto valid = std::find(TOPIC.begin(), TOPIC.end(), args.front());
-
-    if(valid == TOPIC.end()) {
-        std::cout << "Valid first arg is movie series or file" << std::endl;
-        return 0;
+    if(result == -1) {
+        return result;
     }
 
-    if(args.front() == TOPIC.back()) {
+    std::string test = ERROR::COMMON::get(103);
+    if(parsed.front() == "file") {
         FileStationAPI fs;
-        fs.setMethod();
+        fs.makeRequest(parsed);
     }
     else {
         VideoStationAPI vs;
-        vs.setMethod();
+        vs.makeRequest(parsed);
     }
     //
 //    FileStationAPI fs;

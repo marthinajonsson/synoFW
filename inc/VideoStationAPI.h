@@ -10,23 +10,32 @@
 #include <string>
 #include <map>
 
+#include "RequestHandler.h"
 #include "Utilities.h"
+#include "API.h"
 
 
-
-class VideoStationAPI {
+class VideoStationAPI : API{
 public:
     VideoStationAPI() {
-       load();
-    }
+        loadConfig();
+    };
     ~VideoStationAPI() = default;
 
-    void setMethod();
+    void makeRequest(std::vector<std::string>&) override;
+    std::string loadAPI(std::string&) override;
+    std::string loadMethod(std::string&) override;
+    std::string loadParams(std::string&, std::string&) override;
 
 private:
 
-    void load();
+    std::string requestUrl;
 
+    void compileUrl(std::string &request) {
+        requestUrl+=info_s.server;
+        requestUrl+="/webapi/entry.cgi?";
+        requestUrl+=request;
+    }
 };
 
 

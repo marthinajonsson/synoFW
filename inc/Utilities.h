@@ -6,11 +6,10 @@
 #define SYNOFW_UTILITIES_H
 
 #include <vector>
+#include <string>
+#include <assert.h>
 
-enum API {
-    FileStation = 0,
-    VideoStation = 1,
-};
+typedef std::pair<int,std::string> PAIR;
 
 enum FS_methods {
     Info = 0,
@@ -19,7 +18,6 @@ enum FS_methods {
     Download,
     Upload
 };
-
 
 
 template<typename T>

@@ -7,10 +7,11 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include "VideoStationAPI.h"
 
-void VideoStationAPI::load()
-{
+std::string VideoStationAPI::loadAPI(std::string &api) {
+
     Json::Value root;
 
     std::ifstream json("../api/API_VS", std::ifstream::binary);
@@ -18,19 +19,47 @@ void VideoStationAPI::load()
     json.close();
 
     for (Json::Value::const_iterator its=root.begin(); its!=root.end(); ++its) {
-        auto api = *its;
-        auto type = api.type();
-        auto version = api["maxVersion"].asString();
-        auto methods = api["method"].type();
-        auto t = 1;
-        for (Json::ArrayIndex i = 0; api["method"].isValidIndex(i); i++) {
-            auto name = api["method"][i]["name"].asString();
-            auto param = api["method"][i]["param"].asString();
-            std::cout << name << " " << param << std::endl;
+        auto key = its.key().asString();
+        std::string API = key;
+
+        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+        auto found = key.find(api);
+        if(found != std::string::npos) {
+            return API;
         }
     }
+    return "NO_API_FOUND";
+
 }
 
-void VideoStationAPI::setMethod() {
+std::string VideoStationAPI::loadMethod(std::string& api)
+{
+    Json::Value root;
+
+    std::ifstream json("../api/API_VS", std::ifstream::binary);
+    json >> root;
+    json.close();
+
+    auto method = root[api]["method"]["name"];
+    return method.asString();
+}
+
+std::string VideoStationAPI::loadParams(std::string &api, std::string &method) {
+
+    Json::Value root;
+
+    std::ifstream json("../api/API_VS", std::ifstream::binary);
+    json >> root;
+    json.close();
+
+    auto params = root[api]["method"]["param"];
+    return params.asString();
+}
+
+void VideoStationAPI::makeRequest(std::vector<std::string>& parsed)
+{
+    std::string api = parsed.front();
+    pop_front(parsed);
+    loadAPI(api);
 
 }

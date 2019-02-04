@@ -1,1 +1,67 @@
-{}
+{
+  "SYNO.VideoStation2.Info" :
+  {
+    "maxVersion" : 2,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "get",
+        "param": ""
+      }
+    ]
+  },
+  "SYNO.VideoStation2.Movie" :
+  {
+    "maxVersion" : 1,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "list",
+        "param": "limit:library_id"
+      }
+    ]
+  },
+  "SYNO.VideoStation2.TVShow" :
+  {
+    "maxVersion" : 1,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "list",
+        "param": "limit:library_id"
+      }
+    ]
+  },
+  "SYNO.VideoStation2.Folder" :
+  {
+    "maxVersion" : 1,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "list",
+        "param": "limit:library_id:type"
+      }
+    ]
+  },
+  "SYNO.VideoStation2.Library" :
+  {
+    "maxVersion" : 1,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "list",
+        "param": "limit"
+      }
+    ]
+  }
+}
