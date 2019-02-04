@@ -23,10 +23,12 @@ public:
     }
     ~FileStationAPI() = default;
 
-    void makeRequest(std::vector<std::string>&) override;
+    void makeRequest(std::string&) override;
     std::string loadAPI(std::string&) override;
     std::string loadMethod(std::string&) override;
     std::string loadParams(std::string&, std::string&) override;
+    std::string loadPath(std::string&) override;
+    std::string loadVersion(std::string&) override;
 
 private:
 };

@@ -15,13 +15,14 @@ public:
 
     API() = default;
     ~API() = default;
+
     virtual std::string loadAPI(std::string&) = 0;
-
     virtual std::string loadMethod(std::string&) = 0;
-
+    virtual std::string loadPath(std::string&) = 0;
+    virtual std::string loadVersion(std::string&) = 0;
     virtual std::string loadParams(std::string&, std::string&) = 0;
 
-    virtual void makeRequest(std::vector<std::string>&) = 0;
+    virtual void makeRequest(std::string&) = 0;
 
 protected:
 

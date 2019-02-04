@@ -48,10 +48,33 @@ std::string FileStationAPI::loadParams(std::string &api, std::string &method) {
     json >> root;
     json.close();
 
-    auto params = root[api]["method"]["param"];
+    auto params = root[api]["method"][0]["param"];
     return params.asString();
 }
 
-void FileStationAPI::makeRequest(std::vector<std::string>& parsed) {
+std::string FileStationAPI::loadPath(std::string& api) {
+    Json::Value root;
+
+    std::ifstream json("../api/API_FS", std::ifstream::binary);
+    json >> root;
+    json.close();
+
+    auto params = root[api]["path"];
+    return params.asString();
+}
+
+std::string FileStationAPI::loadVersion(std::string& api) {
+    Json::Value root;
+
+    std::ifstream json("../api/API_FS", std::ifstream::binary);
+    json >> root;
+    json.close();
+
+    auto params = root[api]["maxVersion"];
+    return params.asString();
+}
+
+
+void FileStationAPI::makeRequest(std::string& parsed) {
 
 }

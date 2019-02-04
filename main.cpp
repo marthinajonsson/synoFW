@@ -7,18 +7,6 @@
 #include <VideoStationAPI.h>
 #include <ErrorCodes.h>
 
-std::vector<std::string> split(const std::string& s, char delimiter)
-{
-    std::vector<std::string> tokens;
-    std::string token;
-    std::istringstream tokenStream(s);
-    while (std::getline(tokenStream, token, delimiter))
-    {
-        tokens.push_back(std::move(token));
-    }
-    return tokens;
-}
-
 void printOptions() {
 
     std::cout << "info" << std::endl;
@@ -26,11 +14,12 @@ void printOptions() {
     std::cout << "movie" << std::endl;
     std::cout << "tvshow" << std::endl;
     std::cout << "folder" << std::endl;
-    std::cout << "file:list" << std::endl;
+    std::cout << "*metadata TBD.." << std::endl;
+    std::cout << "file" << std::endl;
 }
 
 
-int process(std::vector<std::string> &parsed)
+int process(std::string &parsed)
 {
     for (std::string line; std::cout << "SYNO > " && std::getline(std::cin, line); )
     {
@@ -41,7 +30,7 @@ int process(std::vector<std::string> &parsed)
             return 0;
         }
         else if (!line.empty()) {
-            parsed = split(line, ':');
+            parsed = line;
             return 0;
         }
     }
@@ -51,14 +40,14 @@ int process(std::vector<std::string> &parsed)
 
 int main(int argc, char* argv []) {
 
-    std::vector<std::string> parsed;
+    std::string parsed;
     int result = process(parsed);
 
     if(result == -1) {
         return result;
     }
 
-    if(parsed.front() == "file") {
+    if(parsed.find("file") != std::string::npos) {
         FileStationAPI fs;
         fs.makeRequest(parsed);
     }

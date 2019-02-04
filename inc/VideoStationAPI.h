@@ -22,20 +22,17 @@ public:
     };
     ~VideoStationAPI() = default;
 
-    void makeRequest(std::vector<std::string>&) override;
+    void makeRequest(std::string&) override;
     std::string loadAPI(std::string&) override;
     std::string loadMethod(std::string&) override;
     std::string loadParams(std::string&, std::string&) override;
+    std::string loadPath(std::string&) override;
+    std::string loadVersion(std::string&) override;
 
 private:
 
     std::string requestUrl;
-
-    void compileUrl(std::string &request) {
-        requestUrl+=info_s.server;
-        requestUrl+="/webapi/entry.cgi?";
-        requestUrl+=request;
-    }
+    std::string paramParser(std::string&);
 };
 
 

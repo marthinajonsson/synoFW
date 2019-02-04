@@ -58,7 +58,7 @@ std::string VideoStationAPI::loadParams(std::string &api, std::string &method) {
     return params.asString();
 }
 
-std::string loadPath(std::string& api) {
+std::string VideoStationAPI::loadPath(std::string& api) {
     Json::Value root;
 
     std::ifstream json("../api/API_VS", std::ifstream::binary);
@@ -69,7 +69,7 @@ std::string loadPath(std::string& api) {
     return params.asString();
 }
 
-std::string loadVersion(std::string& api) {
+std::string VideoStationAPI::loadVersion(std::string& api) {
     Json::Value root;
 
     std::ifstream json("../api/API_VS", std::ifstream::binary);
@@ -80,7 +80,7 @@ std::string loadVersion(std::string& api) {
     return params.asString();
 }
 
-std::string paramParser(std::string& params) {
+std::string VideoStationAPI::paramParser(std::string& params) {
     std::vector<std::string> paramVec = split(params, ':');
 
     std::string fullParamStr;
@@ -110,14 +110,12 @@ std::string paramParser(std::string& params) {
     return fullParamStr;
 }
 
-void VideoStationAPI::makeRequest(std::vector<std::string>& parsed)
+void VideoStationAPI::makeRequest(std::string& parsed)
 {
-    std::string apiStr = parsed.front();
     /*
      * info, folder, movie, tvshow, library
      * */
-    pop_front(parsed);
-    auto API = loadAPI(apiStr);
+    auto API = loadAPI(parsed);
     auto method = loadMethod(API);
     /*
      * get, list
@@ -136,5 +134,5 @@ void VideoStationAPI::makeRequest(std::vector<std::string>& parsed)
     requestUrl+="&_sid=";
     removeEndOfLines(requestUrl);
     std::cout << requestUrl << std::endl;
-    RequestHandler::getInstance().make(requestUrl, "VideoStation");
+    RequestHandler::getInstance().make(requestUrl, "VideoStation", info_s.username, info_s.password);
 }

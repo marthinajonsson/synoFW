@@ -110,11 +110,11 @@ void RequestHandler::getApiInfo() {
 
 }
 
-void RequestHandler::login(std::string &session) {
+void RequestHandler::login(const std::string &session, const std::string& user, const std::string& pwd) {
 
     std::cout << "LOGIN.. " << std::endl;
     Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session="+session+"&format=sid";
+    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+user+"&passwd="+pwd+"&session="+session+"&format=sid";
     removeEndOfLines(url);
     sendHttpGetRequest(jsonData, url);
 
@@ -127,7 +127,7 @@ void RequestHandler::login(std::string &session) {
     sid = jsonData["data"]["sid"].toStyledString();
 }
 
-void RequestHandler::logoff(std::string &session) {
+void RequestHandler::logoff(const std::string &session) {
     std::cout << "LOGOUT.." << std::endl;
     Json::Value jsonData;
     std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session="+session;
