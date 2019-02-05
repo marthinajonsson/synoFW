@@ -144,9 +144,10 @@ void RequestHandler::logoff(const std::string &session) {
 }
 
 void RequestHandler::send(std::string &url) {
+
     Json::Value jsonData;
 
-    if(sid == "undef") {
+    if(sid == "undef" || sid.find("null")) {
         return;
     }
 

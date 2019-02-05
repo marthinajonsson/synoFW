@@ -8,7 +8,9 @@
     "method": [
       {
         "name": "get",
-        "param": ""
+        "param": "",
+        "optional": "",
+        "response": ""
       }
     ]
   },
@@ -21,7 +23,9 @@
     "method": [
       {
         "name": "list_share",
-        "param": ""
+        "param": "",
+        "optional": "",
+        "response": ""
       }
     ]
   },
@@ -33,15 +37,105 @@
     "method": [
       {
         "name": "start",
-        "param": "folder_path"
+        "param": "folder_path",
+        "optional": "pattern:extension:",
+        "response": "taskid"
       },
       {
         "name": "list",
-        "param" : ""
+        "param" : "taskid",
+        "optional": "sort_by:pattern",
+        "response": "files"
       },
       {
         "name" : "stop",
-        "param": ""
+        "param": "taskid",
+        "optional": "",
+        "response": ""
+      },
+      {
+        "name": "clean",
+        "param": "taskid",
+        "optional": "",
+        "response": ""
+      }
+    ]
+  },
+  "SYNO.FileStation.CreateFolder" :
+  {
+    "maxVersion" : 2,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "create",
+        "param": "folder_path:name",
+        "optional": "",
+        "response": "folders"
+      }
+    ]
+  },
+  "SYNO.FileStation.Upload" :
+  {
+    "maxVersion" : 3,
+    "minVersion" : 2,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "upload",
+        "param": "path:create_parents:filename",
+        "optional": "overwrite",
+        "response": ""
+      }
+    ]
+  },
+  "SYNO.FileStation.Download" :
+  {
+    "maxVersion" : 2,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "download",
+        "param": "path:mode",
+        "optional": "",
+        "response": ""
+      }
+    ]
+  },
+  "SYNO.FileStation.Delete" :
+  {
+    "maxVersion" : 2,
+    "minVersion" : 1,
+    "path" : "entry.cgi",
+    "requestFormat" : "JSON",
+    "method": [
+      {
+        "name": "start",
+        "param": "path",
+        "optional": "recursive",
+        "response": "taskid"
+      },
+      {
+        "name": "status",
+        "param": "taskid",
+        "optional": "",
+        "response": "progress:finished"
+      },
+      {
+        "name": "stop",
+        "param": "taskid",
+        "optional": "",
+        "response": ""
+      },
+      {
+        "name": "delete",
+        "param": "path",
+        "optional": "recursive",
+        "response": ""
       }
     ]
   }

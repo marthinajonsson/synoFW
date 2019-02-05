@@ -39,9 +39,9 @@ public:
     {
         std::cout << url << std::endl;
         std::cout << session << std::endl;
-        login(session, user, pwd);
-        send(url);
-        logoff(session);
+//        login(session, user, pwd);
+//        send(url);
+//        logoff(session);
     }
 };
 

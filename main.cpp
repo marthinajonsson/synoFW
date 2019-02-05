@@ -6,16 +6,21 @@
 #include <FileStationAPI.h>
 #include <VideoStationAPI.h>
 #include <ErrorCodes.h>
+#include "Utilities.h"
 
 void printOptions() {
 
-    std::cout << "info" << std::endl;
-    std::cout << "library" << std::endl;
-    std::cout << "movie" << std::endl;
-    std::cout << "tvshow" << std::endl;
-    std::cout << "folder" << std::endl;
-    std::cout << "*metadata TBD.." << std::endl;
-    std::cout << "file" << std::endl;
+    std::cout << bold_on << "VIDEO STATION" << bold_off << std::endl;
+    std::cout << "vs:info" << "-- get info" << std::endl;
+    std::cout << "vs:library" << "-- list all libraries" << std::endl;
+    std::cout << "vs:movie" << std::endl;
+    std::cout << "vs:tvshow" << std::endl;
+    std::cout << "vs:folder" << std::endl;
+    std::cout << "*vs:metadata TBD.." << std::endl;
+
+    std::cout << bold_on << "FILE STATION" << bold_off << std::endl;
+    std::cout << "fs:info" << "-- get info" << std::endl;
+    std::cout << "fs:list" << "-- list shared folders" << std::endl;
 }
 
 
@@ -40,29 +45,30 @@ int process(std::string &parsed)
 
 int main(int argc, char* argv []) {
 
-    std::string parsed;
-    int result = process(parsed);
+    std::string input;
+    int result = process(input);
 
     if(result == -1) {
         return result;
     }
 
-    if(parsed.find("file") != std::string::npos) {
+    auto parsed = split(input, ':');
+    auto app = parsed.front();
+    app = "vs";
+    pop_front(parsed);
+    input = parsed.front();
+    if(app.find("fs") != std::string::npos) {
         FileStationAPI fs;
-        fs.makeRequest(parsed);
+        fs.makeRequest(input);
+    }
+    else if(app.find("vs") != std::string::npos) {
+        VideoStationAPI vs;
+        std::string test = "info";
+        vs.makeRequest(test);
     }
     else {
-        VideoStationAPI vs;
-        vs.makeRequest(parsed);
+        printOptions();
     }
-    //
-//    FileStationAPI fs;
-//
-//    std::string url =
-//            "http://192.168.0.107:5000//webapi/entry.cgi?api=SYNO.FileStation.Search&version=2&method=start&folder_path=//video&_sid=";
-//
-//    RequestHandler::getInstance().make(url);
-
 
     return 0;
 }

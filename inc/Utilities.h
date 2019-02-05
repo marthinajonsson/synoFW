@@ -20,6 +20,16 @@ enum FS_methods {
     Upload
 };
 
+static std::ostream& bold_on(std::ostream& os)
+{
+    return os << "\e[1m";
+}
+
+static std::ostream& bold_off(std::ostream& os)
+{
+    return os << "\e[0m";
+}
+
 static void removeEndOfLines(std::string &str) {
     std::string::size_type pos = 0;
     while ( ( pos = str.find ("\n",pos) ) != std::string::npos )

@@ -34,7 +34,7 @@ std::string VideoStationAPI::loadAPI(std::string &api) {
 
 }
 
-std::string VideoStationAPI::loadMethod(std::string& api)
+std::string VideoStationAPI::loadMethod(std::string& api, int& val)
 {
     Json::Value root;
 
@@ -42,11 +42,20 @@ std::string VideoStationAPI::loadMethod(std::string& api)
     json >> root;
     json.close();
 
-    auto method = root[api]["method"][0]["name"];
+    int i = 0;
+    for (Json::Value::const_iterator its=root[api]["method"][0].begin(); its!=root[api]["method"][0].end(); ++its) {
+        auto test = *its;
+        test["name"];
+        auto key = its.key().asString();
+        std::cout << i << ": " << "hej" << std::endl;
+    }
+    std::cout << "Choose method: ";
+    std::cin >> val;
+    auto method = root[api]["method"][val]["name"];
     return method.asString();
 }
 
-std::string VideoStationAPI::loadParams(std::string &api, std::string &method) {
+std::string VideoStationAPI::loadParams(std::string &api, int &val) {
 
     Json::Value root;
 
@@ -54,8 +63,9 @@ std::string VideoStationAPI::loadParams(std::string &api, std::string &method) {
     json >> root;
     json.close();
 
-    auto params = root[api]["method"][0]["param"];
-    return params.asString();
+    auto params = root[api]["method"][val]["param"];
+    auto optional = root[api]["method"][val]["optional"];
+    return params.asString() + ":" + optional.asString();
 }
 
 std::string VideoStationAPI::loadPath(std::string& api) {
@@ -116,7 +126,8 @@ void VideoStationAPI::makeRequest(std::string& parsed)
      * info, folder, movie, tvshow, library
      * */
     auto API = loadAPI(parsed);
-    auto method = loadMethod(API);
+    int index = 0;
+    auto method = loadMethod(API, index);
     /*
      * get, list
      * */
@@ -126,7 +137,7 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     requestUrl+="?api="+API;
 
     auto version = loadVersion(API);
-    auto params = loadParams(API, method);
+    auto params = loadParams(API, index);
     requestUrl+="&version="+version;
     requestUrl+="&method="+method;
     auto compiledParam = paramParser(params);
