@@ -4605,47 +4605,5 @@
 		"minVersion" : 1,
 		"path" : "entry.cgi",
 		"requestFormat" : "JSON"
-	},
-	"SYNO.WebStation.Default" : 
-	{
-		"maxVersion" : 1,
-		"minVersion" : 1,
-		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
-	},
-	"SYNO.WebStation.HTTP.VHost" : 
-	{
-		"maxVersion" : 1,
-		"minVersion" : 1,
-		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
-	},
-	"SYNO.WebStation.PHP" : 
-	{
-		"maxVersion" : 1,
-		"minVersion" : 1,
-		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
-	},
-	"SYNO.WebStation.PHP.Extension" : 
-	{
-		"maxVersion" : 1,
-		"minVersion" : 1,
-		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
-	},
-	"SYNO.WebStation.PHP.Profile" : 
-	{
-		"maxVersion" : 1,
-		"minVersion" : 1,
-		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
-	},
-	"SYNO.WebStation.Status" : 
-	{
-		"maxVersion" : 1,
-		"minVersion" : 1,
-		"path" : "entry.cgi",
-		"requestFormat" : "JSON"
 	}
 }

@@ -1,0 +1,139 @@
+{
+  "data": {
+    "object": [
+      {
+        "file_count": 16,
+        "id": "/volume1/video/film/Old/Hitchcock",
+        "path": "/volume1/video/film/Old/Hitchcock",
+        "sharepath": "/video/film/Old/Hitchcock",
+        "title": "Hitchcock",
+        "type": "folder"
+      },
+      {
+        "additional": {
+          "actor": [],
+          "director": [],
+          "extra": "",
+          "genre": [],
+          "metadata": {
+            "additional": {
+              "file": [
+                {
+                  "audio_bitrate": 95980,
+                  "audio_codec": "aac_lc",
+                  "channel": 2,
+                  "container_type": "mp4",
+                  "display_x": 1280,
+                  "display_y": 720,
+                  "duration": "1:26:42",
+                  "ff_video_profile": 100,
+                  "filesize": 681829239,
+                  "frame_bitrate": 1048419,
+                  "frame_rate_den": 1,
+                  "frame_rate_num": 25,
+                  "frequency": 48000,
+                  "id": 2275,
+                  "path": "/volume1/video/film/Old/Aladdin.1992.720p.BRrip.x264.GAZ.YIFY.mp4",
+                  "position": 0,
+                  "resolutionx": 1280,
+                  "resolutiony": 720,
+                  "rotation": 0,
+                  "video_bitrate": 948831,
+                  "video_codec": "h264",
+                  "video_level": 40,
+                  "video_profile": 3,
+                  "watched_ratio": 0
+                }
+              ],
+              "watched_ratio": 0
+            },
+            "certificate": "G",
+            "create_time": 1549534036,
+            "id": 1747,
+            "last_watched": 0,
+            "library_id": 0,
+            "mapper_id": 6172,
+            "original_available": "1992-11-08",
+            "rating": 80,
+            "sort_title": "Aladdin",
+            "tagline": "Wish granted! (DVD re-release)",
+            "title": "Aladdin"
+          },
+          "poster_mtime": "",
+          "summary": "",
+          "watched_ratio": 0,
+          "writer": []
+        },
+        "id": "2275",
+        "path": "/volume1/video/film/Old/Aladdin.1992.720p.BRrip.x264.GAZ.YIFY.mp4",
+        "sharepath": "/video/film/Old/Aladdin.1992.720p.BRrip.x264.GAZ.YIFY.mp4",
+        "title": "Aladdin.1992.720p.BRrip.x264.GAZ.YIFY.mp4",
+        "type": "file"
+      },
+      {
+        "additional": {
+          "actor": [],
+          "director": [],
+          "extra": "",
+          "genre": [],
+          "metadata": {
+            "additional": {
+              "file": [
+                {
+                  "audio_bitrate": 93952,
+                  "audio_codec": "aac_lc",
+                  "channel": 2,
+                  "container_type": "mp4",
+                  "display_x": 1424,
+                  "display_y": 1080,
+                  "duration": "1:15:16",
+                  "ff_video_profile": 100,
+                  "filesize": 1318423361,
+                  "frame_bitrate": 2335432,
+                  "frame_rate_den": 1001,
+                  "frame_rate_num": 24000,
+                  "frequency": 48000,
+                  "id": 2265,
+                  "path": "/volume1/video/film/Old/Alice.in.Wonderland.1951.1080p.BluRay.x264.YIFY.mp4",
+                  "position": 0,
+                  "resolutionx": 1424,
+                  "resolutiony": 1080,
+                  "rotation": 0,
+                  "video_bitrate": 2237406,
+                  "video_codec": "h264",
+                  "video_level": 41,
+                  "video_profile": 3,
+                  "watched_ratio": 0
+                }
+              ],
+              "watched_ratio": 0
+            },
+            "certificate": "Approved",
+            "create_time": 1549534027,
+            "id": 1734,
+            "last_watched": 0,
+            "library_id": 0,
+            "mapper_id": 6149,
+            "original_available": "1951-07-26",
+            "rating": 74,
+            "sort_title": "Alice in Wonderland",
+            "tagline": "A world of wonders in One Great Picture",
+            "title": "Alice in Wonderland"
+          },
+          "poster_mtime": "",
+          "summary": "",
+          "watched_ratio": 0,
+          "writer": []
+        },
+        "id": "2265",
+        "path": "/volume1/video/film/Old/Alice.in.Wonderland.1951.1080p.BluRay.x264.YIFY.mp4",
+        "sharepath": "/video/film/Old/Alice.in.Wonderland.1951.1080p.BluRay.x264.YIFY.mp4",
+        "title": "Alice.in.Wonderland.1951.1080p.BluRay.x264.YIFY.mp4",
+        "type": "file"
+      }
+    ],
+    "offset": 0,
+    "total": 45
+  },
+  "success": true
+}

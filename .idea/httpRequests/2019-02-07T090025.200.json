@@ -1,0 +1,10 @@
+{
+  "error": {
+    "code": 120,
+    "errors": {
+      "name": "path",
+      "reason": "type"
+    }
+  },
+  "success": false
+}

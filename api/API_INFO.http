@@ -6,7 +6,7 @@
 # * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
 
 ### Get API info
-GET http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all
+GET http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=SYNO.VideoStation2.Movie
 
 ### Login
 GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account=TestUser&passwd=xhfypf6C&session=FileStation&format=sid
@@ -26,24 +26,27 @@ GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method
 GET http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session=VideoStation
 
 ### Get VS INFO
-GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Info&version=2&method=get&_sid=Q7RTa.944Y99g1660NEN539702
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Info&version=2&method=get&_sid=m9rr8Pc8A0tbs1660NEN539702
 
 ### List VS Movie
-GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=8&library_id=0&_sid=hNqchTcUxU1xw1660NEN539702
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Movie&version=1&method=list&limit=1&library_id=0&_sid=m9rr8Pc8A0tbs1660NEN539702
 
 ### List VS TVShow
 GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.TVShow&version=1&method=list&limit=8&library_id=0&_sid=hNqchTcUxU1xw1660NEN539702
 
 ### List content in movie folders
-GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Folder&version=1&method=list&limit=10&library_id=0&type=movie&_sid=hNqchTcUxU1xw1660NEN539702
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Folder&version=1&method=list&limit=3&offset=0&path="/volume1/video/film/Old"&library_id=0&type=movie&_sid=m9rr8Pc8A0tbs1660NEN539702
 
 ### List content in tvshow folders
-GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Folder&version=1&method=list&limit=10&library_id=0&type=tvshow&_sid=hNqchTcUxU1xw1660NEN539702
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Folder&version=1&method=list&limit=10&library_id=0&type=tvshow&_sid=m9rr8Pc8A0tbs1660NEN539702
 
 ### List all libraries i.e. movie, tvshow, home video, recording
-GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Library&version=1&method=list&limit=5&_sid=hNqchTcUxU1xw1660NEN539702
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Library&version=1&method=list&limit=5&_sid=m9rr8Pc8A0tbs1660NEN539702
 
 ### List Metadata of movie
-GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Metadata&version=1&method=list&limit=2&library_id=0&category=imdb&type=movie&_sid=hNqchTcUxU1xw1660NEN539702
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Metadata&version=1&method=list&limit=2&library_id=0&type=movie&category=&_sid=m9rr8Pc8A0tbs1660NEN539702
+
+###
+GET http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.VideoStation2.Info&version=2&method=get&_sid=m9rr8Pc8A0tbs1660NEN539702
 
 ###
