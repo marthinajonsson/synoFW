@@ -8,7 +8,9 @@
     "method": [
       {
         "name": "get",
-        "param": ""
+        "param": "",
+        "optional": "",
+        "response": ""
       }
     ]
   },
@@ -21,7 +23,9 @@
     "method": [
       {
         "name": "list",
-        "param": "limit:library_id"
+        "param": "limit:library_id",
+        "optional": "",
+        "response": ""
       }
     ]
   },
@@ -34,7 +38,9 @@
     "method": [
       {
         "name": "list",
-        "param": "limit:library_id"
+        "param": "limit:library_id",
+        "optional": "",
+        "response": ""
       }
     ]
   },
@@ -47,7 +53,9 @@
     "method": [
       {
         "name": "list",
-        "param": "limit:library_id:type"
+        "param": "limit:library_id:type",
+        "optional": "offset:path",
+        "response": ""
       }
     ]
   },
@@ -60,7 +68,9 @@
     "method": [
       {
         "name": "list",
-        "param": "limit"
+        "param": "limit",
+        "optional": "",
+        "response": ""
       }
     ]
   }
