@@ -87,5 +87,4 @@ template<typename T> map_init_helper<T> map_init(T& item)
     return map_init_helper<T>(item);
 }
 
-
 #endif //SYNOFW_UTILITIES_H
