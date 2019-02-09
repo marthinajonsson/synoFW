@@ -54,7 +54,6 @@ int main(int argc, char* argv []) {
 
     auto parsed = split(input, ':');
     auto app = parsed.front();
-    app = "vs";
     pop_front(parsed);
     input = parsed.front();
     if(app.find("fs") != std::string::npos) {
@@ -63,8 +62,7 @@ int main(int argc, char* argv []) {
     }
     else if(app.find("vs") != std::string::npos) {
         VideoStationAPI vs;
-        std::string test = "info";
-        vs.makeRequest(test);
+        vs.makeRequest(input);
     }
     else {
         printOptions();

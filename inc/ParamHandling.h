@@ -5,7 +5,7 @@
 #ifndef SYNOFW_PARAMHANDLING_H
 #define SYNOFW_PARAMHANDLING_H
 
-
+#include <algorithm>
 #include <string>
 
 class ParamHandling {
@@ -14,7 +14,10 @@ public:
 
 
 
-    std::string getPath(std::string& pattern) {
+    std::string getPath(std::string& pattern)
+    {
+
+        std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
 
         if (pattern.find("old") != std::string::npos) {
             return "/volume1/video/film/Old";

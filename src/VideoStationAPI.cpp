@@ -10,7 +10,10 @@
 #include <algorithm>
 
 #include "VideoStationAPI.h"
+#include "ParamHandling.h"
 #include "Utilities.h"
+#include "ErrorCodes.h"
+
 
 std::string VideoStationAPI::loadAPI(std::string &api) {
 
@@ -30,7 +33,7 @@ std::string VideoStationAPI::loadAPI(std::string &api) {
             return API;
         }
     }
-    return "NO_API_FOUND";
+    throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_API_DOES_NOT_EXISTS, "No API found");
 
 }
 
@@ -43,16 +46,21 @@ std::string VideoStationAPI::loadMethod(std::string& api, int& val)
     json.close();
 
     int i = 0;
-    for (Json::Value::const_iterator its=root[api]["method"][0].begin(); its!=root[api]["method"][0].end(); ++its) {
-        auto test = *its;
-        test["name"];
-        auto key = its.key().asString();
-        std::cout << i << ": " << "hej" << std::endl;
+    Json::Value method = root[api]["method"];
+    for (Json::Value::const_iterator its=method.begin(); its!=method.end(); ++its) {
+        auto object = *its;
+        auto nameObj = object["name"];
+        auto nameStr = nameObj.asString();
+        std::cout << i << ": " << nameStr << std::endl;
+        i++;
     }
     std::cout << "Choose method: ";
     std::cin >> val;
-    auto method = root[api]["method"][val]["name"];
-    return method.asString();
+    auto result = method[val]["name"].asString();
+    if(result.empty()) {
+        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
+    }
+    return result;
 }
 
 std::string VideoStationAPI::loadParams(std::string &api, int &val) {
@@ -65,7 +73,11 @@ std::string VideoStationAPI::loadParams(std::string &api, int &val) {
 
     auto params = root[api]["method"][val]["param"];
     auto optional = root[api]["method"][val]["optional"];
-    return params.asString() + ":" + optional.asString();
+    auto result = params.asString() + ":" + optional.asString();
+    if(result.empty()) {
+        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter of API method");
+    }
+    return result;
 }
 
 std::string VideoStationAPI::loadPath(std::string& api) {
@@ -76,7 +88,11 @@ std::string VideoStationAPI::loadPath(std::string& api) {
     json.close();
 
     auto params = root[api]["path"];
-    return params.asString();
+    auto result = params.asString();
+    if(result.empty()) {
+        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter API path");
+    }
+    return result;
 }
 
 std::string VideoStationAPI::loadVersion(std::string& api) {
@@ -87,18 +103,33 @@ std::string VideoStationAPI::loadVersion(std::string& api) {
     json.close();
 
     auto params = root[api]["maxVersion"];
-    return params.asString();
+    auto result = params.asString();
+    if(result.empty()) {
+        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter Version for this API");
+    }
+    return result;
 }
 
-std::string VideoStationAPI::paramParser(std::string& params) {
-    std::vector<std::string> paramVec = split(params, ':');
+std::string VideoStationAPI::loadResponse(std::string &api, int &val) {
+    return "";
+}
 
+std::vector<std::string> VideoStationAPI::respParser(std::string &, std::string &) {
+
+    return {""};
+}
+
+std::string VideoStationAPI::paramParser(std::string &api, std::string& params) {
+
+    std::vector<std::string> paramVec = split(params, ':');
     std::string fullParamStr;
 
     for(const std::string &s:paramVec) {
-        fullParamStr += "&";
-        fullParamStr += s;
-        fullParamStr += "=";
+        if(!s.empty()) {
+            fullParamStr += "&";
+            fullParamStr += s;
+            fullParamStr += "=";
+        }
         if(s == "limit") {
             int val;
             std::cout << "Set limit (int): " << std::endl;
@@ -115,6 +146,29 @@ std::string VideoStationAPI::paramParser(std::string& params) {
         }
         else if(s == "library_id") {
             fullParamStr+="0";
+        }
+        else if(s == "sort_by") {
+            fullParamStr+="name";
+        }
+        else if(s == "offset") {
+            int val;
+            std::cout << "Set offset (int): " << std::endl;
+            std::cin >> val;
+            std::cout << "Offset set to: " << val << std::endl;
+            if(!val) {
+                val = 0;
+            }
+            auto valStr = std::to_string(val);
+            fullParamStr+=valStr;
+        }
+        else if(s == "path") {
+            std::string val;
+            std::cout << "Choose path" << std::endl;
+            std::cin >> val;
+            ParamHandling param;
+            std::string path = param.getPath(val);
+            std::cout << "Path set to: " << path << std::endl;
+            fullParamStr+=path;
         }
     }
     return fullParamStr;
@@ -140,7 +194,7 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     auto params = loadParams(API, index);
     requestUrl+="&version="+version;
     requestUrl+="&method="+method;
-    auto compiledParam = paramParser(params);
+    auto compiledParam = paramParser(API, params);
     requestUrl+=compiledParam;
     requestUrl+="&_sid=";
     removeEndOfLines(requestUrl);

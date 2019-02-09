@@ -24,7 +24,7 @@
       {
         "name": "list",
         "param": "limit:library_id",
-        "optional": "",
+        "optional": "offset:sort_by",
         "response": ""
       }
     ]
@@ -39,7 +39,7 @@
       {
         "name": "list",
         "param": "limit:library_id",
-        "optional": "",
+        "optional": "offset:sort_by",
         "response": ""
       }
     ]
@@ -69,7 +69,19 @@
       {
         "name": "list",
         "param": "limit",
-        "optional": "",
+        "optional": "offset:sort_by",
+        "response": ""
+      },
+      {
+        "name": "test",
+        "param": "limit",
+        "optional": "offset:sort_by",
+        "response": ""
+      },
+      {
+        "name": "test2",
+        "param": "limit",
+        "optional": "offset:sort_by",
         "response": ""
       }
     ]

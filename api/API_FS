@@ -24,8 +24,14 @@
       {
         "name": "list_share",
         "param": "",
-        "optional": "",
-        "response": ""
+        "optional": "offset:limit:sort_by",
+        "response": "total:offset:shares"
+      },
+      {
+        "name": "list",
+        "param": "folder_path",
+        "optional": "offset:limit:sort_by:pattern:filetype",
+        "response": "total:offset:files"
       }
     ]
   },
@@ -38,14 +44,14 @@
       {
         "name": "start",
         "param": "folder_path",
-        "optional": "pattern:extension:",
+        "optional": "pattern:extension:filetype",
         "response": "taskid"
       },
       {
         "name": "list",
         "param" : "taskid",
-        "optional": "sort_by:pattern",
-        "response": "files"
+        "optional": "offset:limit:sort_by:pattern:filetype",
+        "response": "total:offset:finished:files"
       },
       {
         "name" : "stop",
@@ -116,14 +122,14 @@
       {
         "name": "start",
         "param": "path",
-        "optional": "recursive",
+        "optional": "recursive:search_taskid",
         "response": "taskid"
       },
       {
         "name": "status",
         "param": "taskid",
         "optional": "",
-        "response": "progress:finished"
+        "response": "path:procressing_path:progress:finished:total"
       },
       {
         "name": "stop",
@@ -134,7 +140,7 @@
       {
         "name": "delete",
         "param": "path",
-        "optional": "recursive",
+        "optional": "recursive:search_taskid",
         "response": ""
       }
     ]

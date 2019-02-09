@@ -5,17 +5,19 @@
 #ifndef SYNOFW_ERRORCODES_H
 #define SYNOFW_ERRORCODES_H
 
+
+#include <algorithm>
+#include <json/json.h>
+#include <iostream>
 #include <vector>
 #include <string>
-#include <map>
 #include <mutex>
-#include <algorithm>
+#include <map>
 
 #include <Utilities.h>
 
 
-namespace ERROR {
-
+namespace GENERIC {
 
     static int ERROR_CODE_UNKNOWN_ERROR = 100;
     static int ERROR_CODE_NO_PARAMETER = 101;
@@ -39,8 +41,20 @@ namespace ERROR {
     public:
         std::string code;
         BadRequestException() :  code(std::to_string(ERROR_CODE_NO_PARAMETER)), std::logic_error("No parameter of API, method or version - " + code) { };
-        BadRequestException(int error, std::string &desc) :  code(std::to_string(error)), std::logic_error(desc + " - " + code) { };
+        BadRequestException(int &error, std::string &&desc) :  code(std::to_string(error)), std::logic_error(desc + " - " + code) { };
     };
 
+    static void printError(Json::Value &response) {
+
+        int code = response["error"]["code"].asInt();
+        std::cout << "Request failed - " << code;
+        auto errArray = response["error"]["errors"];
+        for(auto a : errArray) {
+            for (Json::Value::const_iterator it=a.begin(); it!=a.end(); ++it) {
+                auto fault = it->asString();
+                std::cout << "\n" << fault << std::endl;
+            }
+        }
+    }
 }
 #endif //SYNOFW_ERRORCODES_H

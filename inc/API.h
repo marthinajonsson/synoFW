@@ -21,7 +21,9 @@ public:
     virtual std::string loadPath(std::string&) = 0;
     virtual std::string loadVersion(std::string&) = 0;
     virtual std::string loadParams(std::string&, int&) = 0;
-
+    virtual std::string loadResponse(std::string&, int&) = 0;
+    virtual std::string paramParser(std::string &,std::string&) = 0;
+    virtual std::vector<std::string> respParser(std::string &,std::string&) = 0;
     virtual void makeRequest(std::string&) = 0;
 
 protected:
