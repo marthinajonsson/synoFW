@@ -44,6 +44,12 @@ namespace GENERIC {
         BadRequestException(int &error, std::string &&desc) :  code(std::to_string(error)), std::logic_error(desc + " - " + code) { };
     };
 
+    class UnhandledRequestException : public std::logic_error
+    {
+    public:
+        UnhandledRequestException() : std::logic_error("Unexpected error during request") {}
+    };
+
     static void printError(Json::Value &response) {
 
         int code = response["error"]["code"].asInt();

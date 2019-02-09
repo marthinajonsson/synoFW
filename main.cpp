@@ -20,7 +20,7 @@ void printOptions() {
 
     std::cout << bold_on << "FILE STATION" << bold_off << std::endl;
     std::cout << "fs:info" << "-- get info" << std::endl;
-    std::cout << "fs:list" << "-- list shared folders" << std::endl;
+    std::cout << "fs:list" << "-- list shared folders or files" << std::endl;
 }
 
 
@@ -56,6 +56,7 @@ int main(int argc, char* argv []) {
     auto app = parsed.front();
     pop_front(parsed);
     input = parsed.front();
+
     if(app.find("fs") != std::string::npos) {
         FileStationAPI fs;
         fs.makeRequest(input);

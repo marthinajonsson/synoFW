@@ -38,7 +38,9 @@ std::string FileStationAPI::loadMethod(std::string& api, int&val)
     json.close();
 
     int i = 0;
+    val = 0;
     Json::Value method = root[api]["method"];
+
     for (Json::Value::const_iterator its=method.begin(); its!=method.end(); ++its) {
         auto object = *its;
         auto nameObj = object["name"];
@@ -46,8 +48,13 @@ std::string FileStationAPI::loadMethod(std::string& api, int&val)
         std::cout << i << ": " << nameStr << std::endl;
         i++;
     }
-    std::cout << "Choose method: ";
-    std::cin >> val;
+
+    if(method.size() == 1) {
+        std::cout << "Method chosen: " << method[val]["name"].asString() << std::endl;
+    }else {
+        std::cout << "Choose method: ";
+        std::cin >> val;
+    }
     auto result = method[val]["name"].asString();
     if(result.empty()) {
         throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
@@ -114,7 +121,7 @@ std::string FileStationAPI::loadResponse(std::string &api, int &val) {
     return result;
 }
 
-std::vector<std::string> FileStationAPI::respParser(std::string &api, std::string &response) {
+std::vector<std::string> FileStationAPI::respParser(Json::Value &respData, std::string &api, std::string &response) {
 
     std::vector<std::string> respVec = split(response, ':');
     std::string fullRespStr;
@@ -122,36 +129,57 @@ std::vector<std::string> FileStationAPI::respParser(std::string &api, std::strin
 
     for(const std::string &s:respVec)
     {
-        if(!s.empty()) {
-            fullRespStr += "&";
-            fullRespStr += s;
-            fullRespStr += "=";
-        }
-
-        if(s == "total") {
-        }else if(s == "offset"){
-
-        }else if(s == "shares"){
-        }
-        else if(s == "files"){
-        }
-        else if(s == "finished"){
-        }
-        else if(s == "progress"){
-        }
-        else if(s == "taskid"){
+        if(s == "taskid"){
             if(api.find("Search")) {
                 search_id = s;
             }else if(api.find("Delete")) {
                 delete_id = s;
             }
         }
-        else if(s == "folders"){
+        else if(s == "total" || s == "offset" || s == "finished" || s == "progress" ||
+        s == "processing_path" || s == "path")
+        {
+            try {
+                std::cout << s << " : " << respData["data"][s].asString() << std::endl;
+            }
+            catch (Json::Exception &ex) {
+                std::cerr << "Printing string" << ex.what() << std::endl;
+            }
         }
-        else if(s == "path") {
+        else if(s == "shares" || s == "folders")
+        {
+            try {
+                std::cout << s << " : {\n"  << respData["data"][s] << "\n}" << std::endl;
+            }
+            catch (Json::Exception &ex) {
+                std::cerr << "Printing object" << ex.what() << std::endl;
+            }
         }
-        else if(s == "processing_path"){
+        else if(s == "files")
+        {
+            try {
+                std::cout << s << " : {\n";
+                for (Json::Value::const_iterator its=respData["data"][s].begin(); its!=respData["data"][s].end(); ++its) {
+                    auto object = *its;
+                    auto nameObj = object["name"];
+                    auto nameStr = nameObj.asString();
+                    auto found = nameStr.find("vsmeta");
+                    if(found != std::string::npos) {
+                        continue;
+                    }
+                    found = nameStr.find(".srt");
+                    if(found != std::string::npos){
+                        continue;
+                    }
+                    std::cout << "\t" << nameStr << "\n" << std::endl;
+                }
+                std::cout << " \n}";
+            }
+            catch (Json::Exception &ex) {
+                std::cerr << "Printing object" << ex.what() << std::endl;
+            }
         }
+
     }
     return {""};
 }
@@ -162,14 +190,16 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
     std::string fullParamStr;
 
     for(const std::string &s:paramVec) {
-        if(!s.empty()) {
-            fullParamStr += "&";
-            fullParamStr += s;
-            fullParamStr += "=";
+        if(s.empty()) {
+            continue;
         }
+        fullParamStr += "&";
+        fullParamStr += s;
+        fullParamStr += "=";
+
         if(s == "limit") {
             int val;
-            std::cout << "Set limit (int): " << std::endl;
+            std::cout << "Set limit (int): ";
             std::cin >> val;
             std::cout << "Limit set to: " << val << std::endl;
             auto valStr = std::to_string(val);
@@ -180,7 +210,7 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
         }
         else if(s == "offset") {
             int val;
-            std::cout << "Set offset (int): " << std::endl;
+            std::cout << "Set offset (int): ";
             std::cin >> val;
             std::cout << "Offset set to: " << val << std::endl;
             if(!val) {
@@ -189,94 +219,106 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
             auto valStr = std::to_string(val);
             fullParamStr+=valStr;
         }
-        else if(s == "path" || s == "folder_path") {
+        else if(s == "path") {
             std::string val;
-            std::cout << "Choose path" << std::endl;
+            std::cout << "Choose path: ";
             std::cin >> val;
             ParamHandling param;
             std::string path = param.getPath(val);
             std::cout << "Path set to: " << path << std::endl;
             fullParamStr+=path;
         }
-        else if(s == "pattern"){
+        else if(s == "folder_path") {
             std::string val;
-            std::cout << "Choose pattern" << std::endl;
+            ParamHandling param;
+            std::cout << "Choose folder path: ";
             std::cin >> val;
+            auto result = param.getPathFolder(val);
+            fullParamStr+=result;
+        }
+        else if(s == "pattern"){
+            std::string extensions = ".mp4, .mkv, .avi";
+            std::string val;
+            std::cout << "Filter by pattern: ";
+            std::getline(std::cin, val);
             if(!val.empty()) {
-                fullParamStr+=val;
+                val+=","+extensions;
             }
-            else {
-                fullParamStr+="*";
+            else{
+                val = extensions;
             }
+            std::cout << "Pattern set: " << val << std::endl;
+            fullParamStr+=val;
         }
         else if(s == "filetype"){
             std::string val;
-            std::cout << "Choose file/dir/all(default)" << std::endl;
+            std::cout << "Choose file/dir/all: ";
             std::cin >> val;
-            if(!val.empty()) {
-                fullParamStr+=val;
-            }
-            else {
-                fullParamStr+="all";
-            }
+            fullParamStr+=val;
+            std::cout << "Filetype set" << std::endl;
         }
         else if(s == "extension") {
             std::string val;
-            std::cout << "Choose file extension" << std::endl;
-            std::cin >> val;
+            std::cout << "Choose file extension: ";
+            std::getline(std::cin, val);
             if(!val.empty()) {
                 fullParamStr+=val;
             }
             else {
                 fullParamStr+="*";
             }
+            std::cout << "Extension set" << std::endl;
         }
         else if(s == "filename") {
             std::string val;
-            std::cout << "Choose filename" << std::endl;
-            std::cin >> val;
+            std::cout << "Choose filename: ";
+            std::getline(std::cin, val);
             if(!val.empty()) {
                 fullParamStr+=val;
             }
             else {
                 throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "File name is required for this operation");
             }
+            std::cout << "\nFilename set" << std::endl;
         }
         else if(s == "name") {
             std::string val;
-            std::cout << "Choose name for folder, default NewFolder" << std::endl;
-            std::cin >> val;
+            std::cout << "Choose name for folder, default NewFolder: ";
+            std::getline(std::cin, val);
             if(!val.empty()) {
                 fullParamStr+=val;
             }
             else {
                 fullParamStr+="NewFolder";
             }
+            std::cout << "\nFolder name set" << std::endl;
         }
         else if(s == "create_parents"){
             fullParamStr+="true";
         }
         else if(s == "overwrite"){
             std::string val;
-            std::cout << "Overwrite? true(default)/false" << std::endl;
-            std::cin >> val;
+            std::cout << "Overwrite? true(default)/false: ";
+            std::getline(std::cin, val);
             if(!val.empty()) {
                 fullParamStr+=val;
             }
             else {
                 fullParamStr+="true";
             }
+            std::cout << "\n";
         }
         else if(s == "mode") {
             std::string val;
-            std::cout << "Open in browser? y/n" << std::endl;
-            std::cin >> val;
+            std::cout << "Open in browser? y/n: ";
+            std::getline(std::cin, val);
             if(val == "y") {
                 fullParamStr+="open";
             }
             else {
                 fullParamStr+="download";
             }
+            std::cout << "\nMode set" << std::endl;
         }
         else if(s == "recursive") {
             fullParamStr+="true";
@@ -318,7 +360,13 @@ void FileStationAPI::makeRequest(std::string& parsed) {
     auto compiledParam = paramParser(API, params);
     requestUrl+=compiledParam;
     requestUrl+="&_sid=";
+
     removeEndOfLines(requestUrl);
+#if DEBUG
     std::cout << requestUrl << std::endl;
-    RequestHandler::getInstance().make(requestUrl, "FileStation", info_s.username, info_s.password);
+#endif
+    auto responseObject = RequestHandler::getInstance().make(requestUrl, "FileStation", info_s.username, info_s.password);
+    std::string responses = loadResponse(API, index);
+    respParser(responseObject, API, responses);
 }
+

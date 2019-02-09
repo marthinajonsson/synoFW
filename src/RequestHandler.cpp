@@ -84,8 +84,6 @@ void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string
     Json::CharReader * reader = builder.newCharReader();
     std::string errors;
 
-    std::cout << httpCode << "\n";
-
     bool result = reader->parse(httpData.get()->c_str(), httpData->end().base(), &jsonData, &errors);
 
     delete reader;
@@ -137,49 +135,30 @@ void RequestHandler::logoff(const std::string &session) {
     }
 }
 
-void RequestHandler::send(std::string &url) {
+Json::Value RequestHandler::send(std::string &url) {
 
     Json::Value jsonData;
 
-    if(sid == "undef" || sid.find("null")) {
-        return;
+    try {
+       if(sid == "undef" || sid.length() < 5) {
+           throw GENERIC::UnhandledRequestException();
+       }
+    }
+    catch (GENERIC::UnhandledRequestException &ex) {
+        std::cerr << ex.what() << std::endl;
+        jsonData["success"] = "false";
+        return jsonData;
     }
 
     url+=sid;
     removeEndOfLines(url);
-    std::cout << url << std::endl;
+    std::cout << "Sending HTTP request to URL: " << url << std::endl;
     sendHttpGetRequest(jsonData, url);
-    std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
+
+    std::ofstream db_write("../api/RequestResponse.json", std::ios::trunc);
     db_write << jsonData;
     db_write.close();
-//    if(!jsonData["success"].asBool()) {
-//        std::cout << "Request failed" << std::endl;
-//    }
 
-//    if(!jsonData["success"].asBool()) {
-//        int err = jsonData["error"]["code"].asInt();
-//        std::string desc;
-//        ERROR::get(err, desc);
-//        std::cout << "Request failed" << " - " << err << " - " << desc << std::endl;
-//    }else {
-//        std::ofstream db_write("../api/API_VideoStation.json", std::ios::trunc);
-//
-//        //   std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
-//        db_write << jsonData;
-//        db_write.close();
-//        for (Json::Value::const_iterator it=jsonData["data"].begin(); it!=jsonData["data"].end(); ++it)
-//        {
-//            if(it.key().type() == Json::stringValue){
-//                std::cout << it.key().asString() << ":" << *it << std::endl;
-//
-//            }
-//            for(Json::Value::const_iterator it2 = it->begin(); it2 != it->end(); it2++)
-//            {
-//
-//                std::cout << it2.key().asString() << ":" << *it2 << std::endl;
-//
-//            }
-//        }
-    //}
+    return jsonData;
 }
 

@@ -30,7 +30,7 @@ public:
     std::string loadVersion(std::string&) override;
     std::string loadResponse(std::string&, int&) override;
     std::string paramParser(std::string &,std::string&) override;
-    std::vector<std::string> respParser(std::string &,std::string&) override;
+    std::vector<std::string> respParser(Json::Value &, std::string &,std::string&) override;
 private:
     std::string requestUrl;
 };

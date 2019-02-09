@@ -114,7 +114,7 @@ std::string VideoStationAPI::loadResponse(std::string &api, int &val) {
     return "";
 }
 
-std::vector<std::string> VideoStationAPI::respParser(std::string &, std::string &) {
+std::vector<std::string> VideoStationAPI::respParser(Json::Value &respData, std::string &, std::string &) {
 
     return {""};
 }
@@ -198,6 +198,7 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     requestUrl+=compiledParam;
     requestUrl+="&_sid=";
     removeEndOfLines(requestUrl);
+
     std::cout << requestUrl << std::endl;
     RequestHandler::getInstance().make(requestUrl, "VideoStation", info_s.username, info_s.password);
 }

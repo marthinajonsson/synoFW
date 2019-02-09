@@ -12,13 +12,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="76fda5e7-d290-44c9-bf14-ff09eeb7e78c" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/api/API_FS" beforeDir="false" afterPath="$PROJECT_DIR$/api/API_FS" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api/API_VS" beforeDir="false" afterPath="$PROJECT_DIR$/api/API_VS" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api/API_VideoStation.json" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/inc/API.h" beforeDir="false" afterPath="$PROJECT_DIR$/inc/API.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inc/ErrorCodes.h" beforeDir="false" afterPath="$PROJECT_DIR$/inc/ErrorCodes.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inc/FileStationAPI.h" beforeDir="false" afterPath="$PROJECT_DIR$/inc/FileStationAPI.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inc/ParamHandling.h" beforeDir="false" afterPath="$PROJECT_DIR$/inc/ParamHandling.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/inc/Utilities.h" beforeDir="false" afterPath="$PROJECT_DIR$/inc/Utilities.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/inc/RequestHandler.h" beforeDir="false" afterPath="$PROJECT_DIR$/inc/RequestHandler.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/inc/VideoStationAPI.h" beforeDir="false" afterPath="$PROJECT_DIR$/inc/VideoStationAPI.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/FileStationAPI.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/FileStationAPI.cpp" afterDir="false" />
@@ -52,12 +52,15 @@
     <session id="719927295">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="21" />
+          <entry key="project.closed" value="25" />
           <entry key="project.open.time.11" value="2" />
           <entry key="project.open.time.147" value="1" />
+          <entry key="project.open.time.16" value="1" />
+          <entry key="project.open.time.17" value="1" />
+          <entry key="project.open.time.18" value="1" />
           <entry key="project.open.time.19" value="1" />
           <entry key="project.open.time.2" value="1" />
-          <entry key="project.open.time.22" value="1" />
+          <entry key="project.open.time.22" value="2" />
           <entry key="project.open.time.29" value="1" />
           <entry key="project.open.time.30" value="1" />
           <entry key="project.open.time.31" value="2" />
@@ -73,7 +76,7 @@
           <entry key="project.open.time.78" value="1" />
           <entry key="project.open.time.89" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="22" />
+          <entry key="project.opened" value="26" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -81,32 +84,32 @@
           <entry key="API_FS" value="8" />
           <entry key="API_FileStation" value="1" />
           <entry key="API_VS" value="10" />
-          <entry key="cpp" value="56" />
-          <entry key="h" value="81" />
+          <entry key="cpp" value="60" />
+          <entry key="h" value="90" />
           <entry key="http" value="7" />
-          <entry key="iostream" value="1" />
-          <entry key="json" value="29" />
+          <entry key="iostream" value="2" />
+          <entry key="json" value="31" />
           <entry key="synoFW (disassembly)" value="19" />
-          <entry key="txt" value="6" />
+          <entry key="txt" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="CMakeLists.txt" value="6" />
+          <entry key="CMakeLists.txt" value="7" />
           <entry key="Disassembly" value="19" />
           <entry key="HTTP Request" value="7" />
-          <entry key="JSON" value="29" />
+          <entry key="JSON" value="31" />
           <entry key="JSON5" value="17" />
-          <entry key="ObjectiveC" value="138" />
+          <entry key="ObjectiveC" value="152" />
           <entry key="PLAIN_TEXT" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="API_FS" value="603" />
+          <entry key="API_FS" value="621" />
           <entry key="API_VS" value="106" />
-          <entry key="cpp" value="9943" />
-          <entry key="h" value="7202" />
+          <entry key="cpp" value="11786" />
+          <entry key="h" value="7535" />
           <entry key="http" value="1546" />
           <entry key="json" value="357" />
           <entry key="txt" value="98" />
@@ -117,8 +120,8 @@
           <entry key="CMakeLists.txt" value="98" />
           <entry key="HTTP Request" value="1546" />
           <entry key="JSON" value="169" />
-          <entry key="JSON5" value="697" />
-          <entry key="ObjectiveC" value="17145" />
+          <entry key="JSON5" value="715" />
+          <entry key="ObjectiveC" value="19321" />
           <entry key="PLAIN_TEXT" value="188" />
           <entry key="UNKNOWN" value="12" />
         </counts>
@@ -128,61 +131,87 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/api/API_INFO.http">
+        <entry file="file://$PROJECT_DIR$/src/FileStationAPI.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="105">
-              <caret line="28" column="48" lean-forward="true" selection-start-line="28" selection-start-column="48" selection-end-line="28" selection-end-column="48" />
+            <state relative-caret-position="315">
+              <caret line="182" column="5" lean-forward="true" selection-start-line="182" selection-start-column="5" selection-end-line="182" selection-end-column="5" />
+              <folding>
+                <element signature="e#42#61#0" expanded="true" />
+                <element signature="e#9759#9796#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/FileStationAPI.cpp">
+        <entry file="file://$PROJECT_DIR$/inc/Utilities.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="343">
-              <caret line="317" column="40" selection-start-line="317" selection-start-column="40" selection-end-line="317" selection-end-column="40" />
+            <state relative-caret-position="269">
+              <caret line="30" column="5" lean-forward="true" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/inc/ParamHandling.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <caret lean-forward="true" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/inc/RequestHandler.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="291">
+              <caret line="38" column="5" selection-start-line="38" selection-start-column="5" selection-end-line="38" selection-end-column="5" />
               <folding>
-                <element signature="e#42#61#0" expanded="true" />
+                <element signature="e#107#129#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/RequestHandler.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="237">
+              <caret line="105" lean-forward="true" selection-start-line="105" selection-end-line="105" />
+              <folding>
+                <element signature="e#43#70#0" expanded="true" />
+                <marker date="1549736093373" expanded="true" signature="4334:4352" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/inc/ErrorCodes.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="270">
+              <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="31">
+              <caret line="11" selection-start-line="11" selection-end-line="11" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/VideoStationAPI.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-977">
-              <caret line="108" column="5" lean-forward="true" selection-start-line="108" selection-start-column="5" selection-end-line="108" selection-end-column="5" />
-              <folding>
-                <element signature="e#84#103#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/inc/FileStationAPI.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="268">
-              <caret line="32" column="41" selection-start-line="32" selection-start-column="41" selection-end-line="32" selection-end-column="41" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/inc/API.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="330">
-              <caret line="25" column="24" selection-start-line="25" selection-start-column="24" selection-end-line="25" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/api/API_FS">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="166">
-              <caret line="102" column="21" lean-forward="true" selection-start-line="102" selection-start-column="21" selection-end-line="102" selection-end-column="21" />
+            <state relative-caret-position="255">
+              <caret line="35" column="5" lean-forward="true" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -219,6 +248,7 @@
       <find>Metadata</find>
       <find>method</find>
       <find>mode</find>
+      <find>find</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -236,21 +266,21 @@
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/inc/HttpRequests.h" />
         <option value="$PROJECT_DIR$/config.json" />
-        <option value="$PROJECT_DIR$/inc/RequestHandler.h" />
         <option value="$PROJECT_DIR$/api/Api_Info.json" />
         <option value="$PROJECT_DIR$/api/API_INFO.http" />
-        <option value="$PROJECT_DIR$/src/RequestHandler.cpp" />
         <option value="$PROJECT_DIR$/inc/Utilities.h" />
-        <option value="$PROJECT_DIR$/inc/ErrorCodes.h" />
         <option value="$PROJECT_DIR$/api/API_VS" />
-        <option value="$PROJECT_DIR$/inc/ParamHandling.h" />
         <option value="$PROJECT_DIR$/main.cpp" />
-        <option value="$PROJECT_DIR$/api/API_FS" />
-        <option value="$PROJECT_DIR$/inc/FileStationAPI.h" />
+        <option value="$PROJECT_DIR$/inc/ErrorCodes.h" />
         <option value="$PROJECT_DIR$/inc/API.h" />
         <option value="$PROJECT_DIR$/inc/VideoStationAPI.h" />
-        <option value="$PROJECT_DIR$/src/FileStationAPI.cpp" />
         <option value="$PROJECT_DIR$/src/VideoStationAPI.cpp" />
+        <option value="$PROJECT_DIR$/inc/FileStationAPI.h" />
+        <option value="$PROJECT_DIR$/src/RequestHandler.cpp" />
+        <option value="$PROJECT_DIR$/inc/RequestHandler.h" />
+        <option value="$PROJECT_DIR$/api/API_FS" />
+        <option value="$PROJECT_DIR$/inc/ParamHandling.h" />
+        <option value="$PROJECT_DIR$/src/FileStationAPI.cpp" />
       </list>
     </option>
   </component>
@@ -287,7 +317,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -314,6 +343,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -2465,27 +2495,40 @@
       <workItem from="1549621837549" duration="88000" />
       <workItem from="1549634700757" duration="1407000" />
       <workItem from="1549706373404" duration="12069000" />
+      <workItem from="1549724201193" duration="977000" />
+      <workItem from="1549725384253" duration="2335000" />
+      <workItem from="1549728347780" duration="3268000" />
+      <workItem from="1549734923981" duration="4197000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="94217000" />
+    <option name="totallyTimeSpent" value="104994000" />
+  </component>
+  <component name="TodoView">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
   </component>
   <component name="ToolWindowManager">
     <frame x="4" y="33" width="1819" height="952" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21046709" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.21947102" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3244186" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.41162792" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.41976744" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32906976" />
       <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Messages" order="8" visible="true" weight="0.33372092" />
+      <window_info anchor="bottom" id="Messages" order="8" weight="0.33372092" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32906976" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="11" show_stripe_button="false" />
@@ -2523,22 +2566,6 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/src/RequestHandler.cpp</url>
-          <line>149</line>
-          <option name="timeStamp" value="5" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/inc/RequestHandler.h</url>
-          <line>40</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/inc/methods.h" />
@@ -2584,13 +2611,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/include/c++/8/iostream">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="186">
-          <caret line="60" column="17" selection-start-line="60" selection-start-column="17" selection-end-line="60" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/inc/Methods.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -2625,13 +2645,6 @@
     <entry file="file://$USER_HOME$/repo/mediaFW/src/Cli.cpp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="17" column="11" selection-start-line="17" selection-start-column="11" selection-end-line="17" selection-end-column="11" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/repo/mediaFW/inc/JsonParser.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
@@ -2653,9 +2666,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/api/API_VideoStation.json">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
+    <entry file="file://$PROJECT_DIR$/api/API_VideoStation.json" />
     <entry file="file://$PROJECT_DIR$/inc/HttpRequests.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -2698,58 +2709,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/inc/Utilities.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="42" column="5" lean-forward="true" selection-start-line="42" selection-start-column="5" selection-end-line="42" selection-end-column="5" />
-          <folding>
-            <element signature="e#97#114#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$USER_HOME$/thirdlibs/jsoncpp-master/src/lib_json/json_value.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="143">
           <caret line="201" selection-start-line="201" selection-end-line="201" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/RequestHandler.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="179" column="2" lean-forward="true" selection-start-line="179" selection-start-column="2" selection-end-line="179" selection-end-column="2" />
-          <folding>
-            <element signature="e#43#70#0" expanded="true" />
-            <marker date="1549708431391" expanded="true" signature="4134:4152" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="25" lean-forward="true" selection-start-line="25" selection-end-line="25" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/inc/RequestHandler.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="40" selection-start-line="40" selection-end-line="40" />
-          <folding>
-            <element signature="e#107#129#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/api/API_INFO.http">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="28" column="48" lean-forward="true" selection-start-line="28" selection-start-column="48" selection-end-line="28" selection-end-column="48" />
         </state>
       </provider>
     </entry>
@@ -2760,71 +2723,139 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/inc/ParamHandling.h">
+    <entry file="file:///usr/include/c++/8/iostream">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
-          <folding>
-            <element signature="e#104#124#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="186">
+          <caret line="41" selection-start-line="41" selection-end-line="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/API_INFO.http">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="54" lean-forward="true" selection-start-line="13" selection-start-column="54" selection-end-line="13" selection-end-column="54" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/inc/API.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="25" column="24" selection-start-line="25" selection-start-column="24" selection-end-line="25" selection-end-column="24" />
+        <state relative-caret-position="345">
+          <caret line="26" column="47" lean-forward="true" selection-start-line="26" selection-start-column="47" selection-end-line="26" selection-end-column="47" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/inc/VideoStationAPI.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="31" column="42" selection-start-line="31" selection-start-column="42" selection-end-line="31" selection-end-column="42" />
+        <state relative-caret-position="270">
+          <caret line="25" column="47" lean-forward="true" selection-start-line="25" selection-start-column="47" selection-end-line="25" selection-end-column="47" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/inc/ErrorCodes.h">
+    <entry file="file://$PROJECT_DIR$/src/VideoStationAPI.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="231">
-          <caret line="45" lean-forward="true" selection-start-line="45" selection-end-line="45" />
+        <state relative-caret-position="-450">
+          <caret line="125" lean-forward="true" selection-start-line="125" selection-end-line="125" />
           <folding>
-            <element signature="e#100#120#0" expanded="true" />
+            <element signature="e#84#103#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/inc/FileStationAPI.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="268">
-          <caret line="32" column="41" selection-start-line="32" selection-start-column="41" selection-end-line="32" selection-end-column="41" />
+        <state relative-caret-position="465">
+          <caret line="38" column="26" selection-start-line="38" selection-start-column="26" selection-end-line="38" selection-end-column="26" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/api/API_FS">
+    <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="166">
-          <caret line="102" column="21" lean-forward="true" selection-start-line="102" selection-start-column="21" selection-end-line="102" selection-end-column="21" />
+        <state relative-caret-position="31">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/local/include/json/value.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="184">
+          <caret line="415" column="12" selection-start-line="415" selection-start-column="2" selection-end-line="415" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inc/ErrorCodes.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inc/RequestHandler.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="291">
+          <caret line="38" column="5" selection-start-line="38" selection-start-column="5" selection-end-line="38" selection-end-column="5" />
+          <folding>
+            <element signature="e#107#129#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inc/Utilities.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="269">
+          <caret line="30" column="5" lean-forward="true" selection-start-line="30" selection-start-column="5" selection-end-line="30" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/inc/ParamHandling.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret lean-forward="true" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/FileStationAPI.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="343">
-          <caret line="317" column="40" selection-start-line="317" selection-start-column="40" selection-end-line="317" selection-end-column="40" />
+        <state relative-caret-position="315">
+          <caret line="182" column="5" lean-forward="true" selection-start-line="182" selection-start-column="5" selection-end-line="182" selection-end-column="5" />
           <folding>
             <element signature="e#42#61#0" expanded="true" />
+            <element signature="e#9759#9796#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/VideoStationAPI.cpp">
+    <entry file="file://$PROJECT_DIR$/api/RequestResponse.json">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-977">
-          <caret line="108" column="5" lean-forward="true" selection-start-line="108" selection-start-column="5" selection-end-line="108" selection-end-column="5" />
+        <state relative-caret-position="97">
+          <caret line="142" column="81" lean-forward="true" selection-start-line="142" selection-start-column="81" selection-end-line="142" selection-end-column="81" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/RequestHandler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="237">
+          <caret line="105" lean-forward="true" selection-start-line="105" selection-end-line="105" />
           <folding>
-            <element signature="e#84#103#0" expanded="true" />
+            <element signature="e#43#70#0" expanded="true" />
+            <marker date="1549736093373" expanded="true" signature="4334:4352" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/api/API_FS">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="35" column="5" lean-forward="true" selection-start-line="35" selection-start-column="5" selection-end-line="35" selection-end-column="5" />
         </state>
       </provider>
     </entry>

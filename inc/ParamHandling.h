@@ -13,6 +13,46 @@ class ParamHandling {
 public:
 
 
+    std::string getPathFolder(std::string& pattern) {
+        std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
+        if (pattern.find("old") != std::string::npos) {
+            return "/video/film/Old";
+        }
+        else if (pattern.find("barn") != std::string::npos) {
+            return "/video/film/Barn";
+        }
+        else if(pattern.find("rom") != std::string::npos) {
+            return "/video/film/RomAndCom";
+        }
+        else if(pattern.find("com") != std::string::npos) {
+            return "/video/film/RomAndCom";
+        }
+        else if(pattern.find("horror") != std::string::npos) {
+            return "/video/film/Horror";
+        }
+        else if(pattern.find("king") != std::string::npos) {
+            return "/video/film/StephenKing";
+        }
+        else if(pattern.find("hitch") != std::string::npos) {
+            return "/video/film/Old/Hitchcock";
+        }
+        else if(pattern.find("crime") != std::string::npos) {
+            return "/video/film/Crime";
+        }
+        else if(pattern.find("hallmark") != std::string::npos) {
+            return "/video/film/Sliskigt";
+        }
+        else if(pattern.find("mara") != std::string::npos) {
+            return "/video/film/MovieSequels";
+        }
+        else if(pattern.find("doc") != std::string::npos) {
+            return "/video/film/DocumentaryTalkShow";
+        }
+        else if(pattern.find("serie") != std::string::npos) {
+            return "/video/series";
+        }
+        return "/video/film";
+    }
 
     std::string getPath(std::string& pattern)
     {
