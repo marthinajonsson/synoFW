@@ -6,14 +6,25 @@
 #define SYNOFW_PARAMHANDLING_H
 
 #include <algorithm>
+#include <iostream>
 #include <string>
 
 class ParamHandling {
 
 public:
 
+    std::string setParam(std::string &&param, std::string &&defaultvalue) {
+        std::string value;
+        std::cout << "Set param (" + param + "): ";
+        std::getline(std::cin>>std::ws, value);
+        if(value.empty()) {
+            value = defaultvalue;
+        }
+        return value;
+    }
 
-    std::string getPathFolder(std::string& pattern) {
+    std::string getPathFolder(std::string& pattern)
+    {
         std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
         if (pattern.find("old") != std::string::npos) {
             return "/video/film/Old";
@@ -56,7 +67,6 @@ public:
 
     std::string getPath(std::string& pattern)
     {
-
         std::transform(pattern.begin(), pattern.end(), pattern.begin(), ::tolower);
 
         if (pattern.find("old") != std::string::npos) {
@@ -93,6 +103,9 @@ public:
         }
         else if(pattern.find("serie") != std::string::npos) {
             return "/volume1/video/series";
+        }
+        else if(pattern.find("film") != std::string::npos) {
+            return "/volume1/video/film";
         }
         return "";
     }

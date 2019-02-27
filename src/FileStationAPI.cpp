@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include "RequestUrlBuilder.h"
 #include "FileStationAPI.h"
 #include "ParamHandling.h"
 #include "ErrorCodes.h"
@@ -171,7 +172,6 @@ std::vector<std::string> FileStationAPI::respParser(Json::Value &respData, std::
                     if(found != std::string::npos){
                         continue;
                     }
-                    std::cout << "\t" << nameStr << "\n" << std::endl;
                 }
                 std::cout << " \n}";
             }
@@ -188,6 +188,7 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
 
     std::vector<std::string> paramVec = split(params, ':');
     std::string fullParamStr;
+    ParamHandling handler;
 
     for(const std::string &s:paramVec) {
         if(s.empty()) {
@@ -198,127 +199,66 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
         fullParamStr += "=";
 
         if(s == "limit") {
-            int val;
-            std::cout << "Set limit (int): ";
-            std::cin >> val;
-            std::cout << "Limit set to: " << val << std::endl;
-            auto valStr = std::to_string(val);
-            fullParamStr+=valStr;
+            std::string val = handler.setParam("limit", "5");
+            fullParamStr+=val;
         }
         else if(s == "sort_by") {
             fullParamStr+="name";
         }
         else if(s == "offset") {
-            int val;
-            std::cout << "Set offset (int): ";
-            std::cin >> val;
-            std::cout << "Offset set to: " << val << std::endl;
-            if(!val) {
-                val = 0;
-            }
-            auto valStr = std::to_string(val);
-            fullParamStr+=valStr;
+            std::string val = handler.setParam("offset", "0");
+            fullParamStr+=val;
         }
         else if(s == "path") {
-            std::string val;
-            std::cout << "Choose path: ";
-            std::cin >> val;
-            ParamHandling param;
-            std::string path = param.getPath(val);
+            std::string val = handler.setParam("path", "film");
+            std::string path = handler.getPath(val);
             std::cout << "Path set to: " << path << std::endl;
             fullParamStr+=path;
         }
         else if(s == "folder_path") {
-            std::string val;
-            ParamHandling param;
-            std::cout << "Choose folder path: ";
-            std::cin >> val;
-            auto result = param.getPathFolder(val);
+            std::string val = handler.setParam("folder_path", "film");
+            auto result = handler.getPathFolder(val);
             fullParamStr+=result;
         }
         else if(s == "pattern"){
-            std::string extensions = ".mp4, .mkv, .avi";
-            std::string val;
-            std::cout << "Filter by pattern: ";
-            std::getline(std::cin, val);
-            if(!val.empty()) {
-                val+=","+extensions;
-            }
-            else{
-                val = extensions;
-            }
+            std::string extensions = ".mp4,.mkv,.avi";
+            std::string val = handler.setParam("pattern", "");
             std::cout << "Pattern set: " << val << std::endl;
-            fullParamStr+=val;
+            if(!val.empty()) { val = "," + val; }
+            fullParamStr+=extensions+val;
         }
         else if(s == "filetype"){
-            std::string val;
-            std::cout << "Choose file/dir/all: ";
-            std::cin >> val;
+            std::string val = handler.setParam("filetype", "all");
             fullParamStr+=val;
-            std::cout << "Filetype set" << std::endl;
         }
         else if(s == "extension") {
-            std::string val;
-            std::cout << "Choose file extension: ";
-            std::getline(std::cin, val);
-            if(!val.empty()) {
-                fullParamStr+=val;
-            }
-            else {
-                fullParamStr+="*";
-            }
-            std::cout << "Extension set" << std::endl;
+            std::string val = handler.setParam("extension", "mp4");
         }
         else if(s == "filename") {
-            std::string val;
-            std::cout << "Choose filename: ";
-            std::getline(std::cin, val);
+            std::string val = handler.setParam("filename", "");
             if(!val.empty()) {
                 fullParamStr+=val;
             }
             else {
                 throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "File name is required for this operation");
             }
-            std::cout << "\nFilename set" << std::endl;
         }
         else if(s == "name") {
-            std::string val;
-            std::cout << "Choose name for folder, default NewFolder: ";
-            std::getline(std::cin, val);
-            if(!val.empty()) {
-                fullParamStr+=val;
-            }
-            else {
-                fullParamStr+="NewFolder";
-            }
-            std::cout << "\nFolder name set" << std::endl;
+            std::string val = handler.setParam("name", "NewFolder");
+            fullParamStr+=val;
         }
         else if(s == "create_parents"){
             fullParamStr+="true";
         }
         else if(s == "overwrite"){
-            std::string val;
             std::cout << "Overwrite? true(default)/false: ";
-            std::getline(std::cin, val);
-            if(!val.empty()) {
-                fullParamStr+=val;
-            }
-            else {
-                fullParamStr+="true";
-            }
-            std::cout << "\n";
+            std::string val = handler.setParam("overwrite", "true");
+            fullParamStr+=val;
         }
         else if(s == "mode") {
-            std::string val;
-            std::cout << "Open in browser? y/n: ";
-            std::getline(std::cin, val);
-            if(val == "y") {
-                fullParamStr+="open";
-            }
-            else {
-                fullParamStr+="download";
-            }
-            std::cout << "\nMode set" << std::endl;
+            std::cout << "Open in browser? yes write open otherwise download/n: ";
+            std::string val = handler.setParam("mode", "open");
+            fullParamStr+=val;
         }
         else if(s == "recursive") {
             fullParamStr+="true";
@@ -342,31 +282,25 @@ void FileStationAPI::makeRequest(std::string& parsed) {
     /*
      * info, list, search, create, upload, download, delete
      * */
-    auto API = loadAPI(parsed);
-    int index = 0;
-    auto method = loadMethod(API, index);
-    /*
-     * get, list
-     * */
-    auto path = loadPath(API);
-    requestUrl+=info_s.server;
-    requestUrl+="/webapi/"+path;
-    requestUrl+="?api="+API;
 
-    auto version = loadVersion(API);
-    auto params = loadParams(API, index);
-    requestUrl+="&version="+version;
-    requestUrl+="&method="+method;
-    auto compiledParam = paramParser(API, params);
-    requestUrl+=compiledParam;
-    requestUrl+="&_sid=";
+    int indexedMethod = 0;
+    std::string serverUrl = info_s.server;
 
-    removeEndOfLines(requestUrl);
+    auto api = loadAPI(parsed);
+    auto method = loadMethod(api, indexedMethod);
+    auto path = loadPath(api);
+    auto version = loadVersion(api);
+    auto params = loadParams(api, indexedMethod);
+    auto resultParams = paramParser(api, params);
+
+    RequestUrlBuilder urlBuilder (serverUrl, path, api, version, method, resultParams);
+    auto url = urlBuilder.getResult();
+
 #if DEBUG
-    std::cout << requestUrl << std::endl;
+    std::cout << url << std::endl;
 #endif
-    auto responseObject = RequestHandler::getInstance().make(requestUrl, "FileStation", info_s.username, info_s.password);
-    std::string responses = loadResponse(API, index);
-    respParser(responseObject, API, responses);
+    auto responseObject = RequestHandler::getInstance().make(url, "FileStation", info_s.username, info_s.password);
+    std::string responses = loadResponse(api, indexedMethod);
+    respParser(responseObject, api, responses);
 }
 

@@ -1,1 +1,0 @@
-{"data":{"SYNO.VideoStation2.File":{"maxVersion":2,"minVersion":1,"path":"entry.cgi","requestFormat":"JSON"}},"success":true}
