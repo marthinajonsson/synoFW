@@ -1,12 +1,20 @@
 #include <iostream>
 #include <sstream>
 #include <algorithm>
+#include <future>
 
+#include <FilenameStructure.h>
 #include <RequestHandler.h>
+#include <ImdbStructure.h>
 #include <FileStationAPI.h>
 #include <VideoStationAPI.h>
 #include <ErrorCodes.h>
 #include "Utilities.h"
+
+void fetchImdb() {
+    ImdbStructure imdb;
+    imdb.FetchDatabase();
+}
 
 void printOptions() {
 
@@ -43,31 +51,40 @@ int process(std::string &parsed)
 }
 
 
-int main(int argc, char* argv []) {
+int main(int argc, char* argv [])
+{
+    FilenameStructure fnStr;
+    fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
 
-    std::string input;
-    int result = process(input);
+    fnStr.parse("12.Years.a.Slave.2013.1080p.BluRay.x264.YIFY.mp4");
 
-    if(result == -1) {
-        return result;
-    }
+    auto fut = std::async(std::launch::async, fetchImdb);
 
-    auto parsed = split(input, ':');
-    auto app = parsed.front();
-    pop_front(parsed);
-    input = parsed.front();
+//    std::string input;
+//    int result = process(input);
+//
+//    if(result == -1) {
+//        return result;
+//    }
+//
+//    auto parsed = split(input, ':');
+//    auto app = parsed.front();
+//    pop_front(parsed);
+//    input = parsed.front();
+//
+//    if(app.find("fs") != std::string::npos) {
+//        FileStationAPI fs;
+//        fs.makeRequest(input);
+//    }
+//    else if(app.find("vs") != std::string::npos) {
+//        VideoStationAPI vs;
+//        vs.makeRequest(input);
+//    }
+//    else {
+//        printOptions();
+//    }
 
-    if(app.find("fs") != std::string::npos) {
-        FileStationAPI fs;
-        fs.makeRequest(input);
-    }
-    else if(app.find("vs") != std::string::npos) {
-        VideoStationAPI vs;
-        vs.makeRequest(input);
-    }
-    else {
-        printOptions();
-    }
+    fut.get();
 
     return 0;
 }
