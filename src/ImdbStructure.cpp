@@ -3,6 +3,8 @@
 //
 
 #include <iostream>
+#include <any>
+#include <cstring>
 #include "ImdbStructure.h"
 
 size_t ImdbStructure::write_data(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -61,61 +63,88 @@ void ImdbStructure::getDataFiles(std::string&& file) {
     curl_global_cleanup();
 }
 
+bool sort(const std::pair<const unsigned short,std::string> &a,
+               const std::pair<const unsigned short,std::string> &b)
+{
 
-std::vector<std::string> ImdbStructure::parse(std::string &&filename, std::string &&findStr, const short &column, const short &compareColumn, std::string&& compareStr)
+    return (a.first < b.first);
+
+}
+
+std::vector<std::string> ImdbStructure::parse(const std::string &&filename, const std::string &&matchingTitle, std::vector<std::pair<unsigned short, std::string>> &&filterColumn)
 {
     std::fstream file;
     file.open(filename, std::ios::in);
 
     std::vector<std::string> row;
 
-    std::string line, word, temp;
+    std::string line, word;
 
     std::string header;
     getline(file, header);
 
-    if(column < 99) {
-        //std::string firstWord = header.substr(0, line.find('\t'));
-        std::stringstream s(header);
-        for(int i = 0; i <= column; i++) {
-            getline(s, word, '\t');
+    std::stringstream s(header);
+    std::sort(filterColumn.begin(), filterColumn.end());
+    if(!filterColumn.empty())
+    {
+        short index = 0;
+        while(getline(s, word, '\t'))
+        {
+            for (auto col : filterColumn) {
+
+                if(col.first == index) {
+                    row.emplace_back(word);
+                    break;
+                }
+
+            }
+            index++;
         }
-        row.emplace_back(word);
-    }else {
-        std::stringstream s(header);
+
+    }else
+    {
         while (getline(s, word, '\t')) {
             row.emplace_back(word);
         }
+    }
 
+    std::vector<std::string> tmp;
+    tmp.reserve(filterColumn.size());
+    for(auto f : filterColumn) {
+        tmp.emplace_back(f.second);
     }
 
     while (!file.eof()) {
 
         getline(file, line);
-
-        if( std::search(line.begin(), line.end(),
-                        findStr.begin(), findStr.end()) == line.end()){
-            continue;
-        }
-
         std::stringstream s(line);
 
-        if(column < 99) {
-//            std::string firstWord = line.substr(0, line.find('\t'));
-//            row.emplace_back(firstWord);
-            for(int i = 0; i <= column; i++) {
-                getline(s, word, '\t');
+        if(!filterColumn.empty()) {
+
+            bool found = false;
+            for(auto &str : tmp) {
+                if(line.find(str) != std::string::npos) {
+                    found = true;
+                }
             }
-            if(column == 2 && word.compare(findStr) != 0) { //title
-                continue;
+            if(!found) { continue;}
+
+            short index = 0;
+            while(getline(s, word, '\t'))
+            {
+                for (auto col : filterColumn) {
+
+                    if(col.first == index) {
+                        row.emplace_back(word);
+                        break;
+                    }
+
+                }
+                index++;
             }
 
-            if(compareStr != "" && word != compareStr) {
-                continue;
-            }
-
-            row.emplace_back(word);
-        }else {
+        }
+        else {
             while (getline(s, word, '\t')) {
                 row.emplace_back(word);
             }
