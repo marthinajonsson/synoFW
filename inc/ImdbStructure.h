@@ -12,29 +12,18 @@
 #include <sstream>
 #include <algorithm>
 #include <iostream>
+#include <map>
+#include <assert.h>
 
 
 class ImdbStructure {
 private:
 
-    enum class AkasE {
-        titleId = 0,
-        ordering = 1,
-        title = 2,
-        region = 3,
-        language = 4
-    };
-
-    enum class BasicsE {
-        titleId = 0,
-        OriginalTitle = 3,
-        startYear = 5,
-        endYear = 6,
-        genre = 8
-    };
+    struct TitleCommon {
+        const unsigned short titleId = 0;
+    }common;
 
     struct TitleAkas {
-        const unsigned short titleId = 0;
         const unsigned short ordering = 1;
         const unsigned short title = 2;
         const unsigned short region = 3;
@@ -42,7 +31,6 @@ private:
     }akas;
 
     struct TitleBasics {
-        const unsigned short titleId = 0;
         const unsigned short primaryTitle = 2;
         const unsigned short originalTitle = 3;
         const unsigned short startYear = 5;
@@ -50,8 +38,18 @@ private:
         const unsigned short genre = 8;
     }basics;
 
-    std::vector<std::string> parse(const std::string &&, std::pair<unsigned short, std::string> && = {}, std::vector<std::pair<unsigned short, std::string>> && = {});
-    // filter column {column:value, column:value}
+    struct TitleCrew {
+        const unsigned short directors = 1; //array of string
+        const unsigned short writers = 2; //array of string
+    }crew;
+
+    struct TitleEpisode {
+        const unsigned short season = 2; //int
+        const unsigned short episode = 3; //int
+    }episode;
+    
+    std::map<unsigned short, std::string> metadataMapper;
+    std::map<std::string, std::string> parse(const std::string &&, std::pair<unsigned short, std::string> && = {}, std::vector<std::pair<unsigned short, std::string>> && = {});
 
     static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream);
     void unpackFile(std::string&& file);
@@ -59,35 +57,49 @@ private:
 
 public:
 
-    void FetchDatabase() {
+    ImdbStructure() {
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(akas.title,"title") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.startYear, "startYear") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.endYear, "endYear") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.genre, "genre") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.directors, "directors") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.writers, "writers") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.season, "season") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.episode, "episode") );
+    }
+
+    void FetchDatabase(std::string& title)
+    {
 
 //        getDataFiles("title.akas.tsv.gz");
 //        getDataFiles("title.basics.tsv.gz");
 //        getDataFiles("title.crew.tsv.gz");
 //        getDataFiles("title.episode.tsv.gz");
-
+//
 //        unpackFile("title.akas.tsv.gz");
 //        unpackFile("title.basics.tsv.gz");
+//        unpackFile("title.crew.tsv.gz");
+//        unpackFile("title.episode.tsv.gz");
 
-        //tt2404425
-//        std::vector<std::string> resultIdn = parse("title.akas.tsv", "Woman in Gold", akas.titleId);
-//        for(auto &s : resultIdn) {
-//            std::cout << s << std::endl;
-//        }
-//
-//        resultIdn = parse("title.akas.tsv", "Woman in Gold");
-//        for(auto &s : resultIdn) {
-//            std::cout << s << std::endl;
-//        }
+        assert(!title.empty());
+        std::map<std::string, std::string> result = parse("title.akas.tsv", {akas.title, title}, {{common.titleId, ""}});
+        std::string id = result.at(metadataMapper.at(common.titleId));
 
-        auto resultIdn = parse("title.akas.tsv", {akas.title, "Woman in Gold"}, {{akas.titleId, ""}});
-        for(auto &s : resultIdn) {
-            std::cout << s << std::endl;
-        }
+        std::map<std::string, std::string> result2 = parse("title.basics.tsv", {common.titleId, id}, {{basics.genre, ""}, {basics.startYear, ""}, {basics.endYear, ""}});
 
-        resultIdn = parse("title.basics.tsv", {basics.titleId, "tt2404425"}, {{basics.genre, ""}, {basics.startYear, ""}, {basics.endYear, ""}});
-        for(auto &s : resultIdn) {
-            std::cout << s << std::endl;
+        result.insert(result2.begin(), result2.end());
+        result2 = parse("title.crew.tsv", {common.titleId, id}, {{crew.directors, ""}, {crew.writers, ""}});
+
+        result.insert(result2.begin(), result2.end());
+
+
+        /*
+         *  Directors nmxxxxxx used with name.basics.tsv.gz
+         *  Contains the following information for names: nconst (string) - alphanumeric unique identifier of the name/person
+         * */
+        for(auto &s : result) {
+            std::cout << s.first << ":" << s.second << std::endl;
         }
     }
 

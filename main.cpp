@@ -11,9 +11,9 @@
 #include <ErrorCodes.h>
 #include "Utilities.h"
 
-void fetchImdb() {
+void fetchImdb(std::string title) {
     ImdbStructure imdb;
-    imdb.FetchDatabase();
+    imdb.FetchDatabase(title);
 }
 
 void printOptions() {
@@ -56,9 +56,10 @@ int main(int argc, char* argv [])
     FilenameStructure fnStr;
     fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
 
-    fnStr.parse("12.Years.a.Slave.2013.1080p.BluRay.x264.YIFY.mp4");
+    //fnStr.parse("12.Years.a.Slave.2013.1080p.BluRay.x264.YIFY.mp4");
 
-    auto fut = std::async(std::launch::async, fetchImdb);
+    auto title = fnStr.getTitle();
+    auto fut = std::async(std::launch::async, fetchImdb, title);
 
 //    std::string input;
 //    int result = process(input);

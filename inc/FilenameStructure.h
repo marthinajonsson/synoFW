@@ -21,6 +21,8 @@ private:
 
 public:
 
+    std::string getTitle () { return title; }
+
     void parse(std::string &&filename) {
         std::vector<std::string> parts;
         std::string temp;
@@ -51,13 +53,7 @@ public:
             extension = parts.back();
 
         }
-        std::cout << "\n\n";
-        std::cout << "Parsing complete" << "\n" << "title: " << title << "\nyear: " << year << "\nresolution: "
-        << resolution <<
-        "\nExtension: " << extension << std::endl;
-
     }
-
 };
 
 

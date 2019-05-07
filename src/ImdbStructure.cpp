@@ -15,7 +15,7 @@ size_t ImdbStructure::write_data(void *ptr, size_t size, size_t nmemb, void *str
 
 void ImdbStructure::unpackFile(std::string&& file) {
 
-    std::string chmodCmd = "chmod +rx " + file;
+    std::string chmodCmd = "chmod a+x " + file;
     system(chmodCmd.c_str());
     std::string unpackCmd = "gzip -d -f " + file;
     system(unpackCmd.c_str());
@@ -37,7 +37,7 @@ void ImdbStructure::getDataFiles(std::string&& file) {
         fp = fopen(file.c_str(), "wb");
 
 
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS , 0L);
+        curl_easy_setopt(curl, CURLOPT_NOPROGRESS , 1L);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
         curl_easy_setopt(curl, CURLOPT_SSL_VERIFYHOST, false);
 
@@ -71,12 +71,12 @@ bool sort(const std::pair<const unsigned short,std::string> &a,
 
 }
 
-std::vector<std::string> ImdbStructure::parse(const std::string &&filename, std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&add)
+std::map<std::string, std::string> ImdbStructure::parse(const std::string &&filename, std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&add)
 {
     std::fstream file;
     file.open(filename, std::ios::in);
-
-    std::vector<std::string> tmpVec, row;
+    std::map<std::string, std::string> metadata;
+    std::vector<std::string> row;
 
     std::string line, word;
 
@@ -87,31 +87,24 @@ std::vector<std::string> ImdbStructure::parse(const std::string &&filename, std:
         std::stringstream ss(line);
         while (getline(ss, word, '\t'))
         {
-            tmpVec.emplace_back(word);
+            row.emplace_back(word);
         }
 
         if(!match.second.empty())
         {
-            auto found = std::find(tmpVec.begin(), tmpVec.end(), match.second);
-            if(found != tmpVec.end()) {
-                std::string added;
-                for(auto &filterAdd : add) {
-                    added = tmpVec.at(filterAdd.first);
-                    added.append(":");
-                }
+            auto found = std::find(row.begin(), row.end(), match.second);
+            if(found != row.end()) {
                 std::string matching = *found;
-                row.emplace_back(added+matching);
+                metadata.insert ( std::pair<std::string,std::string>(metadataMapper.at(match.first),matching) );
+                std::cout << "Line " << line << std::endl;
+                for(auto &filterAdd : add) {
+                    metadata.insert ( std::pair<std::string, std::string> (metadataMapper.at(filterAdd.first), row.at(filterAdd.first)) );
+                }
             }
-            tmpVec.resize(0);
-        }else {
-            for(auto &item : tmpVec) {
-                row.emplace_back(item);
-            }
-            tmpVec.resize(0);
         }
-
+        row.resize(0);
     }
     file.close();
 
-    return row;
+    return metadata;
 }
