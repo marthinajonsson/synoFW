@@ -50,7 +50,7 @@ private:
         const unsigned short genre = 8;
     }basics;
 
-    std::vector<std::string> parse(const std::string &&, const std::string &&, std::vector<std::pair<unsigned short, std::string>> && = {});
+    std::vector<std::string> parse(const std::string &&, std::pair<unsigned short, std::string> && = {}, std::vector<std::pair<unsigned short, std::string>> && = {});
     // filter column {column:value, column:value}
 
     static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream);
@@ -80,7 +80,12 @@ public:
 //            std::cout << s << std::endl;
 //        }
 
-        auto resultIdn = parse("title.akas.tsv", "Woman in Gold", {{akas.titleId, "tt2404425"}, {akas.title, "Woman in Gold"}});
+        auto resultIdn = parse("title.akas.tsv", {akas.title, "Woman in Gold"}, {{akas.titleId, ""}});
+        for(auto &s : resultIdn) {
+            std::cout << s << std::endl;
+        }
+
+        resultIdn = parse("title.basics.tsv", {basics.titleId, "tt2404425"}, {{basics.genre, ""}, {basics.startYear, ""}, {basics.endYear, ""}});
         for(auto &s : resultIdn) {
             std::cout << s << std::endl;
         }

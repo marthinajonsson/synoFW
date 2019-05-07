@@ -71,83 +71,43 @@ bool sort(const std::pair<const unsigned short,std::string> &a,
 
 }
 
-std::vector<std::string> ImdbStructure::parse(const std::string &&filename, const std::string &&matchingTitle, std::vector<std::pair<unsigned short, std::string>> &&filterColumn)
+std::vector<std::string> ImdbStructure::parse(const std::string &&filename, std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&add)
 {
     std::fstream file;
     file.open(filename, std::ios::in);
 
-    std::vector<std::string> row;
+    std::vector<std::string> tmpVec, row;
 
     std::string line, word;
 
-    std::string header;
-    getline(file, header);
-
-    std::stringstream s(header);
-    std::sort(filterColumn.begin(), filterColumn.end());
-    if(!filterColumn.empty())
+    std::sort(add.begin(), add.end());
+    getline(file, line); // ignore header
+    while(getline(file, line))
     {
-        short index = 0;
-        while(getline(s, word, '\t'))
+        std::stringstream ss(line);
+        while (getline(ss, word, '\t'))
         {
-            for (auto col : filterColumn) {
-
-                if(col.first == index) {
-                    row.emplace_back(word);
-                    break;
-                }
-
-            }
-            index++;
+            tmpVec.emplace_back(word);
         }
 
-    }else
-    {
-        while (getline(s, word, '\t')) {
-            row.emplace_back(word);
-        }
-    }
-
-    std::vector<std::string> tmp;
-    tmp.reserve(filterColumn.size());
-    for(auto f : filterColumn) {
-        tmp.emplace_back(f.second);
-    }
-
-    while (!file.eof()) {
-
-        getline(file, line);
-        std::stringstream s(line);
-
-        if(!filterColumn.empty()) {
-
-            bool found = false;
-            for(auto &str : tmp) {
-                if(line.find(str) != std::string::npos) {
-                    found = true;
+        if(!match.second.empty())
+        {
+            auto found = std::find(tmpVec.begin(), tmpVec.end(), match.second);
+            if(found != tmpVec.end()) {
+                std::string added;
+                for(auto &filterAdd : add) {
+                    added = tmpVec.at(filterAdd.first);
+                    added.append(":");
                 }
+                std::string matching = *found;
+                row.emplace_back(added+matching);
             }
-            if(!found) { continue;}
-
-            short index = 0;
-            while(getline(s, word, '\t'))
-            {
-                for (auto col : filterColumn) {
-
-                    if(col.first == index) {
-                        row.emplace_back(word);
-                        break;
-                    }
-
-                }
-                index++;
+            tmpVec.resize(0);
+        }else {
+            for(auto &item : tmpVec) {
+                row.emplace_back(item);
             }
-
-        }
-        else {
-            while (getline(s, word, '\t')) {
-                row.emplace_back(word);
-            }
+            tmpVec.resize(0);
         }
 
     }
