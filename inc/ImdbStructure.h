@@ -5,6 +5,8 @@
 #ifndef SYNOFW_IMDBSTRUCTURE_H
 #define SYNOFW_IMDBSTRUCTURE_H
 
+#include <Subject.h>
+
 #include <curl/curl.h>
 #include <vector>
 #include <string>
@@ -14,11 +16,27 @@
 #include <iostream>
 #include <map>
 #include <assert.h>
+#include <mutex>
 
 
-class ImdbStructure {
+class ImdbStructure : Subject{
 private:
 
+    ImdbStructure() {
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(akas.title,"title") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.startYear, "startYear") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.endYear, "endYear") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.genre, "genre") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.directors, "directors") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.writers, "writers") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.season, "season") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.episode, "episode") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(name.nconst, "nconst") );
+        metadataMapper.insert ( std::pair<unsigned short, std::string>(name.primaryName, "primaryName") );
+    }
+
+#pragma region structures
     struct TitleCommon {
         const unsigned short titleId = 0;
     }common;
@@ -47,7 +65,14 @@ private:
         const unsigned short season = 2; //int
         const unsigned short episode = 3; //int
     }episode;
-    
+
+    struct Names {
+        const unsigned short nconst = 0;
+        const unsigned short primaryName = 1;
+    }name;
+
+#pragma endregion
+
     std::map<unsigned short, std::string> metadataMapper;
     std::map<std::string, std::string> parse(const std::string &&, std::pair<unsigned short, std::string> && = {}, std::vector<std::pair<unsigned short, std::string>> && = {});
 
@@ -57,31 +82,35 @@ private:
 
 public:
 
-    ImdbStructure() {
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(akas.title,"title") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.startYear, "startYear") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.endYear, "endYear") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.genre, "genre") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.directors, "directors") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.writers, "writers") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.season, "season") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.episode, "episode") );
+    static ImdbStructure& getInstance();
+    ImdbStructure(ImdbStructure const&) = delete;
+    void operator=(ImdbStructure const&) = delete;
+
+    void registerObserver(Observer *observer) override;
+
+
+    void removeObserver(Observer *observer) override;
+
+    void notifyObservers(int &status) override;
+
+    std::vector<Observer *> observers;
+
+    void fetch() {
+        getDataFiles("title.akas.tsv.gz");
+        getDataFiles("title.basics.tsv.gz");
+        getDataFiles("title.crew.tsv.gz");
+        getDataFiles("title.episode.tsv.gz");
+        getDataFiles("name.basics.tsv.gz");
+
+        unpackFile("title.akas.tsv.gz");
+        unpackFile("title.basics.tsv.gz");
+        unpackFile("title.crew.tsv.gz");
+        unpackFile("title.episode.tsv.gz");
+        unpackFile("name.basics.tsv.gz");
     }
 
-    void FetchDatabase(std::string& title)
+    void parseTitle(std::string& title)
     {
-
-//        getDataFiles("title.akas.tsv.gz");
-//        getDataFiles("title.basics.tsv.gz");
-//        getDataFiles("title.crew.tsv.gz");
-//        getDataFiles("title.episode.tsv.gz");
-//
-//        unpackFile("title.akas.tsv.gz");
-//        unpackFile("title.basics.tsv.gz");
-//        unpackFile("title.crew.tsv.gz");
-//        unpackFile("title.episode.tsv.gz");
-
         assert(!title.empty());
         std::map<std::string, std::string> result = parse("title.akas.tsv", {akas.title, title}, {{common.titleId, ""}});
         std::string id = result.at(metadataMapper.at(common.titleId));
@@ -94,10 +123,10 @@ public:
         result.insert(result2.begin(), result2.end());
 
 
-        /*
-         *  Directors nmxxxxxx used with name.basics.tsv.gz
-         *  Contains the following information for names: nconst (string) - alphanumeric unique identifier of the name/person
-         * */
+        std::string nameId = result.at(metadataMapper.at(name.nconst));
+        result2 = parse("name.basics.tsv", {name.nconst, nameId}, {{name.primaryName, ""}});
+        result.insert(result2.begin(), result2.end());
+
         for(auto &s : result) {
             std::cout << s.first << ":" << s.second << std::endl;
         }

@@ -11,9 +11,12 @@
 #include <ErrorCodes.h>
 #include "Utilities.h"
 
-void fetchImdb(std::string title) {
-    ImdbStructure imdb;
-    imdb.FetchDatabase(title);
+static void downloadImdb() {
+    ImdbStructure::getInstance().fetch();
+}
+
+static void parseImdb(std::string title) {
+    ImdbStructure::getInstance().parseTitle(title);
 }
 
 void printOptions() {
@@ -34,6 +37,7 @@ void printOptions() {
 
 int process(std::string &parsed)
 {
+    std::future<void> fut;
     for (std::string line; std::cout << "SYNO > " && std::getline(std::cin, line); )
     {
         if (line.find("help") != std::string::npos) {
@@ -42,11 +46,16 @@ int process(std::string &parsed)
         else if (line.find("exit") != std::string::npos) {
             return 0;
         }
+        else if(line.find("update") != std::string::npos) {
+
+            fut = std::async(std::launch::async, downloadImdb);
+        }
         else if (!line.empty()) {
             parsed = line;
             return 0;
         }
     }
+    fut.get();
     return -1;
 }
 
@@ -57,9 +66,9 @@ int main(int argc, char* argv [])
     fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
 
     //fnStr.parse("12.Years.a.Slave.2013.1080p.BluRay.x264.YIFY.mp4");
-
+    downloadImdb();
     auto title = fnStr.getTitle();
-    auto fut = std::async(std::launch::async, fetchImdb, title);
+    auto fut = std::async(std::launch::async, parseImdb, title);
 
 //    std::string input;
 //    int result = process(input);

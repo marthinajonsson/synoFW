@@ -7,6 +7,34 @@
 #include <cstring>
 #include "ImdbStructure.h"
 
+std::mutex imdbLock;
+
+static ImdbStructure *instance;
+ImdbStructure& ImdbStructure::getInstance()
+{
+    std::lock_guard<std::mutex> lock(imdbLock);
+    if(!instance) {
+        instance = new ImdbStructure();
+    }
+    return *instance;
+}
+
+void ImdbStructure::registerObserver(Observer *observer) {
+    observers.push_back(observer);
+}
+void ImdbStructure::removeObserver(Observer *observer) {
+    auto iterator = std::find(observers.begin(), observers.end(), observer);
+
+    if (iterator != observers.end()) {
+        observers.erase(iterator);
+    }
+}
+void ImdbStructure::notifyObservers(int &status) {
+    for (Observer *observer : observers) {
+        observer->update(status);
+    }
+}
+
 size_t ImdbStructure::write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
@@ -61,14 +89,6 @@ void ImdbStructure::getDataFiles(std::string&& file) {
 
     }
     curl_global_cleanup();
-}
-
-bool sort(const std::pair<const unsigned short,std::string> &a,
-               const std::pair<const unsigned short,std::string> &b)
-{
-
-    return (a.first < b.first);
-
 }
 
 std::map<std::string, std::string> ImdbStructure::parse(const std::string &&filename, std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&add)

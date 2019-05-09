@@ -7,6 +7,7 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 find_package(OpenSSL)
 
 include_directories(inc)
+include_directories(ifc)
 
 set(Includes
         #${CMAKE_CURRENT_LIST_DIR}/inc/Cli.h
@@ -15,7 +16,7 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/ErrorCodes.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/FileStationAPI.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Utilities.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/HttpRequests.h inc/API.h inc/ParamHandling.h inc/RequestUrlBuilder.h inc/FilenameStructure.h inc/ImdbStructure.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/HttpRequests.h inc/API.h inc/ParamHandling.h inc/RequestUrlBuilder.h inc/FilenameStructure.h inc/ImdbStructure.h ifc/Observer.h ifc/Subject.h ifc/Logger.h inc/StatusLogger.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
