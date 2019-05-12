@@ -5,7 +5,8 @@
 #ifndef SYNOFW_LOGGER_H
 #define SYNOFW_LOGGER_H
 
-#include <Subject.h>
+#include "Utilities.h"
+#include "Subject.h"
 
 #include <iostream>
 #include <map>

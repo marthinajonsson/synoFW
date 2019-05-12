@@ -4,12 +4,10 @@
 
 #include "Subject.h"
 #include "Observer.h"
+//class Subject;
+//class Observer;
 
-using namespace Pattern;
-
-std::map<int , std::vector<Observer *> > registryMap;
-
-void Subject::registerObserver(int event, Observer *observer) {
+void Subject::registerObserver(SeverityType event, Observer *observer) {
     registryMap[event].push_back(observer);
 }
 
@@ -24,13 +22,13 @@ void Subject::removeObserver(Observer *observer) {
     }
 }
 
-void Subject::notifyObservers(int event) {
+void Subject::notifyObservers(SeverityType event) {
     auto it = registryMap.find(event);
     if(it != registryMap.end())
     {
         for(auto vecIt = it->second.begin(); vecIt != it->second.end(); vecIt++)
         {
-            (*vecIt)->update(this);
+            (*vecIt)->update(event, this);
         }
     }
 }

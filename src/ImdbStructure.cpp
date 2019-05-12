@@ -26,19 +26,25 @@ size_t ImdbStructure::write_data(void *ptr, size_t size, size_t nmemb, void *str
     return written;
 }
 
-void ImdbStructure::unpackFile(std::string&& file) {
+std::string ImdbStructure::unpackFile(std::string&& file) {
 
+    std::string errStr;
     std::string chmodCmd = "chmod a+x " + file;
-    system(chmodCmd.c_str());
+    if(0 != system(chmodCmd.c_str()) ) {
+        errStr = "Unable to run chmod on " + file;
+    }
     std::string unpackCmd = "gzip -d -f " + file;
-    system(unpackCmd.c_str());
+    if(0 != system(unpackCmd.c_str()) ) {
+        errStr = "Unable to decompess file " + file;
+    }
+    return errStr;
 }
 
-void ImdbStructure::getDataFiles(std::string&& file) {
+std::string ImdbStructure::getDataFiles(std::string&& file) {
 
     CURL *curl = NULL;
     FILE *fp;
-
+    std::string errStr;
     curl_global_init(CURL_GLOBAL_ALL);
     curl = curl_easy_init();
     CURLcode res;
@@ -67,13 +73,15 @@ void ImdbStructure::getDataFiles(std::string&& file) {
 
         retCode = static_cast<int>(http_code);
         if(retCode != 200) {
-            std::cerr << "HTTP code " << retCode << std::endl;
+            errStr = "HTTP code ";
+            errStr.append(std::to_string(retCode));
         }
 
         curl_easy_cleanup(curl);
 
     }
     curl_global_cleanup();
+    return errStr;
 }
 
 std::map<std::string, std::string> ImdbStructure::parse(const std::string &&filename, std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&add)

@@ -5,37 +5,28 @@
 #ifndef SYNOFW_SUBJECT_H
 #define SYNOFW_SUBJECT_H
 
+#include "Utilities.h"
+
 #include <algorithm>
 #include <map>
 #include <vector>
 
-namespace Pattern{
+class Observer;
 
-#include "Observer.h"
+class Subject
+{
+private:
+    std::string info;
+    std::map<int , std::vector<Observer *> > registryMap;
+public:
 
-    class Subject {
+    void setInfo(std::string &value) { info = value; }
+    std::string& getInfo() { return info; }
 
-        std::string info;
-    public:
+    void registerObserver(SeverityType event, Observer *observer);
+    void removeObserver(Observer *observer);
+    void notifyObservers(SeverityType event);
+};
 
-        typedef enum SeverityType
-        {
-            ERROR,
-            WARNING,
-            GENERAL,
-        }SeverityType;
-
-        void setInfo(std::string &value) {
-            info = value;
-        }
-
-        std::string& getInfo() { return info; }
-
-        void registerObserver(int event, Observer *observer);
-        void removeObserver(Observer *observer);
-        void notifyObservers(int event);
-    };
-
-}
 
 #endif //SYNOFW_SUBJECT_H

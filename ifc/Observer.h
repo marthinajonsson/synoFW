@@ -8,19 +8,21 @@
 #ifndef SYNOFW_OBSERVER_H
 #define SYNOFW_OBSERVER_H
 
-namespace Pattern{
+#include "Utilities.h"
 
-    class Observer {
+class Subject;
 
-    public:
+class Observer {
 
-        Observer() = default;
+public:
 
-        ~Observer() = default;
+    Observer() = default;
 
-        virtual int update(Subject *subject) = 0;
+    ~Observer() = default;
 
-    };
-}
+    virtual void update(SeverityType event, Subject *subject) = 0;
+
+};
+
 
 #endif //SYNOFW_OBSERVER_H

@@ -1,9 +1,9 @@
 //
-// Created by mjonsson on 5/9/19.
+// Created by mjonsson on 5/12/19.
 //
 
-#ifndef SYNOFW_STATUSLOGGER_H
-#define SYNOFW_STATUSLOGGER_H
+#ifndef SYNOFW_FILELOGGER_H
+#define SYNOFW_FILELOGGER_H
 
 #include "Utilities.h"
 #include "Subject.h"
@@ -20,44 +20,32 @@
 
 static std::mutex readwrite;
 
-class StatusLogger : public Observer {
+
+class FileLogger : public Observer {
 public:
 
-    StatusLogger() {
-
-        logfile.open(getFilename(), std::ios::out | std::ios::app );
+    FileLogger() {
+        logfile.open(getFilename(), std::ios::out | std::ios::app);
     }
 
-    ~StatusLogger() {
+    ~FileLogger() {
         logfile.close();
     }
 
-    void update(Subject *subject)
-    {
-        std::cout<<subject->getInfo()<<std::endl;
+    void update(SeverityType event, Subject *subject) override {
+        std::string info = subject->getInfo();
+        write(event, info);
     }
 
-
-    void TRACE(int level, std::string message, std::string errorCode){
-//        std::string statusLevel  = m_levelMap.at(level);
-//        std::string output = statusLevel + message + " (" + errorCode + ") ";
-//        write(level, output);
-    }
-
-    void TRACE(int level, std::string message){
-//        std::string statusLevel  = m_levelMap.at(level);
-//        std::string output = statusLevel + message;
-       // write(level, output);
-    }
-
-    
 private:
 
     std::ofstream logfile;
 
-    std::string getFilename () {
+    std::string getFilename() {
         auto date = getDate();
-        std::string filename = date;
+        std::string filename = typeid(FileLogger).name();
+        filename.append("-");
+        filename.append(date);
         filename.append(".log");
         auto dir = GetCurrentWorkingDir();
         filename = dir + "/logs/" + filename;
@@ -66,7 +54,7 @@ private:
 
     std::string GetCurrentWorkingDir() {
         char buff[FILENAME_MAX];
-        GetCurrentDir( buff, FILENAME_MAX );
+        GetCurrentDir(buff, FILENAME_MAX);
         std::string current_working_dir(buff);
         return current_working_dir;
     }
@@ -101,27 +89,11 @@ private:
         return h + m + s;
     }
 
-    void write(int level, std::string &output){
+    void write(SeverityType level, std::string &output) {
         std::lock_guard<std::mutex> lock(readwrite);
-//        std::string startcode = "\033[";
-//        std::string endcode = "\033[0m\n";
-//        std::string time = getTime();
-//        time = "[" + time + "]";
-//
-//        if (level == ERR) {
-//
-//            auto thecode = "1;31m";
-//            std::cerr << startcode + thecode + time + output + endcode << std::endl;
-//        }
-//        else if (level == WARN) {
-//
-//            auto thecode = "1;33m";
-//            std::cout << startcode + thecode + time + output + endcode << std::endl;
-//        }
-
-//        logfile << time + output + "\n";
+        std::string time = getTime();
+        time = "[" + time + "]";
+        logfile << time + output + "\n";
     }
 };
-
-
-#endif //SYNOFW_STATUSLOGGER_H
+#endif //SYNOFW_FILELOGGER_H

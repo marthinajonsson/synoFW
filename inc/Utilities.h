@@ -9,18 +9,15 @@
 #include <string>
 #include <assert.h>
 #include <sstream>
+#include <memory>
 
 
-enum Status {
-    DownloadCompleted,
-    DownloadOngoing,
-    ParsingOngoing,
-    ParsingCompleted,
-    Idle
-};
-
-
-
+typedef enum SeverityType
+{
+    ERROR,
+    WARNING,
+    GENERAL,
+}SeverityType;
 
 struct TitleCommon {
     const unsigned short titleId = 0;

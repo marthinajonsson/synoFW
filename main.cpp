@@ -3,6 +3,9 @@
 #include <algorithm>
 #include <future>
 
+#include "Logger.h"
+#include "EventLogger.h"
+
 #include <FilenameStructure.h>
 #include <RequestHandler.h>
 #include <ImdbStructure.h>
@@ -11,12 +14,14 @@
 #include <ErrorCodes.h>
 #include "Utilities.h"
 
+std::shared_ptr pLog = std::make_shared<Logger>();
+
 static void downloadImdb() {
-    ImdbStructure::getInstance().fetch();
+    ImdbStructure::getInstance().fetch(pLog);
 }
 
 static void parseImdb(std::string title) {
-    ImdbStructure::getInstance().parseTitle(title);
+    ImdbStructure::getInstance().parseTitle(pLog, title);
 }
 
 void printOptions() {
@@ -44,32 +49,36 @@ int process(std::string &parsed)
             printOptions();
         }
         else if (line.find("exit") != std::string::npos) {
+            pLog->writeLog(SeverityType::GENERAL, "Exiting application.. ");
             return 0;
         }
         else if(line.find("update") != std::string::npos) {
 
+            pLog->writeLog(SeverityType::GENERAL, "Download information asynchronic.. ");
             fut = std::async(std::launch::async, downloadImdb);
         }
         else if (!line.empty()) {
             parsed = line;
             return 0;
         }
+        if(fut.valid()) {
+            pLog->writeLog(SeverityType::GENERAL, "Waiting for download to complete.. ");
+            fut.get();
+            pLog->writeLog(SeverityType::GENERAL, "Download completed");
+        }
     }
-    fut.get();
     return -1;
 }
 
 
 int main(int argc, char* argv [])
 {
-    FilenameStructure fnStr;
-    fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
 
-    //fnStr.parse("12.Years.a.Slave.2013.1080p.BluRay.x264.YIFY.mp4");
-    //downloadImdb();
-    auto title = fnStr.getTitle();
-    auto fut = std::async(std::launch::async, parseImdb, title);
-
+    EventLogger *pElog = new EventLogger();
+    pLog->registerObserver(SeverityType::GENERAL, pElog);
+    pLog->registerObserver(SeverityType::WARNING, pElog);
+    pLog->registerObserver(SeverityType::ERROR, pElog);
+    pLog->writeLog(SeverityType::GENERAL, "Fetch SYNO information.. ");
 //    std::string input;
 //    int result = process(input);
 //
@@ -94,7 +103,21 @@ int main(int argc, char* argv [])
 //        printOptions();
 //    }
 
+
+/*
+ * FROM SYNO REQUEST FETCH INFORMATION ABOUT GIVEN TITLE
+ *
+ */
+
+    FilenameStructure fnStr;
+    fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
+    std::string title = fnStr.getTitle();
+
+    auto fut = std::async(std::launch::async, parseImdb, title);
     fut.get();
 
+    pLog->removeObserver(pElog);
+
+    delete pElog;
     return 0;
 }
