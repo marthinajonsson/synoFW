@@ -66,7 +66,7 @@ int main(int argc, char* argv [])
     fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
 
     //fnStr.parse("12.Years.a.Slave.2013.1080p.BluRay.x264.YIFY.mp4");
-    downloadImdb();
+    //downloadImdb();
     auto title = fnStr.getTitle();
     auto fut = std::async(std::launch::async, parseImdb, title);
 

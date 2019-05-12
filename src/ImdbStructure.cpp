@@ -5,6 +5,7 @@
 #include <iostream>
 #include <any>
 #include <cstring>
+
 #include "ImdbStructure.h"
 
 std::mutex imdbLock;
@@ -17,22 +18,6 @@ ImdbStructure& ImdbStructure::getInstance()
         instance = new ImdbStructure();
     }
     return *instance;
-}
-
-void ImdbStructure::registerObserver(Observer *observer) {
-    observers.push_back(observer);
-}
-void ImdbStructure::removeObserver(Observer *observer) {
-    auto iterator = std::find(observers.begin(), observers.end(), observer);
-
-    if (iterator != observers.end()) {
-        observers.erase(iterator);
-    }
-}
-void ImdbStructure::notifyObservers(int &status) {
-    for (Observer *observer : observers) {
-        observer->update(status);
-    }
 }
 
 size_t ImdbStructure::write_data(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -93,12 +78,17 @@ void ImdbStructure::getDataFiles(std::string&& file) {
 
 std::map<std::string, std::string> ImdbStructure::parse(const std::string &&filename, std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&add)
 {
-    std::fstream file;
-    file.open(filename, std::ios::in);
     std::map<std::string, std::string> metadata;
     std::vector<std::string> row;
-
     std::string line, word;
+
+    std::fstream file;
+    file.open(filename, std::ios::in);
+
+    if(!file.is_open()) {
+        std::cerr << typeid(this).name() << " - File is not open and cannot be parsed" << std::endl;
+        return metadata;
+    }
 
     std::sort(add.begin(), add.end());
     getline(file, line); // ignore header
@@ -115,8 +105,9 @@ std::map<std::string, std::string> ImdbStructure::parse(const std::string &&file
             auto found = std::find(row.begin(), row.end(), match.second);
             if(found != row.end()) {
                 std::string matching = *found;
-                metadata.insert ( std::pair<std::string,std::string>(metadataMapper.at(match.first),matching) );
-                std::cout << "Line " << line << std::endl;
+
+                metadata.insert ( std::pair<std::string,std::string>(metadataMapper.at(match.first), matching) );
+
                 for(auto &filterAdd : add) {
                     metadata.insert ( std::pair<std::string, std::string> (metadataMapper.at(filterAdd.first), row.at(filterAdd.first)) );
                 }

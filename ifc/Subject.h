@@ -5,33 +5,37 @@
 #ifndef SYNOFW_SUBJECT_H
 #define SYNOFW_SUBJECT_H
 
+#include <algorithm>
+#include <map>
+#include <vector>
+
+namespace Pattern{
+
 #include "Observer.h"
 
-/**
- * Interface for the Subject
- */
+    class Subject {
 
-class Subject {
+        std::string info;
+    public:
 
-public:
+        typedef enum SeverityType
+        {
+            ERROR,
+            WARNING,
+            GENERAL,
+        }SeverityType;
 
-    /**
-     * Register an observer
-     * @param observer the observer object to be registered
-     */
-    virtual void registerObserver(Observer *observer) = 0;
+        void setInfo(std::string &value) {
+            info = value;
+        }
 
-    /**
-     * Unregister an observer
-     * @param observer the observer object to be unregistered
-     */
-    virtual void removeObserver(Observer *observer) = 0;
+        std::string& getInfo() { return info; }
 
-    /**
-     * Notify all the registered observers when a change happens
-     */
-    virtual void notifyObservers(int &) = 0;
+        void registerObserver(int event, Observer *observer);
+        void removeObserver(Observer *observer);
+        void notifyObservers(int event);
+    };
 
-};
+}
 
 #endif //SYNOFW_SUBJECT_H

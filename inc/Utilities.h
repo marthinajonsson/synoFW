@@ -11,6 +11,52 @@
 #include <sstream>
 
 
+enum Status {
+    DownloadCompleted,
+    DownloadOngoing,
+    ParsingOngoing,
+    ParsingCompleted,
+    Idle
+};
+
+
+
+
+struct TitleCommon {
+    const unsigned short titleId = 0;
+};
+
+struct TitleAkas {
+    const unsigned short ordering = 1;
+    const unsigned short title = 2;
+    const unsigned short region = 3;
+    const unsigned short language = 4;
+};
+
+struct TitleBasics {
+    const unsigned short startYear = 5;
+    const unsigned short endYear = 6;
+    const unsigned short genre = 8;
+};
+
+struct TitleCrew {
+    const unsigned short directors = 1; //array of string
+    const unsigned short writers = 2; //array of string
+};
+
+struct TitleEpisode {
+    const unsigned short season = 2; //int
+    const unsigned short episode = 3; //int
+};
+
+struct Names {
+    const unsigned short nconst = 0;
+    const unsigned short primaryName = 1;
+};
+
+
+
+
 static std::ostream& bold_on(std::ostream& os)
 {
     return os << "\e[1m";
@@ -23,6 +69,8 @@ static std::ostream& bold_off(std::ostream& os)
 }
 
 
+
+
 static void removeEndOfLines(std::string &str) {
     std::string::size_type pos = 0;
     while ( ( pos = str.find ("\n",pos) ) != std::string::npos )
@@ -30,7 +78,6 @@ static void removeEndOfLines(std::string &str) {
         str.erase(pos,2);
     }
 }
-
 
 static std::vector<std::string> split(std::string &input, char delim) {
     std::stringstream m_stream(input);

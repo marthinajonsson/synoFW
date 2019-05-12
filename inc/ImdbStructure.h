@@ -6,6 +6,8 @@
 #define SYNOFW_IMDBSTRUCTURE_H
 
 #include <Subject.h>
+#include <Utilities.h>
+#include "StatusLogger.h"
 
 #include <curl/curl.h>
 #include <vector>
@@ -14,13 +16,23 @@
 #include <sstream>
 #include <algorithm>
 #include <iostream>
+#include <functional>
 #include <map>
 #include <assert.h>
 #include <mutex>
 
+using namespace Pattern;
 
 class ImdbStructure : Subject{
 private:
+    TitleCommon common;
+    TitleAkas akas;
+    TitleBasics basics;
+    TitleCrew crew;
+    TitleEpisode episode;
+    Names name;
+
+    std::map<unsigned short, std::string> metadataMapper;
 
     ImdbStructure() {
         metadataMapper.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
@@ -36,49 +48,11 @@ private:
         metadataMapper.insert ( std::pair<unsigned short, std::string>(name.primaryName, "primaryName") );
     }
 
-#pragma region structures
-    struct TitleCommon {
-        const unsigned short titleId = 0;
-    }common;
 
-    struct TitleAkas {
-        const unsigned short ordering = 1;
-        const unsigned short title = 2;
-        const unsigned short region = 3;
-        const unsigned short language = 4;
-    }akas;
-
-    struct TitleBasics {
-        const unsigned short primaryTitle = 2;
-        const unsigned short originalTitle = 3;
-        const unsigned short startYear = 5;
-        const unsigned short endYear = 6;
-        const unsigned short genre = 8;
-    }basics;
-
-    struct TitleCrew {
-        const unsigned short directors = 1; //array of string
-        const unsigned short writers = 2; //array of string
-    }crew;
-
-    struct TitleEpisode {
-        const unsigned short season = 2; //int
-        const unsigned short episode = 3; //int
-    }episode;
-
-    struct Names {
-        const unsigned short nconst = 0;
-        const unsigned short primaryName = 1;
-    }name;
-
-#pragma endregion
-
-    std::map<unsigned short, std::string> metadataMapper;
-    std::map<std::string, std::string> parse(const std::string &&, std::pair<unsigned short, std::string> && = {}, std::vector<std::pair<unsigned short, std::string>> && = {});
-
-    static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream);
     void unpackFile(std::string&& file);
     void getDataFiles(std::string&& file);
+    static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream);
+    std::map<std::string, std::string> parse(const std::string &&, std::pair<unsigned short, std::string> && = {}, std::vector<std::pair<unsigned short, std::string>> && = {});
 
 public:
 
@@ -86,16 +60,9 @@ public:
     ImdbStructure(ImdbStructure const&) = delete;
     void operator=(ImdbStructure const&) = delete;
 
-    void registerObserver(Observer *observer) override;
-
-
-    void removeObserver(Observer *observer) override;
-
-    void notifyObservers(int &status) override;
-
-    std::vector<Observer *> observers;
-
     void fetch() {
+        //notifyObservers(Status::DownloadOngoing);
+
         getDataFiles("title.akas.tsv.gz");
         getDataFiles("title.basics.tsv.gz");
         getDataFiles("title.crew.tsv.gz");
@@ -107,11 +74,15 @@ public:
         unpackFile("title.crew.tsv.gz");
         unpackFile("title.episode.tsv.gz");
         unpackFile("name.basics.tsv.gz");
+
+    //    notifyObservers(Status::DownloadCompleted);
+
     }
 
     void parseTitle(std::string& title)
     {
         assert(!title.empty());
+     //   notifyObservers(Status::ParsingOngoing);
         std::map<std::string, std::string> result = parse("title.akas.tsv", {akas.title, title}, {{common.titleId, ""}});
         std::string id = result.at(metadataMapper.at(common.titleId));
 
@@ -130,6 +101,7 @@ public:
         for(auto &s : result) {
             std::cout << s.first << ":" << s.second << std::endl;
         }
+     //   notifyObservers(Status::ParsingCompleted);
     }
 
 };

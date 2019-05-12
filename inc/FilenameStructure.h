@@ -11,6 +11,7 @@
 #include <iostream>
 #include <algorithm>
 #include <iterator>
+#include <assert.h>
 
 class FilenameStructure {
 private:
@@ -22,11 +23,13 @@ private:
 public:
 
     std::string getTitle () { return title; }
+    std::string getYear () { return year; }
 
     void parse(std::string &&filename) {
         std::vector<std::string> parts;
         std::string temp;
 
+        assert(!filename.empty());
         std::stringstream s(filename);
         while (getline(s, temp, '.')) {
             parts.emplace_back(temp);
@@ -57,11 +60,4 @@ public:
 };
 
 
-
-
-
-//struct {
-//    unsigned int widthValidated : 1;
-//    unsigned int heightValidated : 1;
-//} status;
 #endif //SYNOFW_FILENAMESTRUCTURE_H

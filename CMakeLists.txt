@@ -16,13 +16,24 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/ErrorCodes.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/FileStationAPI.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Utilities.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/HttpRequests.h inc/API.h inc/ParamHandling.h inc/RequestUrlBuilder.h inc/FilenameStructure.h inc/ImdbStructure.h ifc/Observer.h ifc/Subject.h ifc/Logger.h inc/StatusLogger.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/HttpRequests.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/API.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ParamHandling.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/RequestUrlBuilder.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/FilenameStructure.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbStructure.h
+        ${CMAKE_CURRENT_LIST_DIR}/ifc/Observer.h
+        ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.h
+        ${CMAKE_CURRENT_LIST_DIR}/ifc/Logger.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/StatusLogger.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/RequestHandler.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/FileStationAPI.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/VideoStationAPI.cpp src/ImdbStructure.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/src/VideoStationAPI.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/ImdbStructure.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.cpp)
 
 
 add_executable(synoFW ${Sources} ${Includes})
