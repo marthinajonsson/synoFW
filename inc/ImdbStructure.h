@@ -78,11 +78,16 @@ public:
 
 
         pLog->writeLog(SeverityType::GENERAL, "Decompress files.. ");
-        unpackFile("title.akas.tsv.gz");
-        unpackFile("title.basics.tsv.gz");
-        unpackFile("title.crew.tsv.gz");
-        unpackFile("title.episode.tsv.gz");
-        unpackFile("name.basics.tsv.gz");
+        for(auto f : files) {
+            std::string err = unpackFile(f);
+            if(!err.empty()) {
+                std::string info = "Decompressing file ";
+                info.append(f);
+                info.append(" failed due to ");
+                info.append(err);
+                pLog->writeLog(SeverityType::WARNING, info);
+            }
+        }
         pLog->writeLog(SeverityType::GENERAL, "IMDB files are decompressed");
     }
 
@@ -108,7 +113,7 @@ public:
         pLog->writeLog(SeverityType::GENERAL, "Found IMDB crew name ..");
 
         for(auto &s : result) {
-            std::cout << s.first << ":" << s.second << std::endl;
+            pLog->writeLog(SeverityType::GENERAL, s.first + ":" + s.second);
         }
         pLog->writeLog(SeverityType::ERROR, "Parsing completed with error");
     }

@@ -104,9 +104,10 @@ private:
 
             auto thecode = "1;33m";
             std::cout << startcode + thecode + time + output + endcode << std::endl;
+        }else {
+            std::cout << time + output << std::endl;
         }
-
-        //logfile << time + output + "\n";
+        std::cout.flush();
     }
 };
 
