@@ -25,7 +25,8 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/ifc/Observer.h
         ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.h
         ${CMAKE_CURRENT_LIST_DIR}/ifc/Logger.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/EventLogger.h inc/FileLogger.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/EventLogger.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/FileLogger.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp

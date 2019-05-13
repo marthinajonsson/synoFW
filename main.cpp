@@ -20,8 +20,8 @@ static void downloadImdb() {
     ImdbStructure::getInstance().fetch(pLog);
 }
 
-static bool parseImdb(std::string title) {
-    return ImdbStructure::getInstance().parseTitle(pLog, title);
+static bool parseImdb(std::string title, std::shared_ptr<Logger> &logger) {
+    return ImdbStructure::getInstance().parseTitle(logger, title);
 }
 
 void printOptions() {
@@ -112,13 +112,7 @@ int main(int argc, char* argv [])
     FilenameStructure fnStr;
     fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
     std::string title = fnStr.getTitle();
-
-    auto fut = std::async(std::launch::async, parseImdb, title);
-    fut.wait();
-    auto result = fut.get();
-    if(result != true) {
-        std::cerr << "shit!" << std::endl;
-    }
+    auto res = parseImdb(title, pLog);
     pLog->removeObserver(pElog);
 
     delete pElog;

@@ -32,7 +32,6 @@ private:
     TitleEpisode episode;
     Names name;
 
-
     std::map<std::string, std::map<unsigned short, std::string>> metaMapper;
 
     ImdbStructure() {
@@ -116,11 +115,10 @@ public:
     {
         std::cout.flush();
         assert(!title.empty());
-        //pLog->writeLog(SeverityType::GENERAL, "Parsing " + title + ".. ");
+
         std::map<std::string, std::string> result = parse("title.akas.tsv", {akas.title, title}, {{common.titleId, ""}});
         std::string id = result.at(getMetaMapping("title.akas.tsv").at(common.titleId));
 
-        //pLog->writeLog(SeverityType::GENERAL, "Found IMDB id " + id);
         std::map<std::string, std::string> result2 = parse("title.basics.tsv", {common.titleId, id}, {{basics.genre, ""}, {basics.startYear, ""}, {basics.endYear, ""}});
         result.insert(result2.begin(), result2.end());
 
@@ -131,19 +129,20 @@ public:
 
         std::string namesOfCrew;
         for (auto &d : directors) {
-            result2 = parse("name.basics.tsv", {name.nconst, d}, {{name.primaryName, ""}});
+            auto tmp = parse("name.basics.tsv", {name.nconst, d}, {{name.primaryName, ""}});
             auto map = getMetaMapping("name.basics.tsv");
-            std::string primaryName = result2.at(map.at(name.primaryName));
+            std::string primaryName = tmp.at(map.at(name.primaryName));
             namesOfCrew.append(primaryName);
             namesOfCrew.append(", ");
         }
 
+        namesOfCrew.erase (namesOfCrew.end()-2);
         result.insert(std::make_pair("directors", namesOfCrew));
 
-        nameIds = result.at(getMetaMapping("title.crew.tsv").at(crew.writers));
+        nameIds = result2.at(getMetaMapping("title.crew.tsv").at(crew.writers));
         auto writers = split(nameIds, ',');
 
-        namesOfCrew = "";
+        namesOfCrew.clear();
         for (auto &w : writers) {
             result2 = parse("name.basics.tsv", {name.nconst, w}, {{name.primaryName, ""}});
             auto map = getMetaMapping("name.basics.tsv");
@@ -151,16 +150,14 @@ public:
             namesOfCrew.append(primaryName);
             namesOfCrew.append(", ");
         }
-
+        namesOfCrew.erase (namesOfCrew.end()-2);
         result.insert(std::make_pair("writers", namesOfCrew));
 
-        //pLog->writeLog(SeverityType::GENERAL, "Found IMDB crew name ..");
-
         for(auto &s : result) {
-            std::cout << s.first << ":" << s.second << std::endl;
-            //pLog->writeLog(SeverityType::GENERAL, s.first + ":" + s.second);
+            //std::cout << s.first << ":" << s.second << std::endl;
+            pLog->writeLog(SeverityType::GENERAL, s.first + ":" + s.second);
         }
-        //pLog->writeLog(SeverityType::ERROR, "Parsing completed with error");
+        pLog->writeLog(SeverityType::ERROR, "Parsing completed with error");
         return true;
     }
 
