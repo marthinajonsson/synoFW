@@ -20,8 +20,8 @@ static void downloadImdb() {
     ImdbStructure::getInstance().fetch(pLog);
 }
 
-static void parseImdb(std::string title) {
-    ImdbStructure::getInstance().parseTitle(pLog, title);
+static bool parseImdb(std::string title) {
+    return ImdbStructure::getInstance().parseTitle(pLog, title);
 }
 
 void printOptions() {
@@ -114,8 +114,11 @@ int main(int argc, char* argv [])
     std::string title = fnStr.getTitle();
 
     auto fut = std::async(std::launch::async, parseImdb, title);
-    fut.get();
-
+    fut.wait();
+    auto result = fut.get();
+    if(result != true) {
+        std::cerr << "shit!" << std::endl;
+    }
     pLog->removeObserver(pElog);
 
     delete pElog;

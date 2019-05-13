@@ -32,22 +32,43 @@ private:
     TitleEpisode episode;
     Names name;
 
-    std::map<unsigned short, std::string> metadataMapper;
+
+    std::map<std::string, std::map<unsigned short, std::string>> metaMapper;
 
     ImdbStructure() {
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(akas.title,"title") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.startYear, "startYear") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.endYear, "endYear") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(basics.genre, "genre") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.directors, "directors") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(crew.writers, "writers") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.season, "season") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(episode.episode, "episode") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(name.nconst, "nconst") );
-        metadataMapper.insert ( std::pair<unsigned short, std::string>(name.primaryName, "primaryName") );
+        std::map<unsigned short, std::string> metaMap;
+        metaMap.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(akas.title,"title") );
+        metaMapper.insert(std::make_pair("title.akas.tsv", metaMap));
+        metaMap.clear();
+
+        metaMap.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(basics.startYear, "startYear") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(basics.endYear, "endYear") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(basics.genre, "genre") );
+        metaMapper.insert(std::make_pair("title.basics.tsv", metaMap));
+        metaMap.clear();
+
+        metaMap.insert ( std::pair<unsigned short, std::string>(common.titleId,"titleId") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(crew.directors, "directors") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(crew.writers, "writers") );
+        metaMapper.insert(std::make_pair("title.crew.tsv", metaMap));
+        metaMap.clear();
+
+        metaMap.insert ( std::pair<unsigned short, std::string>(episode.season, "season") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(episode.episode, "episode") );
+        metaMapper.insert(std::make_pair("title.episode.tsv", metaMap));
+        metaMap.clear();
+
+        metaMap.insert ( std::pair<unsigned short, std::string>(name.nconst, "nconst") );
+        metaMap.insert ( std::pair<unsigned short, std::string>(name.primaryName, "primaryName") );
+        metaMapper.insert(std::make_pair("name.basics.tsv", metaMap));
+        metaMap.clear();
     }
 
+    const std::map<unsigned short, std::string>& getMetaMapping(const std::string& filename) {
+        return metaMapper.at(filename);
+    }
 
     std::string unpackFile(std::string&& file);
     std::string getDataFiles(std::string&& file);
@@ -91,31 +112,56 @@ public:
         pLog->writeLog(SeverityType::GENERAL, "IMDB files are decompressed");
     }
 
-    void parseTitle(std::shared_ptr<Logger> &pLog, std::string& title)
+    bool parseTitle(std::shared_ptr<Logger> &pLog, std::string& title)
     {
+        std::cout.flush();
         assert(!title.empty());
-        pLog->writeLog(SeverityType::GENERAL, "Parsing " + title + ".. ");
+        //pLog->writeLog(SeverityType::GENERAL, "Parsing " + title + ".. ");
         std::map<std::string, std::string> result = parse("title.akas.tsv", {akas.title, title}, {{common.titleId, ""}});
-        std::string id = result.at(metadataMapper.at(common.titleId));
+        std::string id = result.at(getMetaMapping("title.akas.tsv").at(common.titleId));
 
-        pLog->writeLog(SeverityType::GENERAL, "Found IMDB id " + id);
+        //pLog->writeLog(SeverityType::GENERAL, "Found IMDB id " + id);
         std::map<std::string, std::string> result2 = parse("title.basics.tsv", {common.titleId, id}, {{basics.genre, ""}, {basics.startYear, ""}, {basics.endYear, ""}});
-
         result.insert(result2.begin(), result2.end());
+
+
         result2 = parse("title.crew.tsv", {common.titleId, id}, {{crew.directors, ""}, {crew.writers, ""}});
+        std::string nameIds = result2.at(getMetaMapping("title.crew.tsv").at(crew.directors));
+        auto directors = split(nameIds, ',');
 
-        result.insert(result2.begin(), result2.end());
+        std::string namesOfCrew;
+        for (auto &d : directors) {
+            result2 = parse("name.basics.tsv", {name.nconst, d}, {{name.primaryName, ""}});
+            auto map = getMetaMapping("name.basics.tsv");
+            std::string primaryName = result2.at(map.at(name.primaryName));
+            namesOfCrew.append(primaryName);
+            namesOfCrew.append(", ");
+        }
 
-        std::string nameId = result.at(metadataMapper.at(name.nconst));
-        result2 = parse("name.basics.tsv", {name.nconst, nameId}, {{name.primaryName, ""}});
-        result.insert(result2.begin(), result2.end());
+        result.insert(std::make_pair("directors", namesOfCrew));
 
-        pLog->writeLog(SeverityType::GENERAL, "Found IMDB crew name ..");
+        nameIds = result.at(getMetaMapping("title.crew.tsv").at(crew.writers));
+        auto writers = split(nameIds, ',');
+
+        namesOfCrew = "";
+        for (auto &w : writers) {
+            result2 = parse("name.basics.tsv", {name.nconst, w}, {{name.primaryName, ""}});
+            auto map = getMetaMapping("name.basics.tsv");
+            std::string primaryName = result2.at(map.at(name.primaryName));
+            namesOfCrew.append(primaryName);
+            namesOfCrew.append(", ");
+        }
+
+        result.insert(std::make_pair("writers", namesOfCrew));
+
+        //pLog->writeLog(SeverityType::GENERAL, "Found IMDB crew name ..");
 
         for(auto &s : result) {
-            pLog->writeLog(SeverityType::GENERAL, s.first + ":" + s.second);
+            std::cout << s.first << ":" << s.second << std::endl;
+            //pLog->writeLog(SeverityType::GENERAL, s.first + ":" + s.second);
         }
-        pLog->writeLog(SeverityType::ERROR, "Parsing completed with error");
+        //pLog->writeLog(SeverityType::ERROR, "Parsing completed with error");
+        return true;
     }
 
 };

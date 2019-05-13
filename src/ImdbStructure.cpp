@@ -98,10 +98,16 @@ std::map<std::string, std::string> ImdbStructure::parse(const std::string &&file
         return metadata;
     }
 
+    auto meta = getMetaMapping(filename);
+
     std::sort(add.begin(), add.end());
     getline(file, line); // ignore header
     while(getline(file, line))
     {
+        if(line.find(match.second) == std::string::npos) {
+            continue;
+        }
+
         std::stringstream ss(line);
         while (getline(ss, word, '\t'))
         {
@@ -114,10 +120,11 @@ std::map<std::string, std::string> ImdbStructure::parse(const std::string &&file
             if(found != row.end()) {
                 std::string matching = *found;
 
-                metadata.insert ( std::pair<std::string,std::string>(metadataMapper.at(match.first), matching) );
+                assert(!meta.at(match.first).empty());
+                metadata.insert ( std::make_pair(meta.at(match.first), matching));
 
                 for(auto &filterAdd : add) {
-                    metadata.insert ( std::pair<std::string, std::string> (metadataMapper.at(filterAdd.first), row.at(filterAdd.first)) );
+                    metadata.insert ( std::pair<std::string, std::string> (meta.at(filterAdd.first), row.at(filterAdd.first)) );
                 }
             }
         }
