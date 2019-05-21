@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <sstream>
 #include <memory>
+#include <map>
 
 
 typedef enum SeverityType
@@ -19,39 +20,8 @@ typedef enum SeverityType
     GENERAL,
 }SeverityType;
 
-struct TitleCommon {
-    const unsigned short titleId = 0;
-};
-
-struct TitleAkas {
-    const unsigned short ordering = 1;
-    const unsigned short title = 2;
-    const unsigned short region = 3;
-    const unsigned short language = 4;
-};
-
-struct TitleBasics {
-    const unsigned short startYear = 5;
-    const unsigned short endYear = 6;
-    const unsigned short genre = 8;
-};
-
-struct TitleCrew {
-    const unsigned short directors = 1; //array of string
-    const unsigned short writers = 2; //array of string
-};
-
-struct TitleEpisode {
-    const unsigned short season = 2; //int
-    const unsigned short episode = 3; //int
-};
-
-struct Names {
-    const unsigned short nconst = 0;
-    const unsigned short primaryName = 1;
-};
-
-
+//metaMap.insert(std::pair<unsigned short, std::string>(common.titleId, "titleId"));
+//metaMap.insert(std::pair<unsigned short, std::string>(akas.title, "title"));
 
 
 static std::ostream& bold_on(std::ostream& os)

@@ -17,7 +17,7 @@
 std::shared_ptr pLog = std::make_shared<Logger>();
 
 static void downloadImdb() {
-    ImdbStructure::getInstance().fetch(pLog);
+    //ImdbStructure::getInstance().fetch(pLog);
 }
 
 static bool parseImdb(std::string title, std::shared_ptr<Logger> &logger) {
