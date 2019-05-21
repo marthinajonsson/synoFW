@@ -20,6 +20,7 @@
 #include <map>
 #include <assert.h>
 #include <mutex>
+#include <chrono>
 
 class Logger;
 
@@ -115,15 +116,25 @@ public:
     {
         std::cout.flush();
         assert(!title.empty());
-
+        auto start = std::chrono::high_resolution_clock::now();
         std::map<std::string, std::string> result = parse("title.akas.tsv", {akas.title, title}, {{common.titleId, ""}});
+        auto stop = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
+        std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
         std::string id = result.at(getMetaMapping("title.akas.tsv").at(common.titleId));
 
+        start = std::chrono::high_resolution_clock::now();
         std::map<std::string, std::string> result2 = parse("title.basics.tsv", {common.titleId, id}, {{basics.genre, ""}, {basics.startYear, ""}, {basics.endYear, ""}});
+        stop = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
+        std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
         result.insert(result2.begin(), result2.end());
 
-
+        start = std::chrono::high_resolution_clock::now();
         result2 = parse("title.crew.tsv", {common.titleId, id}, {{crew.directors, ""}, {crew.writers, ""}});
+        stop = std::chrono::high_resolution_clock::now();
+        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
+        std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
         std::string nameIds = result2.at(getMetaMapping("title.crew.tsv").at(crew.directors));
         auto directors = split(nameIds, ',');
 
@@ -157,7 +168,7 @@ public:
             //std::cout << s.first << ":" << s.second << std::endl;
             pLog->writeLog(SeverityType::GENERAL, s.first + ":" + s.second);
         }
-        pLog->writeLog(SeverityType::ERROR, "Parsing completed with error");
+        //pLog->writeLog(SeverityType::ERROR, "Parsing completed with error");
         return true;
     }
 

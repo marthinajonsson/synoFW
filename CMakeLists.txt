@@ -26,7 +26,7 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.h
         ${CMAKE_CURRENT_LIST_DIR}/ifc/Logger.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/EventLogger.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/FileLogger.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/FileLogger.h inc/JsonReadWrite.h inc/DatabaseObject.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
@@ -34,7 +34,7 @@ set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/src/FileStationAPI.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/VideoStationAPI.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/ImdbStructure.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.cpp src/JsonReadWrite.cpp)
 
 
 add_executable(synoFW ${Sources} ${Includes})
