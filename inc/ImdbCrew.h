@@ -1,9 +1,10 @@
 //
-// Created by mjonsson on 5/21/19.
+// Created by mjonsson on 5/22/19.
 //
 
-#ifndef SYNOFW_IMDBBASICS_H
-#define SYNOFW_IMDBBASICS_H
+#ifndef SYNOFW_IMDBCREW_H
+#define SYNOFW_IMDBCREW_H
+
 
 #include <fstream>
 #include "Imdb.h"
@@ -12,28 +13,18 @@
 
 class Logger;
 
-class ImdbBasics : Subject, Imdb {
+class ImdbCrew : Subject, Imdb {
 private:
-    std::string imdbFilename = "title.basics.tsv";
+    std::string imdbFilename = "title.crew.tsv";
     long currentFilePos;
-    long headerSize;
-    std::map<unsigned short, std::string> mapBasics {
-            {0, "titleId"}, {1, "titleType"}, {2, "startYear"}, {3, "endYear"}, {5, "genre"}
+
+    std::map<unsigned short, std::string> mapCrew {
+            {0, "titleId"}, {1, "directors"}, {2, "writers"}
     };
 
-
 public:
-    ImdbBasics() : currentFilePos(0){
-        std::fstream file;
-        file.open(imdbFilename, std::ios::in);
-        currentFilePos = file.tellg();
-        std::string tmp;
-        getline(file, tmp);
-        headerSize = file.tellg();
-        file.seekg (0, file.beg);
-        file.close();
-    }
-    ~ImdbBasics() = default;
+    ImdbCrew() : currentFilePos(0){}
+    ~ImdbCrew() = default;
 
     std::map<std::string, std::string> parse(std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&find) override
     {
@@ -41,7 +32,7 @@ public:
         std::vector<std::string> columnsValue;
         std::string line, word;
 
-        std::lock_guard<std::mutex> lock(basicsLck);
+        std::lock_guard<std::mutex> lock(crewLck);
 
         std::fstream file;
         file.open(imdbFilename, std::ios::in);
@@ -56,13 +47,11 @@ public:
         unsigned short matchColumnIndex = match.first;
         std::string matchColumnValue = match.second;
 
-        auto columnStructure = mapBasics;
+        auto columnStructure = mapCrew;
         file.seekg(currentFilePos, file.beg);
 
         std::sort(find.begin(), find.end());
-        if(currentFilePos == 0) {
-            getline(file, line); // ignore header
-        }
+        getline(file, line); // ignore header
 
         while(getline(file, line))
         {
@@ -85,7 +74,6 @@ public:
             auto found = std::find(columnsValue.begin(), columnsValue.end(), matchColumnValue);
             if(found != columnsValue.end()) {
                 currentFilePos = file.tellg(); // save current position in file so we don't need to parse the entire file for next property
-                currentFilePos -= headerSize;
                 std::string matching = *found;
 
                 // make pair of i.e. columnIndex (match.first) and our matching property
@@ -93,11 +81,8 @@ public:
 
                 for(auto &filterAdd : find) {
                     unsigned short newColumnIndex = filterAdd.first;
-                    assert(columnsValue.size() >= newColumnIndex);
-                    assert(columnStructure.size() >= newColumnIndex);
-                    auto type = columnStructure.at(newColumnIndex);
-                    auto val = columnsValue.at(newColumnIndex);
-                    metadata.insert ( std::pair<std::string, std::string> (type, val) );
+                    // make pair of new columnIndex (structure from meta and value from columns)
+                    metadata.insert ( std::pair<std::string, std::string> (columnStructure.at(newColumnIndex), columnsValue.at(newColumnIndex)) );
                 }
             }
             columnsValue.resize(0); // clear before next row
@@ -108,4 +93,5 @@ public:
     }
 };
 
-#endif //SYNOFW_IMDBBASICS_H
+
+#endif //SYNOFW_IMDBCREW_H

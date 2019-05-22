@@ -14,26 +14,26 @@ class Logger;
 
 class ImdbAkas : Subject, Imdb {
 private:
-    std::string m_imdbFilename;
+    std::string imdbFilename = "title.akas.tsv";
     long currentFilePos;
+    long headerSize;
 
     std::map<unsigned short, std::string> mapAkas {
-            {0, "titleId"}, {1, "ordering"}, {2, "title"}
+            {0, "titleId"}, {1, "ordering"}, {2, "title"}, {3, "region"}, {4, "language"}
     };
 
 public:
-    ImdbAkas(std::string &&f) : m_imdbFilename(f) {
-        this->init();
-    }
+    ImdbAkas() {
+        std::fstream file;
+        file.open(imdbFilename, std::ios::in);
+        currentFilePos = file.tellg();
+        std::string tmp;
+        getline(file, tmp);
+        headerSize = file.tellg();
+        file.seekg (0, file.beg);
+        file.close();
+    };
     ~ImdbAkas() = default;
-
-    void init() override {
-        Imdb::metaMapper.insert(std::make_pair("title.akas.tsv", mapAkas));
-    }
-
-    const std::map<unsigned short, std::string>& getMetaMapping() override {
-        return Imdb::metaMapper.at(m_imdbFilename);
-    }
 
     std::map<std::string, std::string> parse(std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&find) override
     {
@@ -44,7 +44,7 @@ public:
         std::lock_guard<std::mutex> lock(akasLck);
 
         std::fstream file;
-        file.open(m_imdbFilename, std::ios::in);
+        file.open(imdbFilename, std::ios::in);
 
         if(!file.is_open()) {
             std::cerr << typeid(this).name() << " - File is not open and cannot be parsed" << std::endl;
@@ -56,12 +56,18 @@ public:
         unsigned short matchColumnIndex = match.first;
         std::string matchColumnValue = match.second;
 
-        auto columnStructure = getMetaMapping();
-        file.seekg(currentFilePos, file.beg);
+        auto columnStructure = mapAkas;
+      //file.seekg(currentFilePos, file.beg);
 
+        file.seekg(currentFilePos, file.beg); // -header
+
+        long pos = file.tellg();
         std::sort(find.begin(), find.end());
-        getline(file, line); // ignore header
+        if(currentFilePos == 0) {
+            getline(file, line); // ignore header
+        }
 
+        long pos2 = file.tellg();
         while(getline(file, line))
         {
             if(line.find(match.second) == std::string::npos) {
@@ -83,6 +89,7 @@ public:
             auto found = std::find(columnsValue.begin(), columnsValue.end(), matchColumnValue);
             if(found != columnsValue.end()) {
                 currentFilePos = file.tellg(); // save current position in file so we don't need to parse the entire file for next property
+                currentFilePos -= headerSize;
                 std::string matching = *found;
 
                 // make pair of i.e. columnIndex (match.first) and our matching property
@@ -90,8 +97,11 @@ public:
 
                 for(auto &filterAdd : find) {
                     unsigned short newColumnIndex = filterAdd.first;
-                    // make pair of new columnIndex (structure from meta and value from columns)
-                    metadata.insert ( std::pair<std::string, std::string> (columnStructure.at(newColumnIndex), columnsValue.at(newColumnIndex)) );
+                    assert(columnsValue.size() >= newColumnIndex);
+                    assert(columnStructure.size() >= newColumnIndex);
+                    auto type = columnStructure.at(newColumnIndex);
+                    auto val = columnsValue.at(newColumnIndex);
+                    metadata.insert ( std::pair<std::string, std::string> (type, val) );
                 }
             }
             columnsValue.resize(0); // clear before next row

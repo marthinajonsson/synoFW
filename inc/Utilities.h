@@ -36,8 +36,6 @@ static std::ostream& bold_off(std::ostream& os)
 }
 
 
-
-
 static void removeEndOfLines(std::string &str) {
     std::string::size_type pos = 0;
     while ( ( pos = str.find ("\n",pos) ) != std::string::npos )
@@ -67,6 +65,7 @@ void pop_front(std::vector<T>& vec)
     assert(!vec.empty());
     vec.erase(vec.begin());
 }
+
 
 
 template<typename T> struct map_init_helper

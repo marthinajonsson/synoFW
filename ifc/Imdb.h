@@ -23,29 +23,18 @@ class Imdb {
 public:
     Imdb() = default;
     ~Imdb() = default;
-    virtual void init() = 0;
-    virtual const std::map<unsigned short, std::string>& getMetaMapping() = 0;
-    virtual std::map<std::string, std::string> parse(std::pair<unsigned short, std::string> &&, std::vector<std::pair<unsigned short, std::string>> &&) = 0;
+    virtual std::map<std::string, std::string> parse(std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&find) = 0;
 
     std::mutex akasLck;
     std::mutex basicsLck;
     std::mutex crewLck;
-    std::mutex episodeLck;
+    //std::mutex episodeLck;
     std::mutex nameLck;
 
-    static std::map<std::string, std::map<unsigned short, std::string>> metaMapper;
-//
-//    std::map<unsigned short, std::string> mapCrew {
-//            {0, "titleId"}, {1, "directors"}, {2, "writers"}
-//    };
-//
 //    std::map<unsigned short, std::string> mapEpisode {
 //            {0, "episodeId"}, {2, "season"}, {3, "episode"}
 //    };
 //
-//    std::map<unsigned short, std::string> mapNames {
-//            {0, "nameId"}, {1, "primaryName"}
-//    };
 
     std::string unpackFile(std::string&& file) {
 

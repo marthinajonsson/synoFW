@@ -8,7 +8,7 @@
 
 #include <FilenameStructure.h>
 #include <RequestHandler.h>
-#include <ImdbStructure.h>
+#include <CacheMgr.h>
 #include <FileStationAPI.h>
 #include <VideoStationAPI.h>
 #include <ErrorCodes.h>
@@ -21,7 +21,16 @@ static void downloadImdb() {
 }
 
 static bool parseImdb(std::string title, std::shared_ptr<Logger> &logger) {
-    return ImdbStructure::getInstance().parseTitle(logger, title);
+    CacheMgr::getInstance().validate(title);
+    DatabaseObject obj = CacheMgr::getInstance().get(title);
+    std::cout << obj.m_title << std::endl;
+    std::cout << obj.m_titleId << std::endl;
+    std::cout << obj.m_genre << std::endl;
+    std::cout << obj.m_directors << std::endl;
+    std::cout << obj.m_writers << std::endl;
+    std::cout << obj.m_startYear << std::endl;
+    std::cout << obj.m_endYear << std::endl;
+    return true;
 }
 
 void printOptions() {
@@ -109,10 +118,8 @@ int main(int argc, char* argv [])
  *
  */
 
-    FilenameStructure fnStr;
-    fnStr.parse("Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4");
-    std::string title = fnStr.getTitle();
-    auto res = parseImdb(title, pLog);
+    std::string result = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
+    auto res = parseImdb(result, pLog);
     pLog->removeObserver(pElog);
 
     delete pElog;
