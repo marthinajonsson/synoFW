@@ -1,6 +1,3 @@
-
-#include <CacheMgr.h>
-
 #include "CacheMgr.h"
 #include "JsonStreamer.h"
 #include "FilenameStructure.h"
@@ -37,93 +34,87 @@ void CacheMgr::validate(std::string& result) {
 bool CacheMgr::update(std::string& title)
 {
     assert(!title.empty());
-    auto start = std::chrono::high_resolution_clock::now();
-    ImdbAkas a;
-    std::map<std::string, std::string> result = a.parse({akasS.title, title}, {{commonS.titleId, ""}});
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
-    std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
-    assert(!result.empty());
+
     DatabaseObject obj;
+
+    ImdbAkas a;
+    ImdbBasics b;
+    ImdbCrew c;
+    ImdbEpisode e;
+    ImdbName n;
+
+    std::map<std::string, std::string> result = a.parse({akasS.title, title}, {{akasS.titleId, ""}});
+    assert(result.size() > 1);
+
+    obj.m_title = result.at("title");
     obj.m_titleId = result.at("titleId");
 
-    start = std::chrono::high_resolution_clock::now();
-    result = a.parse({akasS.title, title}, {{akasS.region, ""}});
-    stop = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
-    std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
-    assert(!result.empty());
-    obj.m_region = result.at("region");
-
-    start = std::chrono::high_resolution_clock::now();
     result = a.parse({akasS.title, title}, {{akasS.language, ""}});
-    stop = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
-    std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
-    assert(!result.empty());
+    assert(result.size() > 1);
     obj.m_language = result.at("language");
 
-    ImdbBasics b;
-    start = std::chrono::high_resolution_clock::now();
-    result = b.parse({commonS.titleId, obj.m_titleId}, {{basicsS.genre, ""}});
-    stop = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
-    std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
+    result = a.parse({akasS.title, title}, {{akasS.region, ""}});
+    assert(result.size() > 1);
+    obj.m_region = result.at("region");
 
+    result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.titletype, ""}});
+    assert(result.size() > 1);
+    obj.m_titleType = result.at("titleType");
+
+    if(obj.m_titleType == "series") {
+        result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.endYear, ""}});
+        assert(result.size() > 1);
+        obj.m_endYear = result.at("endYear");
+
+        result = e.parse({episodeS.parentTconst, obj.m_titleId}, {{episodeS.season, ""}, {episodeS.episode, ""}});
+        assert(result.size() > 1);
+        obj.m_season = result.at("season");
+        obj.m_episode = result.at("episode");
+    }
+
+    result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.startYear, ""}});
+    assert(result.size() > 1);
+    obj.m_startYear = result.at("startYear");
+    result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.runtimeMinutes, ""}});
+    assert(result.size() > 1);
+    obj.m_runtimeMinutes = result.at("runtimeMinutes");
+
+    result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.genre, ""}});
     assert(!result.empty());
     obj.m_genre = result.at("genre");
 
-    start = std::chrono::high_resolution_clock::now();
-    result = b.parse({commonS.titleId, obj.m_titleId}, {{basicsS.startYear, ""}});
-    stop = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
-    std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
+    result = c.parse({crewS.titleId, obj.m_titleId}, {{crewS.directors, ""}, {crewS.writers, ""}});
 
-    assert(!result.empty());
-    obj.m_startYear = result.at("startYear");
+    std::string nameIds = result.at("directors");
+    auto directors = split(nameIds, ',');
+    nameIds = result.at("writers");
+    auto writers = split(nameIds, ',');
 
-    start = std::chrono::high_resolution_clock::now();
-    result = b.parse({commonS.titleId, obj.m_titleId}, {{basicsS.endYear, ""}});
-    stop = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
-    std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
+    std::string namesOfCrew;
+    for (auto &d : directors) {
+        auto tmp = n.parse({nameS.nconst, d}, {{nameS.primaryName, ""}});
+        if(tmp.size() < 2) {
+            break;
+        }
+        std::string primaryName = tmp.at("primaryName");
+        namesOfCrew.append(primaryName);
+        namesOfCrew.append(", ");
+    }
+    namesOfCrew.erase (namesOfCrew.end()-2);
+    obj.m_directors = namesOfCrew;
+    namesOfCrew = "";
 
-    assert(!result.empty());
-    obj.m_endYear = result.at("endYear");
-
-//        start = std::chrono::high_resolution_clock::now();
-//        result2 = parse({common.titleId, id}, {{crew.directors, ""}, {crew.writers, ""}});
-//        stop = std::chrono::high_resolution_clock::now();
-//        duration = std::chrono::duration_cast<std::chrono::microseconds>(stop-start);
-//        std::cout << "Exec time " << duration.count() << " [ms]" << std::endl;
-//        std::string nameIds = result2.at(getMetaMapping("title.crew.tsv").at(crew.directors));
-//        auto directors = split(nameIds, ',');
-//
-//        std::string namesOfCrew;
-//        for (auto &d : directors) {
-//            auto tmp = parse("name.basics.tsv", {name.nconst, d}, {{name.primaryName, ""}});
-//            auto map = getMetaMapping("name.basics.tsv");
-//            std::string primaryName = tmp.at(map.at(name.primaryName));
-//            namesOfCrew.append(primaryName);
-//            namesOfCrew.append(", ");
-//        }
-
-//        namesOfCrew.erase (namesOfCrew.end()-2);
-//        result.insert(std::make_pair("directors", namesOfCrew));
-//
-//        nameIds = result2.at(getMetaMapping("title.crew.tsv").at(crew.writers));
-//        auto writers = split(nameIds, ',');
-//
-//        namesOfCrew.clear();
-//        for (auto &w : writers) {
-//            result2 = parse("name.basics.tsv", {name.nconst, w}, {{name.primaryName, ""}});
-//            auto map = getMetaMapping("name.basics.tsv");
-//            std::string primaryName = result2.at(map.at(name.primaryName));
-//            namesOfCrew.append(primaryName);
-//            namesOfCrew.append(", ");
-//        }
-//        namesOfCrew.erase (namesOfCrew.end()-2);
-//        result.insert(std::make_pair("writers", namesOfCrew));
+    for (auto &w : writers) {
+        auto tmp = n.parse({nameS.nconst, w}, {{nameS.primaryName, ""}});
+        if(tmp.size() < 2) {
+            break;
+        }
+        std::string primaryName = tmp.at("primaryName");
+        namesOfCrew.append(primaryName);
+        namesOfCrew.append(", ");
+    }
+    namesOfCrew.erase (namesOfCrew.end()-2);
+    obj.m_writers = namesOfCrew;
 
     streamer.update(obj);
     return true;

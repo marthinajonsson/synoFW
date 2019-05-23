@@ -3,10 +3,16 @@
 #include <algorithm>
 #include <future>
 
+#include <sys/stat.h>
+#include <unistd.h>
+#include <time.h>
+#include <stdio.h>
+#include <chrono>
+#include <ctime>
+
 #include "Logger.h"
 #include "EventLogger.h"
-
-#include <FilenameStructure.h>
+#include "ActiveObject.h"
 #include <RequestHandler.h>
 #include <CacheMgr.h>
 #include <FileStationAPI.h>
@@ -16,20 +22,41 @@
 
 std::shared_ptr pLog = std::make_shared<Logger>();
 
-static void downloadImdb() {
-    //ImdbStructure::getInstance().fetch(pLog);
+
+struct tm *timeS;
+struct stat statS;
+
+
+void download() {
+
+    stat("title.akas.tsv", &statS);
+    timeS = gmtime(&(statS.st_mtime));
+    std::cout << "Year: " << timeS->tm_year;
+    std::cout << "Month: " << timeS->tm_mon;
+    std::cout << "Day: " << timeS->tm_mday;
+
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::cout << std::ctime(&now_time);
+
 }
+
+
 
 static bool parseImdb(std::string title, std::shared_ptr<Logger> &logger) {
     CacheMgr::getInstance().validate(title);
     DatabaseObject obj = CacheMgr::getInstance().get(title);
-    std::cout << obj.m_title << std::endl;
-    std::cout << obj.m_titleId << std::endl;
-    std::cout << obj.m_genre << std::endl;
-    std::cout << obj.m_directors << std::endl;
-    std::cout << obj.m_writers << std::endl;
-    std::cout << obj.m_startYear << std::endl;
-    std::cout << obj.m_endYear << std::endl;
+    logger->writeLog(SeverityType::GENERAL, obj.m_title);
+    logger->writeLog(SeverityType::GENERAL, obj.m_titleId);
+    logger->writeLog(SeverityType::GENERAL, obj.m_titleType);
+    logger->writeLog(SeverityType::GENERAL, obj.m_genre);
+    logger->writeLog(SeverityType::GENERAL, obj.m_language);
+    logger->writeLog(SeverityType::GENERAL, obj.m_runtimeMinutes);
+    logger->writeLog(SeverityType::GENERAL, obj.m_directors);
+    logger->writeLog(SeverityType::GENERAL, obj.m_writers);
+    logger->writeLog(SeverityType::GENERAL, obj.m_startYear);
+    logger->writeLog(SeverityType::GENERAL, obj.m_endYear);
+    logger->writeLog(SeverityType::GENERAL, obj.m_region);
     return true;
 }
 
@@ -64,7 +91,7 @@ int process(std::string &parsed)
         else if(line.find("update") != std::string::npos) {
 
             pLog->writeLog(SeverityType::GENERAL, "Download information asynchronic.. ");
-            fut = std::async(std::launch::async, downloadImdb);
+            download();
         }
         else if (!line.empty()) {
             parsed = line;
@@ -82,6 +109,8 @@ int process(std::string &parsed)
 
 int main(int argc, char* argv [])
 {
+    ActiveObject active;
+    //active.registerWork("updateFiles");
 
     EventLogger *pElog = new EventLogger();
     pLog->registerObserver(SeverityType::GENERAL, pElog);

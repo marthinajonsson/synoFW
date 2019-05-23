@@ -32,7 +32,7 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbBasics.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbAkas.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbCrew.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbName.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbName.h inc/ImdbEpisode.h inc/ActiveObject.h inc/Queue.h inc/Dispatcher.h inc/FileMgr.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp

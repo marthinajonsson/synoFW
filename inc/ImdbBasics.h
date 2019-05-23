@@ -7,18 +7,16 @@
 
 #include <fstream>
 #include "Imdb.h"
-#include "Subject.h"
-
 
 class Logger;
 
-class ImdbBasics : Subject, Imdb {
+class ImdbBasics : Imdb {
 private:
     std::string imdbFilename = "title.basics.tsv";
     long currentFilePos;
     long headerSize;
     std::map<unsigned short, std::string> mapBasics {
-            {0, "titleId"}, {1, "titleType"}, {2, "startYear"}, {3, "endYear"}, {5, "genre"}
+            {0, "titleId"}, {1, "titleType"}, {2, "primaryTitle"}, {3, "originalTitle"}, {5, "startYear"}, {6, "endYear"}, {7, "runtimeMinutes"}, {8, "genre"}
     };
 
 

@@ -8,12 +8,10 @@
 
 #include <fstream>
 #include "Imdb.h"
-#include "Subject.h"
-
 
 class Logger;
 
-class ImdbCrew : Subject, Imdb {
+class ImdbCrew : Imdb {
 private:
     std::string imdbFilename = "title.crew.tsv";
     long currentFilePos;

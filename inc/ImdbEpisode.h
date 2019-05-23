@@ -1,9 +1,9 @@
 //
-// Created by mjonsson on 5/21/19.
+// Created by mjonsson on 5/23/19.
 //
 
-#ifndef SYNOFW_IMDBAKAS_H
-#define SYNOFW_IMDBAKAS_H
+#ifndef SYNOFW_IMDBEPISODE_H
+#define SYNOFW_IMDBEPISODE_H
 
 #include <fstream>
 #include "Imdb.h"
@@ -11,18 +11,18 @@
 
 class Logger;
 
-class ImdbAkas : Imdb {
+class ImdbEpisode : Imdb {
 private:
-    std::string imdbFilename = "title.akas.tsv";
+    std::string imdbFilename = "title.episode.tsv";
     long currentFilePos;
     long headerSize;
 
-    std::map<unsigned short, std::string> mapAkas {
-            {0, "titleId"}, {1, "ordering"}, {2, "title"}, {3, "region"}, {4, "language"}
+    std::map<unsigned short, std::string> mapEpisode {
+            {0, "episodeId"}, {1, "parentTconst"}, {2, "season"}, {3, "episode"}
     };
 
 public:
-    ImdbAkas() {
+    ImdbEpisode() {
         std::fstream file;
         file.open(imdbFilename, std::ios::in);
         currentFilePos = file.tellg();
@@ -32,7 +32,7 @@ public:
         file.seekg (0, file.beg);
         file.close();
     };
-    ~ImdbAkas() = default;
+    ~ImdbEpisode() = default;
 
     std::map<std::string, std::string> parse(std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&find) override
     {
@@ -40,7 +40,7 @@ public:
         std::vector<std::string> columnsValue;
         std::string line, word;
 
-        std::lock_guard<std::mutex> lock(akasLck);
+        std::lock_guard<std::mutex> lock(episodeLck);
 
         std::fstream file;
         file.open(imdbFilename, std::ios::in);
@@ -55,8 +55,8 @@ public:
         unsigned short matchColumnIndex = match.first;
         std::string matchColumnValue = match.second;
 
-        auto columnStructure = mapAkas;
-      //file.seekg(currentFilePos, file.beg);
+        auto columnStructure = mapEpisode;
+        //file.seekg(currentFilePos, file.beg);
 
         file.seekg(currentFilePos, file.beg); // -header
 
@@ -111,4 +111,4 @@ public:
     }
 };
 
-#endif //SYNOFW_IMDBAKAS_H
+#endif //SYNOFW_IMDBEPISODE_H
