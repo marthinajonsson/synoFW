@@ -155,6 +155,7 @@ Json::Value RequestHandler::send(std::string &url) {
     std::cout << "Sending HTTP request to URL: " << url << std::endl;
     sendHttpGetRequest(jsonData, url);
 
+    // TODO how to collaborate with CacheMgr?
     std::ofstream db_write("../api/RequestResponse.json", std::ios::trunc);
     db_write << jsonData;
     db_write.close();

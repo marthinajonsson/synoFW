@@ -11,33 +11,38 @@
 #include <thread>
 #include <queue>
 #include <mutex>
-#include <future>
+//#include <future>
 #include <iostream>
+
 
 class ActiveObject {
 private:
 
-    std::string val;
     Queue queue;
     std::atomic<bool> done;
     std::thread *runnable;
 
 public:
-    ActiveObject() : val(""), done(false) {
+    ActiveObject() : done(false) {
         runnable = new std::thread(&ActiveObject::run, this);
     }
     ~ActiveObject() { runnable->join(); }
 
-    std::string getVal() { return val; }
+    bool stillRunning() {
+        return runnable->joinable();
+    }
 
-    void registerWork(std::string choice, std::string arg = "") {
-        val = arg;
+    void stop() {
+        done = false;
+    }
+
+    void registerRequest(std::string choice) {
         queue.put(choice);
     }
 
     void run() {
         while (!done) {
-            queue.take()();
+            queue.take();
         }
     }
 };

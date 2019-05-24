@@ -10,6 +10,7 @@
 #include <assert.h>
 #include <sstream>
 #include <memory>
+#include <algorithm>
 #include <map>
 
 
@@ -19,9 +20,6 @@ typedef enum SeverityType
     WARNING,
     GENERAL,
 }SeverityType;
-
-//metaMap.insert(std::pair<unsigned short, std::string>(common.titleId, "titleId"));
-//metaMap.insert(std::pair<unsigned short, std::string>(akas.title, "title"));
 
 
 static std::ostream& bold_on(std::ostream& os)

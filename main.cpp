@@ -3,13 +3,6 @@
 #include <algorithm>
 #include <future>
 
-#include <sys/stat.h>
-#include <unistd.h>
-#include <time.h>
-#include <stdio.h>
-#include <chrono>
-#include <ctime>
-
 #include "Logger.h"
 #include "EventLogger.h"
 #include "ActiveObject.h"
@@ -21,26 +14,6 @@
 #include "Utilities.h"
 
 std::shared_ptr pLog = std::make_shared<Logger>();
-
-
-struct tm *timeS;
-struct stat statS;
-
-
-void download() {
-
-    stat("title.akas.tsv", &statS);
-    timeS = gmtime(&(statS.st_mtime));
-    std::cout << "Year: " << timeS->tm_year;
-    std::cout << "Month: " << timeS->tm_mon;
-    std::cout << "Day: " << timeS->tm_mday;
-
-    auto now = std::chrono::system_clock::now();
-    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-    std::cout << std::ctime(&now_time);
-
-}
-
 
 
 static bool parseImdb(std::string title, std::shared_ptr<Logger> &logger) {
@@ -76,32 +49,32 @@ void printOptions() {
 }
 
 
-int process(std::string &parsed)
+int process()
 {
-    std::future<void> fut;
+    ActiveObject active;
     for (std::string line; std::cout << "SYNO > " && std::getline(std::cin, line); )
     {
         if (line.find("help") != std::string::npos) {
             printOptions();
         }
         else if (line.find("exit") != std::string::npos) {
+            active.stop();
             pLog->writeLog(SeverityType::GENERAL, "Exiting application.. ");
             return 0;
         }
         else if(line.find("update") != std::string::npos) {
-
             pLog->writeLog(SeverityType::GENERAL, "Download information asynchronic.. ");
-            download();
+            active.registerRequest("update");
         }
         else if (!line.empty()) {
-            parsed = line;
+            active.registerRequest(line);
             return 0;
         }
-        if(fut.valid()) {
-            pLog->writeLog(SeverityType::GENERAL, "Waiting for download to complete.. ");
-            fut.get();
-            pLog->writeLog(SeverityType::GENERAL, "Download completed");
-        }
+    }
+    active.stop();
+
+    if(active.stillRunning()) {
+        pLog->writeLog(SeverityType::ERROR, "Active thread still running");
     }
     return -1;
 }
@@ -109,47 +82,20 @@ int process(std::string &parsed)
 
 int main(int argc, char* argv [])
 {
-    ActiveObject active;
-    //active.registerWork("updateFiles");
-
     EventLogger *pElog = new EventLogger();
     pLog->registerObserver(SeverityType::GENERAL, pElog);
     pLog->registerObserver(SeverityType::WARNING, pElog);
     pLog->registerObserver(SeverityType::ERROR, pElog);
-    pLog->writeLog(SeverityType::GENERAL, "Fetch SYNO information.. ");
-//    std::string input;
-//    int result = process(input);
-//
-//    if(result == -1) {
-//        return result;
-//    }
-//
-//    auto parsed = split(input, ':');
-//    auto app = parsed.front();
-//    pop_front(parsed);
-//    input = parsed.front();
-//
-//    if(app.find("fs") != std::string::npos) {
-//        FileStationAPI fs;
-//        fs.makeRequest(input);
-//    }
-//    else if(app.find("vs") != std::string::npos) {
-//        VideoStationAPI vs;
-//        vs.makeRequest(input);
-//    }
-//    else {
-//        printOptions();
-//    }
 
+    int result = process();
 
-/*
- * FROM SYNO REQUEST FETCH INFORMATION ABOUT GIVEN TITLE
- *
- */
+    if(result == -1) {
+        pLog->removeObserver(pElog);
+        delete pElog;
+        return result;
+    }
 
-    std::string result = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
-    auto res = parseImdb(result, pLog);
-    pLog->removeObserver(pElog);
+    std::string test = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
 
     delete pElog;
     return 0;

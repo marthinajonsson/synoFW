@@ -200,5 +200,5 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     removeEndOfLines(requestUrl);
 
     std::cout << requestUrl << std::endl;
-    RequestHandler::getInstance().make(requestUrl, "VideoStation", info_s.username, info_s.password);
+    auto responseObject = RequestHandler::getInstance().make(requestUrl, "VideoStation", info_s.username, info_s.password);
 }

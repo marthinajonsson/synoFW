@@ -5,10 +5,20 @@
 #ifndef SYNOFW_FILEMGR_H
 #define SYNOFW_FILEMGR_H
 
-
+#include <map>
 #include <curl/curl.h>
 #include <string>
+#include <iostream>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <time.h>
+#include <stdio.h>
+#include <chrono>
+#include <ctime>
 
+
+struct tm *modifiedS;
+struct stat statS;
 
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
@@ -18,6 +28,42 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 
 class FileMgr {
 public:
+
+    std::map<std::string, bool> needUpdate ()
+    {
+        std::map<std::string, bool> checkList;
+        auto files = {"title.akas.tsv", "title.basics.tsv", "title.crew.tsv", "title.episode.tsv", "name.basics.tsv"};
+        std::string modifiedYear;
+        std::string modifiedMonth;
+
+        auto now = std::chrono::system_clock::now();
+        std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+        char currentDateNum[10];
+        if (std::strftime(currentDateNum, sizeof(currentDateNum), "%Y %m", std::localtime(&now_time))) {
+            for(int i = 0; i < 4; i++) {
+                modifiedYear += currentDateNum[i];
+            }
+            for(int i = 5; i < 7; i++) {
+                modifiedMonth += currentDateNum[i];
+            }
+        }
+
+        int todaysYear = stoi(modifiedYear);
+        int todaysMonth = stoi(modifiedMonth);
+
+        for(auto &f : files)
+        {
+            stat(f, &statS);
+            modifiedS = gmtime(&(statS.st_mtime));
+            auto year = modifiedS->tm_year;
+            auto month = modifiedS->tm_mon;
+            if(todaysYear >= year && todaysMonth > month + 2) {
+                checkList.insert(std::make_pair(f, true));
+            }
+            checkList.insert(std::make_pair(f, false));
+        }
+        return checkList;
+    }
 
     std::string unpackFile(std::string&& file) {
 
@@ -78,35 +124,37 @@ public:
     }
 
 
-    void fetch() {
-        //pLog->writeLog(SeverityType::GENERAL, "Downloading compressed files.. ");
+    void fetch()
+    {
         auto files = {"title.akas.tsv.gz", "title.basics.tsv.gz", "title.crew.tsv.gz", "title.episode.tsv.gz", "name.basics.tsv.gz"};
 
+        auto require = needUpdate();
+
         for(auto f : files) {
+            if(!require.at(f)) {
+                continue;
+            }
             std::string err = getDataFiles(f);
             if(!err.empty()) {
                 std::string info = "Compressed file ";
                 info.append(f);
                 info.append(" failed to download due to ");
                 info.append(err);
-                //pLog->writeLog(SeverityType::WARNING, info);
             }
         }
-       // pLog->writeLog(SeverityType::GENERAL, "Downloading complete");
 
-
-       // pLog->writeLog(SeverityType::GENERAL, "Decompress files.. ");
         for(auto f : files) {
+            if(!require.at(f)) {
+                continue;
+            }
             std::string err = unpackFile(f);
             if(!err.empty()) {
                 std::string info = "Decompressing file ";
                 info.append(f);
                 info.append(" failed due to ");
                 info.append(err);
-        //        pLog->writeLog(SeverityType::WARNING, info);
             }
         }
-      //  pLog->writeLog(SeverityType::GENERAL, "IMDB files are decompressed");
     }
 };
 #endif //SYNOFW_FILEMGR_H

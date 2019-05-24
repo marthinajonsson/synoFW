@@ -8,40 +8,41 @@
 #include <string>
 #include <functional>
 #include "FileMgr.h"
+#include "FileStationAPI.h"
+#include "VideoStationAPI.h"
+
+/*
+ *  vs:info -- get info
+ *  vs:library -- list all libraries
+ *  vs:movie
+ *  vs:tvshow
+ *  vs:folder
+ *
+ *  fs:info -- get info
+ *  fs:list -- list shared folders or files
+ *
+ */
 
 class Dispatcher {
 private:
-
+    FileStationAPI fs;
+    VideoStationAPI vs;
+    FileMgr fMgr;
 public:
 
-    std::function<void()> set(std::string &type)
+    std::function<void()> set(std::string &request)
     {
-        FileMgr fMgr;
-        if(type == "updateFiles"){
+        if(request == "update"){
             return std::bind(&FileMgr::fetch, &fMgr);
         }
-        else if(type == "downloadAkas") {
-            return std::bind(&FileMgr::getDataFiles, &fMgr, "title.akas.tsv.gz");
+        else if(request.find("vs") != std::string::npos) {
+            return std::bind(&VideoStationAPI::makeRequest, &vs, request);
+            vs.makeRequest(request);
         }
-        else if(type == "downloadBasics") {
-            return std::bind(&FileMgr::getDataFiles, &fMgr, "title.basics.tsv.gz");
+        else if(request.find("fs") != std::string::npos) {
+            return std::bind(&FileStationAPI::makeRequest, &fs, request);
         }
-        else if(type == "downloadCrew") {
-            return std::bind(&FileMgr::getDataFiles, &fMgr, "title.crew.tsv.gz");
-        }
-        else if(type == "downloadEpisode") {
-            return std::bind(&FileMgr::getDataFiles, &fMgr, "title.episode.tsv.gz");
-        }
-        else if(type == "downloadName") {
-            return std::bind(&FileMgr::getDataFiles, &fMgr, "name.basics.tsv.gz");
-        }
-        else {
-            return std::bind(&FileMgr::unpackFile, &fMgr, "title.akas.tsv.gz");
-        }
-
-        //return std::bind(&MeanReversion::run, &MeanReversion::getInstance());
     }
-
 };
 
 

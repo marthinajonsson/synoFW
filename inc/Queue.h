@@ -14,32 +14,29 @@
 #include <future>
 #include <iostream>
 
-typedef std::function<void()> Operation;
+typedef std::function<void()> Request;
 
 class Queue {
 private:
-    std::mutex qlock;
-    std::queue<Operation> ops_queue;
+    std::mutex queueLck;
+    std::queue<Request> queue;
     std::condition_variable empty;
     Dispatcher dispatcher;
 public:
-    Queue() = default;
-    ~Queue() = default;
 
-    void put(std::string opName) {
-        std::lock_guard<std::mutex> guard(qlock);
-        Operation op = dispatcher.set(opName);
-        ops_queue.push(op);
+    void put(std::string &val) {
+        std::lock_guard<std::mutex> guard(queueLck);
+        Request request = dispatcher.set(val);
+        queue.push(request);
         empty.notify_one();
     }
 
-    Operation take() {
-        std::unique_lock<std::mutex> lock(qlock);
-        empty.wait(lock, [&]{ return !ops_queue.empty(); });
-
-        Operation op = ops_queue.front();
-        ops_queue.pop();
-        return op;
+    Request take() {
+        std::unique_lock<std::mutex> lock(queueLck);
+        empty.wait(lock, [&]{ return !queue.empty(); });
+        Request request = queue.front();
+        queue.pop();
+        return request;
     }
 };
 

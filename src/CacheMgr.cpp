@@ -1,3 +1,4 @@
+#include <FileMgr.h>
 #include "CacheMgr.h"
 #include "JsonStreamer.h"
 #include "FilenameStructure.h"
