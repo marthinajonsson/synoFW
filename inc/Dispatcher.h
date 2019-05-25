@@ -37,7 +37,6 @@ public:
         }
         else if(request.find("vs") != std::string::npos) {
             return std::bind(&VideoStationAPI::makeRequest, &vs, request);
-            vs.makeRequest(request);
         }
         else if(request.find("fs") != std::string::npos) {
             return std::bind(&FileStationAPI::makeRequest, &fs, request);

@@ -17,9 +17,6 @@
 #include <ctime>
 
 
-struct tm *modifiedS;
-struct stat statS;
-
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 {
     size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
@@ -28,6 +25,9 @@ static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream)
 
 class FileMgr {
 public:
+
+    struct tm *modifiedS;
+    struct stat statS;
 
     std::map<std::string, bool> needUpdate ()
     {

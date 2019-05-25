@@ -8,6 +8,14 @@ find_package(OpenSSL)
 
 include_directories(inc)
 include_directories(ifc)
+include_directories(unittest)
+include_directories(external/gtest/googlemock)
+
+add_subdirectory(external/gtest/googlemock)
+
+set(Test
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/TestStartup.h
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/CacheTest.h)
 
 set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/Methods.h
@@ -32,7 +40,12 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbBasics.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbAkas.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbCrew.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbName.h inc/ImdbEpisode.h inc/ActiveObject.h inc/Queue.h inc/Dispatcher.h inc/FileMgr.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbName.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbEpisode.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ActiveObject.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/Queue.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/Dispatcher.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/FileMgr.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
@@ -44,9 +57,12 @@ set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/src/JsonStreamer.cpp)
 
 
-add_executable(synoFW ${Sources} ${Includes})
+
+enable_testing()
+add_executable(synoFW ${Sources} ${Includes} ${Test})
 
 
 target_link_libraries(synoFW curl)
 target_link_libraries(synoFW jsoncpp)
+target_link_libraries(synoFW gmock_main)
 target_link_libraries(synoFW /usr/share/boost-build)

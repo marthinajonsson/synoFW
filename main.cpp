@@ -2,6 +2,9 @@
 #include <sstream>
 #include <algorithm>
 #include <future>
+#include <include/gmock/gmock.h>
+
+#include "CacheTest.h"
 
 #include "Logger.h"
 #include "EventLogger.h"
@@ -82,21 +85,24 @@ int process()
 
 int main(int argc, char* argv [])
 {
-    EventLogger *pElog = new EventLogger();
-    pLog->registerObserver(SeverityType::GENERAL, pElog);
-    pLog->registerObserver(SeverityType::WARNING, pElog);
-    pLog->registerObserver(SeverityType::ERROR, pElog);
-
-    int result = process();
-
-    if(result == -1) {
-        pLog->removeObserver(pElog);
-        delete pElog;
-        return result;
-    }
-
-    std::string test = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
-
-    delete pElog;
+    ::testing::InitGoogleMock(&argc, argv);
+    return RUN_ALL_TESTS();
+//
+//    EventLogger *pElog = new EventLogger();
+//    pLog->registerObserver(SeverityType::GENERAL, pElog);
+//    pLog->registerObserver(SeverityType::WARNING, pElog);
+//    pLog->registerObserver(SeverityType::ERROR, pElog);
+//
+//    int result = process();
+//
+//    if(result == -1) {
+//        pLog->removeObserver(pElog);
+//        delete pElog;
+//        return result;
+//    }
+//
+//    std::string test = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
+//
+//    delete pElog;
     return 0;
 }

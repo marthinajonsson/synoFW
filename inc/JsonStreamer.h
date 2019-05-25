@@ -5,9 +5,13 @@
 #ifndef SYNOFW_JSONREADWRITE_H
 #define SYNOFW_JSONREADWRITE_H
 
+
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
 #include <string>
-#include <json/json.h>
 #include <fstream>
+
 #include "DatabaseObject.h"
 
 class JsonStreamer {
@@ -16,7 +20,7 @@ private:
     std::string m_path;
 
     void writeStream(DatabaseObject &obj);
-    Json::Value readStream(std::string&);
+    boost::property_tree::ptree readStream(std::string&);
 public:
 
     JsonStreamer() = default;

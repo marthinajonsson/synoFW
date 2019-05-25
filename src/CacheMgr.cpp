@@ -1,4 +1,4 @@
-#include <FileMgr.h>
+#include "FileMgr.h"
 #include "CacheMgr.h"
 #include "JsonStreamer.h"
 #include "FilenameStructure.h"
@@ -101,8 +101,10 @@ bool CacheMgr::update(std::string& title)
         namesOfCrew.append(primaryName);
         namesOfCrew.append(", ");
     }
-    namesOfCrew.erase (namesOfCrew.end()-2);
-    obj.m_directors = namesOfCrew;
+    if(namesOfCrew.size() > 2) {
+        namesOfCrew.erase (namesOfCrew.end()-2);
+    }
+    obj.m_directors = !namesOfCrew.empty() ? namesOfCrew : "N";
     namesOfCrew = "";
 
     for (auto &w : writers) {
@@ -114,8 +116,10 @@ bool CacheMgr::update(std::string& title)
         namesOfCrew.append(primaryName);
         namesOfCrew.append(", ");
     }
-    namesOfCrew.erase (namesOfCrew.end()-2);
-    obj.m_writers = namesOfCrew;
+    if(namesOfCrew.size() > 2) {
+        namesOfCrew.erase (namesOfCrew.end()-2);
+    }
+    obj.m_writers = !namesOfCrew.empty() ? namesOfCrew : "N";
 
     streamer.update(obj);
     return true;

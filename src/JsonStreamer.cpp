@@ -2,65 +2,59 @@
 // Created by mjonsson on 5/20/19.
 //
 
+#include <iostream>
 #include "JsonStreamer.h"
 
+typedef boost::property_tree::ptree ptree;
 
 void JsonStreamer::writeStream(DatabaseObject &obj) {
-    Json::Value rootItem;
-    Json::Value addItem;
-    std::ifstream inFile(m_path, std::ifstream::binary);
-    inFile >> rootItem;
-    inFile.close();
 
-    addItem["title"] = obj.m_title;
-    addItem["titleId"] = obj.m_titleId;
-    addItem["titleType"] = obj.m_titleType;
-    addItem["genre"] = obj.m_genre;
-    addItem["startYear"] = obj.m_startYear;
-    addItem["endYear"] = !obj.m_endYear.empty() ? obj.m_endYear : "N";
-    addItem["region"] = !obj.m_region.empty() ? obj.m_region : "N";
-    addItem["language"] = !obj.m_language.empty() ? obj.m_language : "N";
-    addItem["runtimeMinutes"] = !obj.m_runtimeMinutes.empty() ? obj.m_runtimeMinutes : "0";
-    addItem["season"] = !obj.m_season.empty() ? obj.m_season : "0";
-    addItem["episode"] = !obj.m_episode.empty() ? obj.m_episode : "0";
-    addItem["parentTconst"] = !obj.m_parentTconst.empty() ? obj.m_parentTconst : "0";
-    addItem["writers"] = obj.m_writers;
-    addItem["directors"] = obj.m_directors;
-    rootItem.append(addItem);
+    ptree root;
+    boost::property_tree::read_json(m_path, root);
 
-    std::ofstream outFile(m_path, std::ios::trunc);
-    outFile << rootItem;
-    outFile.close();
+    long size = root.size();
+    std::string index = std::to_string(size);
+    ptree parent, child;
+    parent.put("title", obj.m_title);
+    child.put("titleId", obj.m_titleId);
+    child.put("titleType", obj.m_titleType);
+    child.put("genre", obj.m_genre);
+    child.put("actors", "Ryan Reynolds");
+    child.put("startYear", obj.m_startYear);
+    child.put("endYear", !obj.m_endYear.empty() ? obj.m_endYear : "0");
+    child.put("runtimeMinutes", !obj.m_runtimeMinutes.empty() ? obj.m_runtimeMinutes : "0");
+    child.put("directors", obj.m_directors);
+    child.put("writers", obj.m_writers);
+    child.put("region", !obj.m_region.empty() ? obj.m_language : "N");
+    child.put("language", !obj.m_language.empty() ? obj.m_language : "0");
+    child.put("season", !obj.m_season.empty() ? obj.m_season : "0");
+    child.put("episode", !obj.m_episode.empty() ? obj.m_episode : "0");
+    child.put("parentTconst", !obj.m_parentTconst.empty() ? obj.m_parentTconst : "0");
+    parent.put_child("metadata", child);
+
+    root.push_back(std::make_pair(index, parent));
+    boost::property_tree::json_parser::write_json(m_path, root);
 }
 
-Json::Value JsonStreamer::readStream(std::string& searchTitle) {
-    Json::Value root;
-    std::ifstream inFile(m_path, std::ifstream::binary);
-    inFile >> root;
-    inFile.close();
+boost::property_tree::ptree JsonStreamer::readStream(std::string& searchTitle) {
+    ptree root, empty;
+    boost::property_tree::read_json(m_path, root);
 
-    for (const Json::Value& cacheItem : root)
-    {
-        std::string cachedTitle = cacheItem["title"].asString();
-        if (cachedTitle == searchTitle)
-        {
-            return cacheItem;
+    for(auto it : root) {
+        auto key = it.first;
+        auto val = it.second;
+        auto found = val.get<std::string>("title");
+        if(found.find(searchTitle) != std::string::npos) {
+            return val;
         }
     }
-
-    return Json::Value(Json::arrayValue);
+    return empty;
 }
 
 
 bool JsonStreamer::checkForNull(std::string &searchTitle) {
     auto item = readStream(searchTitle);
-    auto needUpdate = item.empty();
-    if(needUpdate) { return true; }
-
-    for (auto const& keys : item.getMemberNames()) {
-        auto val = item[keys].asString();
-        if(val.empty()) { return true; }
-    }
+    if(item.empty()) { return true; }
     return false;
 }
 
@@ -71,21 +65,21 @@ void JsonStreamer::update(DatabaseObject &obj) {
 DatabaseObject JsonStreamer::find(std::string &searchTitle) {
     auto item = readStream(searchTitle);
     DatabaseObject obj;
-    obj.m_titleId = item["titleId"].asString();
-    obj.m_titleType = item["titleType"].asString();
+    obj.m_title = item.get<std::string>("title");
+    auto child = item.get_child("metadata");
+
+    obj.m_titleId = child.get<std::string>("titleId");
+    obj.m_titleType = child.get<std::string>("titleType");
+    obj.m_genre = child.get<std::string>("genre");
+    obj.m_startYear = child.get<std::string>("startYear");
+    obj.m_endYear = child.get<std::string>("endYear");
+    obj.m_runtimeMinutes = child.get<std::string>("runtimeMinutes");
+    obj.m_directors = child.get<std::string>("directors");
+    obj.m_writers = child.get<std::string>("writers");
     if(obj.m_titleType == "series") {
-        obj.m_episode = item["episode"].asString();
-        obj.m_season = item["season"].asString();
-        obj.m_parentTconst = item["parentTconst"].asString();
+        obj.m_episode = child.get<std::string>("episode");
+        obj.m_season = child.get<std::string>("season");
+        obj.m_parentTconst = child.get<std::string>("parentTconst");
     }
-    obj.m_title = item["title"].asString();
-    obj.m_genre = item["genre"].asString();
-    obj.m_region = item["region"].asString();
-    obj.m_language = item["language"].asString();
-    obj.m_directors = item["directors"].asString();
-    obj.m_writers = item["writers"].asString();
-    obj.m_runtimeMinutes = item["runtimeMinutes"].asString();
-    obj.m_startYear = item["startYear"].asString();
-    obj.m_endYear = item["endYear"].asString();
     return obj;
 }

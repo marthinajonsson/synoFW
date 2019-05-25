@@ -57,7 +57,7 @@ public:
             return "/video/film/MovieSequels";
         }
         else if(pattern.find("doc") != std::string::npos) {
-            return "/video/film/DocumentaryTalkShow";
+            return "/video/film/Documentary";
         }
         else if(pattern.find("serie") != std::string::npos) {
             return "/video/series";
@@ -99,7 +99,7 @@ public:
             return "/volume1/video/film/MovieSequels";
         }
         else if(pattern.find("doc") != std::string::npos) {
-            return "/volume1/video/film/DocumentaryTalkShow";
+            return "/volume1/video/film/Documentary";
         }
         else if(pattern.find("serie") != std::string::npos) {
             return "/volume1/video/series";
