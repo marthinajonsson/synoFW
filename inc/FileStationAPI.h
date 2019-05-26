@@ -22,6 +22,7 @@ public:
         loadConfig();
     }
     ~FileStationAPI() = default;
+    bool testing = false;
 
     void makeRequest(std::string&) override;
     std::string loadAPI(std::string&) override;

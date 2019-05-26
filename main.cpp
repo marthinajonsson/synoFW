@@ -5,6 +5,7 @@
 #include <include/gmock/gmock.h>
 
 #include "CacheTest.h"
+#include "FileStationTest.h"
 
 #include "Logger.h"
 #include "EventLogger.h"

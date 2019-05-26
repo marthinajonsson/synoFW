@@ -53,6 +53,7 @@ std::string FileStationAPI::loadMethod(std::string& api, int&val)
     if(method.size() == 1) {
         std::cout << "Method chosen: " << method[val]["name"].asString() << std::endl;
     }else {
+        if(testing) { return method[0]["name"].asString(); }
         std::cout << "Choose method: ";
         std::cin >> val;
     }

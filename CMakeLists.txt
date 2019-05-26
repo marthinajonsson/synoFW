@@ -15,7 +15,7 @@ add_subdirectory(external/gtest/googlemock)
 
 set(Test
         ${CMAKE_CURRENT_LIST_DIR}/unittest/TestStartup.h
-        ${CMAKE_CURRENT_LIST_DIR}/unittest/CacheTest.h)
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/CacheTest.h unittest/FileStationTest.h)
 
 set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/Methods.h
