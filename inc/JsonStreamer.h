@@ -5,8 +5,6 @@
 #ifndef SYNOFW_JSONREADWRITE_H
 #define SYNOFW_JSONREADWRITE_H
 
-
-#include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/lexical_cast.hpp>
 #include <string>

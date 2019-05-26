@@ -6,6 +6,10 @@
 #define SYNOFW_FILESTATIONAPI_H
 
 
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
 #include <json/json.h>
 #include <fstream>
 #include <string>

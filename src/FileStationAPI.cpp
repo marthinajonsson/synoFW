@@ -9,22 +9,18 @@
 #include "ParamHandling.h"
 #include "ErrorCodes.h"
 
+typedef boost::property_tree::ptree ptree;
+
 std::string FileStationAPI::loadAPI(std::string &api) {
 
-    Json::Value root;
+    ptree root;
+    boost::property_tree::read_json("../api/API_FS", root);
 
-    std::ifstream json("../api/API_FS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    for (Json::Value::const_iterator its=root.begin(); its!=root.end(); ++its) {
-        auto key = its.key().asString();
-        std::string API = key;
-
-        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-        auto found = key.find(api);
-        if(found != std::string::npos) {
-            return API;
+    for(auto it : root) {
+        auto key = it.first;
+        auto tmp = boost::algorithm::to_lower_copy(key);
+        if(tmp.find(api) != std::string::npos) {
+            return key;
         }
     }
     throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_API_DOES_NOT_EXISTS, "No API found");
@@ -32,36 +28,39 @@ std::string FileStationAPI::loadAPI(std::string &api) {
 
 std::string FileStationAPI::loadMethod(std::string& api, int&val)
 {
-    Json::Value root;
-
-    std::ifstream json("../api/API_FS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    int i = 0;
     val = 0;
-    Json::Value method = root[api]["method"];
+    ptree root;
+    boost::property_tree::read_json("../api/API_FS", root);
+    boost::property_tree::ptree node;
 
-    for (Json::Value::const_iterator its=method.begin(); its!=method.end(); ++its) {
-        auto object = *its;
-        auto nameObj = object["name"];
-        auto nameStr = nameObj.asString();
-        std::cout << i << ": " << nameStr << std::endl;
-        i++;
+    auto nodeIt = root.find(api);
+    if(root.not_found() != nodeIt) {
+        node = (*nodeIt).second;
+    }
+    auto methods = node.get_child("method");
+    std::vector<std::string> vec;
+
+    BOOST_FOREACH(ptree::value_type& v, methods) {
+        auto n = v.second.get<std::string>("name");
+        vec.push_back(n);
+    }
+    if(vec.size() == 1 || testing ) {
+        return vec.front();
     }
 
-    if(method.size() == 1) {
-        std::cout << "Method chosen: " << method[val]["name"].asString() << std::endl;
-    }else {
-        if(testing) { return method[0]["name"].asString(); }
-        std::cout << "Choose method: ";
-        std::cin >> val;
+    for(auto &s : vec) {
+        std::cout << val << ": " << s << std::endl;
     }
-    auto result = method[val]["name"].asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
+
+    std::cout << "Choose method: " << std::endl;
+    std::cin >> val;
+
+    if(!vec.at(val).empty()) {
+        return vec.at(val);
     }
-    return result;
+
+    throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
+
 }
 
 std::string FileStationAPI::loadParams(std::string &api, int &val) {
