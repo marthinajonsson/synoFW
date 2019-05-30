@@ -15,106 +15,7 @@
 #include "ErrorCodes.h"
 
 
-std::string VideoStationAPI::loadAPI(std::string &api) {
-
-    Json::Value root;
-
-    std::ifstream json("../api/API_VS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    for (Json::Value::const_iterator its=root.begin(); its!=root.end(); ++its) {
-        auto key = its.key().asString();
-        std::string API = key;
-
-        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
-        auto found = key.find(api);
-        if(found != std::string::npos) {
-            return API;
-        }
-    }
-    throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_API_DOES_NOT_EXISTS, "No API found");
-
-}
-
-std::string VideoStationAPI::loadMethod(std::string& api, int& val)
-{
-    Json::Value root;
-
-    std::ifstream json("../api/API_VS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    int i = 0;
-    Json::Value method = root[api]["method"];
-    for (Json::Value::const_iterator its=method.begin(); its!=method.end(); ++its) {
-        auto object = *its;
-        auto nameObj = object["name"];
-        auto nameStr = nameObj.asString();
-        std::cout << i << ": " << nameStr << std::endl;
-        i++;
-    }
-    std::cout << "Choose method: ";
-    std::cin >> val;
-    auto result = method[val]["name"].asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
-    }
-    return result;
-}
-
-std::string VideoStationAPI::loadParams(std::string &api, int &val) {
-
-    Json::Value root;
-
-    std::ifstream json("../api/API_VS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    auto params = root[api]["method"][val]["param"];
-    auto optional = root[api]["method"][val]["optional"];
-    auto result = params.asString() + ":" + optional.asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter of API method");
-    }
-    return result;
-}
-
-std::string VideoStationAPI::loadPath(std::string& api) {
-    Json::Value root;
-
-    std::ifstream json("../api/API_VS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    auto params = root[api]["path"];
-    auto result = params.asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter API path");
-    }
-    return result;
-}
-
-std::string VideoStationAPI::loadVersion(std::string& api) {
-    Json::Value root;
-
-    std::ifstream json("../api/API_VS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    auto params = root[api]["maxVersion"];
-    auto result = params.asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter Version for this API");
-    }
-    return result;
-}
-
-std::string VideoStationAPI::loadResponse(std::string &api, int &val) {
-    return "";
-}
-
-std::vector<std::string> VideoStationAPI::respParser(Json::Value &respData, std::string &, std::string &) {
+std::vector<std::string> VideoStationAPI::respParser(boost::property_tree::ptree &respData, std::string &, std::string &) {
 
     return {""};
 }
@@ -165,7 +66,7 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
             std::string val;
             std::cout << "Choose path" << std::endl;
             std::cin >> val;
-            ParamHandling param;
+            ParamHandling param(testing);
             std::string path = param.getPath(val);
             std::cout << "Path set to: " << path << std::endl;
             fullParamStr+=path;
@@ -179,19 +80,19 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     /*
      * info, folder, movie, tvshow, library
      * */
-    auto API = loadAPI(parsed);
+    auto API = loadAPI(__FILE__, parsed);
     int index = 0;
-    auto method = loadMethod(API, index);
+    auto method = loadMethod(__FILE__, API, index);
     /*
      * get, list
      * */
-    auto path = loadPath(API);
+    auto path = loadPath(__FILE__, API);
     requestUrl+=info_s.server;
     requestUrl+="/webapi/"+path;
     requestUrl+="?api="+API;
 
-    auto version = loadVersion(API);
-    auto params = loadParams(API, index);
+    auto version = loadVersion(__FILE__, API);
+    auto params = loadParams(__FILE__, API, index);
     requestUrl+="&version="+version;
     requestUrl+="&method="+method;
     auto compiledParam = paramParser(API, params);
@@ -200,5 +101,5 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     removeEndOfLines(requestUrl);
 
     std::cout << requestUrl << std::endl;
-    auto responseObject = RequestHandler::getInstance().make(requestUrl, "VideoStation", info_s.username, info_s.password);
+    auto responseObject = RequestHandler::getInstance().make(requestUrl, __FILE__, info_s.username, info_s.password, info_s.server);
 }

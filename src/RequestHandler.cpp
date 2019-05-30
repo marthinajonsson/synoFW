@@ -5,12 +5,12 @@
 
 #include "RequestHandler.h"
 
+#include <boost/property_tree/ptree.hpp>
 #include <ErrorCodes.h>
 #include <curl/curl.h>
 #include <iostream>
 #include <assert.h>
 #include <fstream>
-
 
 std::mutex single;
 static std::string sid("undef");
@@ -32,36 +32,7 @@ std::size_t callback(const char* in, std::size_t size, std::size_t num, std::str
     return totalBytes;
 }
 
-void RequestHandler::parseData(const Json::Value &data, std::vector<std::string> &argVec) {
-
-    for (Json::Value::const_iterator it=data.begin(); it!=data.end(); ++it) {
-        std::string data = it.key().asString() + ':' + it->asString();
-
-        argVec.emplace_back(data);
-    }
-}
-
-void RequestHandler::parseArgData(const Json::Value &data, std::vector<std::string> &argVec, std::string &&arg)
-{
-    if(!data.isMember(arg)){
-        std::cout << "Key doesn't exists" << std::endl;
-        return;
-    }
-
-    auto val = data[arg];
-    if(val.isArray()) {
-        for(const auto &v : val) {
-            argVec.emplace_back(v.asString());
-        }
-    }
-    else {
-        argVec.emplace_back(val.asString());
-
-    }
-}
-
-
-void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string &url) {
+void RequestHandler::sendHttpGetRequest(boost::property_tree::ptree &jsonData, const std::string &url) {
 
     CURL* curl = curl_easy_init();
 
@@ -73,71 +44,59 @@ void RequestHandler::sendHttpGetRequest(Json::Value &jsonData, const std::string
 
 
     long int httpCode(0);
-    std::unique_ptr<std::string> httpData(new std::string());
+    std::stringstream response;
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, httpData.get());
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
     curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     curl_easy_cleanup(curl);
 
-    Json::CharReaderBuilder builder;
-    Json::CharReader * reader = builder.newCharReader();
-    std::string errors;
-
-    bool result = reader->parse(httpData.get()->c_str(), httpData->end().base(), &jsonData, &errors);
-
-    delete reader;
+    boost::property_tree::read_json(response, jsonData);
 }
 
-void RequestHandler::getApiInfo() {
-    std::cout << "get API Info.. " << std::endl;
-    Json::Value jsonData;
-    //std::string url = "http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all";
-    std::string url = "http://192.168.0.107:5000/webapi/query.cgi?api=SYNO.API.Info&version=1&method=query&query=all";
-    sendHttpGetRequest(jsonData, url);
-
-    if(!jsonData["success"].asBool()) {
-        GENERIC::printError(jsonData);
-    }
-
-    std::ofstream db_write("../api/Api_Info.json", std::ios::trunc);
-    db_write << jsonData["data"];
-    db_write.close();
-
-}
-
-void RequestHandler::login(const std::string &session, const std::string& user, const std::string& pwd) {
+void RequestHandler::login(const std::string &session, const std::string& user, const std::string& pwd, const std::string& server) {
 
     std::cout << "LOGIN.. " << std::endl;
-    Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+user+"&passwd="+pwd+"&session="+session+"&format=sid";
+    boost::property_tree::ptree jsonData;
+    std::string url = server;
+    url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+user+"&passwd="+pwd+"&session="+session+"&format=sid");
     removeEndOfLines(url);
+
+    std::cout << "Sending HTTP request to URL: " << url << std::endl;
     sendHttpGetRequest(jsonData, url);
 
-    if(!jsonData["success"].asBool()) {
+    auto val = jsonData.get<bool>("success");
+    if(!val) {
         GENERIC::printError(jsonData);
     }
 
-    sid = jsonData["data"]["sid"].toStyledString();
+    auto nodeIt = jsonData.find("data");
+    if(jsonData.not_found() != nodeIt) {
+        jsonData = (*nodeIt).second;
+    }
+
+    sid = jsonData.get<std::string>("sid");
 }
 
-void RequestHandler::logoff(const std::string &session) {
+void RequestHandler::logoff(const std::string &session, const std::string &server) {
     std::cout << "LOGOUT.." << std::endl;
-    Json::Value jsonData;
-    std::string url = "http://192.168.0.107:5000/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session="+session;
+    boost::property_tree::ptree jsonData;
+    std::string url = server;
+    url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session="+session);
     removeEndOfLines(url);
     sendHttpGetRequest(jsonData, url);
 
     sid = "undef";
 
-    if(!jsonData["success"].asBool()) {
+    auto val = jsonData.get<bool>("success");
+    if(!val) {
         GENERIC::printError(jsonData);
     }
 }
 
-Json::Value RequestHandler::send(std::string &url) {
+boost::property_tree::ptree RequestHandler::send(std::string &url) {
 
-    Json::Value jsonData;
+    boost::property_tree::ptree jsonData;
 
     try {
        if(sid == "undef" || sid.length() < 5) {
@@ -146,7 +105,7 @@ Json::Value RequestHandler::send(std::string &url) {
     }
     catch (GENERIC::UnhandledRequestException &ex) {
         std::cerr << ex.what() << std::endl;
-        jsonData["success"] = "false";
+        auto val = jsonData.get<std::string>("success");
         return jsonData;
     }
 
@@ -156,10 +115,7 @@ Json::Value RequestHandler::send(std::string &url) {
     sendHttpGetRequest(jsonData, url);
 
     // TODO how to collaborate with CacheMgr?
-    std::ofstream db_write("../api/RequestResponse.json", std::ios::trunc);
-    db_write << jsonData;
-    db_write.close();
-
+    boost::property_tree::json_parser::write_json("../api/RequestResponse.json", jsonData);
     return jsonData;
 }
 

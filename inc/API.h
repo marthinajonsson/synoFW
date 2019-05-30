@@ -7,8 +7,12 @@
 
 #include <string>
 #include <fstream>
-#include <json/value.h>
 #include <cstring>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
+
 
 class API {
 public:
@@ -16,14 +20,16 @@ public:
     API() = default;
     ~API() = default;
 
-    virtual std::string loadAPI(std::string&) = 0;
-    virtual std::string loadMethod(std::string&, int&) = 0;
-    virtual std::string loadPath(std::string&) = 0;
-    virtual std::string loadVersion(std::string&) = 0;
-    virtual std::string loadParams(std::string&, int&) = 0;
-    virtual std::string loadResponse(std::string&, int&) = 0;
+    bool testing = false;
+    std::string loadAPI(const char*, std::string&);
+    std::string loadMethod(const char*, std::string&, int&);
+    std::string loadPath(const char*, std::string&);
+    std::string loadVersion(const char*, std::string&);
+    std::string loadParams(const char*, std::string&, int&);
+    std::string loadResponse(const char*, std::string&, int&);
+
     virtual std::string paramParser(std::string &,std::string&) = 0;
-    virtual std::vector<std::string> respParser(Json::Value &, std::string &,std::string&) = 0;
+    virtual std::vector<std::string> respParser(boost::property_tree::ptree &, std::string &,std::string&) = 0;
     virtual void makeRequest(std::string&) = 0;
 
 protected:
@@ -36,13 +42,14 @@ protected:
 
     void loadConfig() {
 
-        Json::Value root;
-        std::ifstream db_read("../config.json", std::ifstream::binary);
-        db_read >> root;
-        db_read.close();
-        strcpy(info_s.username, root["username"].asCString());
-        strcpy(info_s.password,root["password"].asCString());
-        strcpy(info_s.server, root["server"].asCString());
+        boost::property_tree::ptree root;
+        boost::property_tree::read_json("../config.json", root);
+        auto val = root.get<std::string>("username");
+        strcpy(info_s.username, val.c_str());
+        val = root.get<std::string>("password");
+        strcpy(info_s.password, val.c_str());
+        val = root.get<std::string>("server");
+        strcpy(info_s.server, val.c_str());
     }
 };
 

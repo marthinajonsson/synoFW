@@ -6,6 +6,8 @@
 
 #include "CacheTest.h"
 #include "FileStationTest.h"
+#include "FsRequestTest.h"
+#include "VsRequestTest.h"
 
 #include "Logger.h"
 #include "EventLogger.h"

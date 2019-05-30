@@ -9,178 +9,65 @@
 #include "ParamHandling.h"
 #include "ErrorCodes.h"
 
-typedef boost::property_tree::ptree ptree;
-
-std::string FileStationAPI::loadAPI(std::string &api) {
-
-    ptree root;
-    boost::property_tree::read_json("../api/API_FS", root);
-
-    for(auto it : root) {
-        auto key = it.first;
-        auto tmp = boost::algorithm::to_lower_copy(key);
-        if(tmp.find(api) != std::string::npos) {
-            return key;
-        }
-    }
-    throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_API_DOES_NOT_EXISTS, "No API found");
-}
-
-std::string FileStationAPI::loadMethod(std::string& api, int&val)
-{
-    val = 0;
-    ptree root;
-    boost::property_tree::read_json("../api/API_FS", root);
-    boost::property_tree::ptree node;
-
-    auto nodeIt = root.find(api);
-    if(root.not_found() != nodeIt) {
-        node = (*nodeIt).second;
-    }
-    auto methods = node.get_child("method");
-    std::vector<std::string> vec;
-
-    BOOST_FOREACH(ptree::value_type& v, methods) {
-        auto n = v.second.get<std::string>("name");
-        vec.push_back(n);
-    }
-    if(vec.size() == 1 || testing ) {
-        return vec.front();
-    }
-
-    for(auto &s : vec) {
-        std::cout << val << ": " << s << std::endl;
-    }
-
-    std::cout << "Choose method: " << std::endl;
-    std::cin >> val;
-
-    if(!vec.at(val).empty()) {
-        return vec.at(val);
-    }
-
-    throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
-
-}
-
-std::string FileStationAPI::loadParams(std::string &api, int &val) {
-
-    Json::Value root;
-
-    std::ifstream json("../api/API_FS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    auto params = root[api]["method"][val]["param"];
-    auto optional = root[api]["method"][val]["optional"];
-    auto result = params.asString() + ":" + optional.asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter of API method");
-    }
-    return result;
-}
-
-std::string FileStationAPI::loadPath(std::string& api) {
-    Json::Value root;
-
-    std::ifstream json("../api/API_FS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    auto params = root[api]["path"];
-    auto result = params.asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter API path");
-    }
-    return result;
-}
-
-std::string FileStationAPI::loadVersion(std::string& api) {
-    Json::Value root;
-
-    std::ifstream json("../api/API_FS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    auto params = root[api]["maxVersion"];
-    auto result = params.asString();
-    if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter Version for this API");
-    }
-    return result;
-}
-
-std::string FileStationAPI::loadResponse(std::string &api, int &val) {
-    Json::Value root;
-
-    std::ifstream json("../api/API_FS", std::ifstream::binary);
-    json >> root;
-    json.close();
-
-    auto response = root[api]["method"][val]["response"];
-    auto result = response.asString();
-    return result;
-}
-
-std::vector<std::string> FileStationAPI::respParser(Json::Value &respData, std::string &api, std::string &response) {
+std::vector<std::string> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response) {
 
     std::vector<std::string> respVec = split(response, ':');
     std::string fullRespStr;
-    ParamHandling param;
-
-    for(const std::string &s:respVec)
-    {
-        if(s == "taskid"){
-            if(api.find("Search")) {
-                search_id = s;
-            }else if(api.find("Delete")) {
-                delete_id = s;
-            }
-        }
-        else if(s == "total" || s == "offset" || s == "finished" || s == "progress" ||
-        s == "processing_path" || s == "path")
-        {
-            try {
-                std::cout << s << " : " << respData["data"][s].asString() << std::endl;
-            }
-            catch (Json::Exception &ex) {
-                std::cerr << "Printing string" << ex.what() << std::endl;
-            }
-        }
-        else if(s == "shares" || s == "folders")
-        {
-            try {
-                std::cout << s << " : {\n"  << respData["data"][s] << "\n}" << std::endl;
-            }
-            catch (Json::Exception &ex) {
-                std::cerr << "Printing object" << ex.what() << std::endl;
-            }
-        }
-        else if(s == "files")
-        {
-            try {
-                std::cout << s << " : {\n";
-                for (Json::Value::const_iterator its=respData["data"][s].begin(); its!=respData["data"][s].end(); ++its) {
-                    auto object = *its;
-                    auto nameObj = object["name"];
-                    auto nameStr = nameObj.asString();
-                    auto found = nameStr.find("vsmeta");
-                    if(found != std::string::npos) {
-                        continue;
-                    }
-                    found = nameStr.find(".srt");
-                    if(found != std::string::npos){
-                        continue;
-                    }
-                }
-                std::cout << " \n}";
-            }
-            catch (Json::Exception &ex) {
-                std::cerr << "Printing object" << ex.what() << std::endl;
-            }
-        }
-
-    }
+    ParamHandling param(testing);
+//
+//    for(const std::string &s:respVec)
+//    {
+//        if(s == "taskid"){
+//            if(api.find("Search")) {
+//                search_id = s;
+//            }else if(api.find("Delete")) {
+//                delete_id = s;
+//            }
+//        }
+//        else if(s == "total" || s == "offset" || s == "finished" || s == "progress" ||
+//        s == "processing_path" || s == "path")
+//        {
+//            try {
+//                std::cout << s << " : " << respData["data"][s].asString() << std::endl;
+//            }
+//            catch (Json::Exception &ex) {
+//                std::cerr << "Printing string" << ex.what() << std::endl;
+//            }
+//        }
+//        else if(s == "shares" || s == "folders")
+//        {
+//            try {
+//                std::cout << s << " : {\n"  << respData["data"][s] << "\n}" << std::endl;
+//            }
+//            catch (Json::Exception &ex) {
+//                std::cerr << "Printing object" << ex.what() << std::endl;
+//            }
+//        }
+//        else if(s == "files")
+//        {
+//            try {
+//                std::cout << s << " : {\n";
+//                for (Json::Value::const_iterator its=respData["data"][s].begin(); its!=respData["data"][s].end(); ++its) {
+//                    auto object = *its;
+//                    auto nameObj = object["name"];
+//                    auto nameStr = nameObj.asString();
+//                    auto found = nameStr.find("vsmeta");
+//                    if(found != std::string::npos) {
+//                        continue;
+//                    }
+//                    found = nameStr.find(".srt");
+//                    if(found != std::string::npos){
+//                        continue;
+//                    }
+//                }
+//                std::cout << " \n}";
+//            }
+//            catch (Json::Exception &ex) {
+//                std::cerr << "Printing object" << ex.what() << std::endl;
+//            }
+//        }
+//
+//    }
     return {""};
 }
 
@@ -188,7 +75,7 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
 
     std::vector<std::string> paramVec = split(params, ':');
     std::string fullParamStr;
-    ParamHandling handler;
+    ParamHandling handler(testing);
 
     for(const std::string &s:paramVec) {
         if(s.empty()) {
@@ -282,15 +169,14 @@ void FileStationAPI::makeRequest(std::string& parsed) {
     /*
      * info, list, search, create, upload, download, delete
      * */
-
     int indexedMethod = 0;
     std::string serverUrl = info_s.server;
 
-    auto api = loadAPI(parsed);
-    auto method = loadMethod(api, indexedMethod);
-    auto path = loadPath(api);
-    auto version = loadVersion(api);
-    auto params = loadParams(api, indexedMethod);
+    auto api = loadAPI(__FILE__, parsed);
+    auto method = loadMethod(__FILE__, api, indexedMethod);
+    auto path = loadPath(__FILE__, api);
+    auto version = loadVersion(__FILE__, api);
+    auto params = loadParams(__FILE__, api, indexedMethod);
     auto resultParams = paramParser(api, params);
 
     RequestUrlBuilder urlBuilder (serverUrl, path, api, version, method, resultParams);
@@ -299,8 +185,8 @@ void FileStationAPI::makeRequest(std::string& parsed) {
 #if DEBUG
     std::cout << url << std::endl;
 #endif
-    auto responseObject = RequestHandler::getInstance().make(url, "FileStation", info_s.username, info_s.password);
-    std::string responses = loadResponse(api, indexedMethod);
+    auto responseObject = RequestHandler::getInstance().make(url, __FILE__, info_s.username, info_s.password, info_s.server);
+    std::string responses = loadResponse(__FILE__, api, indexedMethod);
     respParser(responseObject, api, responses);
 }
 

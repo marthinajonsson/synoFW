@@ -7,7 +7,6 @@
 
 
 #include <algorithm>
-#include <json/json.h>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,6 +14,7 @@
 #include <map>
 
 #include <Utilities.h>
+#include <boost/property_tree/ptree.hpp>
 
 
 namespace GENERIC {
@@ -50,17 +50,23 @@ namespace GENERIC {
         UnhandledRequestException() : std::logic_error("Unexpected error during request") {}
     };
 
-    static void printError(Json::Value &response) {
-
-        int code = response["error"]["code"].asInt();
-        std::cout << "Request failed - " << code;
-        auto errArray = response["error"]["errors"];
-        for(auto a : errArray) {
-            for (Json::Value::const_iterator it=a.begin(); it!=a.end(); ++it) {
-                auto fault = it->asString();
-                std::cout << "\n" << fault << std::endl;
-            }
+    static void printError(boost::property_tree::ptree &response)
+    {
+        boost::property_tree::ptree node;
+        auto nodeIt = response.find("error");
+        if(response.not_found() != nodeIt) {
+            node = (*nodeIt).second;
         }
+
+        int code = node.get<int>("code");
+        std::cout << "Request failed - " << code;
+//        auto errArray = response["error"]["errors"];
+//        for(auto a : errArray) {
+//            for (Json::Value::const_iterator it=a.begin(); it!=a.end(); ++it) {
+//                auto fault = it->asString();
+//                std::cout << "\n" << fault << std::endl;
+//            }
+//        }
     }
 }
 #endif //SYNOFW_ERRORCODES_H

@@ -5,7 +5,11 @@
 #ifndef SYNOFW_REQUESTHANDLER_H
 #define SYNOFW_REQUESTHANDLER_H
 
-#include <json/json.h>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/foreach.hpp>
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -19,15 +23,10 @@ private:
     RequestHandler() = default;
     ~RequestHandler() = default;
 
-    void parseArgData(const Json::Value &data, std::vector<std::string> &argVec, std::string &&arg);
-    void parseData(const Json::Value &data, std::vector<std::string> &argVec);
-
-
-    void sendHttpGetRequest(Json::Value &jsonData, const std::string &url);
-    void getApiInfo();
-    Json::Value send(std::string &url);
-    void login(const std::string&, const std::string&, const std::string&);
-    void logoff(const std::string&);
+    void sendHttpGetRequest(boost::property_tree::ptree &jsonData, const std::string &url);
+    boost::property_tree::ptree send(std::string &url);
+    void login(const std::string&, const std::string&, const std::string&, const std::string&);
+    void logoff(const std::string&, const std::string&);
 
 public:
 
@@ -35,11 +34,12 @@ public:
     RequestHandler(RequestHandler const&) = delete;
     void operator=(RequestHandler const&) = delete;
 
-    Json::Value make(std::string &url, std::string&& session, const std::string& user, const std::string& pwd)
+    boost::property_tree::ptree make(std::string &url, const char* file, const std::string& user, const std::string& pwd, const std::string& server)
     {
-        login(session, user, pwd);
+        std::string session = strcmp(file, "VideoStation") != 0 ? "VideoStation" : strcmp(file, "FileStation") != 0 ? "FileStation" : "VideoStation";
+        login(session, user, pwd, server);
         auto rsp = send(url);
-        logoff(session);
+        logoff(session, server);
         return rsp;
     }
 };

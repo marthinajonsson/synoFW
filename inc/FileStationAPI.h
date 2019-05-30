@@ -5,12 +5,6 @@
 #ifndef SYNOFW_FILESTATIONAPI_H
 #define SYNOFW_FILESTATIONAPI_H
 
-
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/foreach.hpp>
-#include <json/json.h>
 #include <fstream>
 #include <string>
 #include <map>
@@ -20,26 +14,16 @@
 #include "RequestHandler.h"
 
 
-class FileStationAPI : API {
+class FileStationAPI : public API {
 public:
     FileStationAPI() {
         loadConfig();
     }
     ~FileStationAPI() = default;
-    bool testing = false;
-
     void makeRequest(std::string&) override;
-    std::string loadAPI(std::string&) override;
-    std::string loadMethod(std::string&, int&) override;
-    std::string loadParams(std::string&, int&) override;
-    std::string loadPath(std::string&) override;
-    std::string loadVersion(std::string&) override;
-    std::string loadResponse(std::string&, int&) override;
     std::string paramParser(std::string &, std::string&) override;
-    std::vector<std::string> respParser(Json::Value &, std::string &,std::string&) override;
+    std::vector<std::string> respParser(boost::property_tree::ptree &, std::string &,std::string&) override;
 private:
-
-    std::string requestUrl;
     std::string search_id;
     std::string delete_id;
 };
