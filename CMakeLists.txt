@@ -15,7 +15,10 @@ add_subdirectory(external/gtest/googlemock)
 
 set(Test
         ${CMAKE_CURRENT_LIST_DIR}/unittest/TestStartup.h
-        ${CMAKE_CURRENT_LIST_DIR}/unittest/CacheTest.h unittest/FileStationTest.h unittest/FsRequestTest.h unittest/VsRequestTest.h)
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/CacheTest.h
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/FileStationTest.h
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/FsRequestTest.h
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/VsRequestTest.h)
 
 set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/Methods.h
@@ -54,7 +57,9 @@ set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/src/VideoStationAPI.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/CacheMgr.cpp
         ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/JsonStreamer.cpp src/ParamHandling.cpp src/API.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/src/JsonStreamer.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/ParamHandling.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/API.cpp)
 
 
 

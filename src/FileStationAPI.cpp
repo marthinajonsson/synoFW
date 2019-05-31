@@ -4,6 +4,8 @@
 
 #include <iostream>
 #include <algorithm>
+#include <boost/assert.hpp>
+
 #include "RequestUrlBuilder.h"
 #include "FileStationAPI.h"
 #include "ParamHandling.h"
@@ -14,6 +16,22 @@ std::vector<std::string> FileStationAPI::respParser(boost::property_tree::ptree 
     std::vector<std::string> respVec = split(response, ':');
     std::string fullRespStr;
     ParamHandling param(testing);
+    boost::property_tree::ptree pData, tmp;
+    boost::property_tree::read_json("../api/RequestResponse.json", respData);
+    pData = respData.get_child("data");
+    pData = pData.get_child("object");
+
+    BOOST_FOREACH(boost::property_tree::ptree::value_type& v, pData) {
+        auto p = v.second.get_child("");
+        auto t = p.get<std::string>("title");
+        auto ps = p.get<std::string>("path");
+        BOOST_ASSERT(!p.empty());
+        //boost::property_tree::write_json(std::cout, p);
+        std::cout << "TITLE " << t << std::endl;
+        std::cout << "PATH " << ps << std::endl;
+    }
+  //  std::stringstream ss;
+    //boost::property_tree::write_json(std::cout, pData);
 //
 //    for(const std::string &s:respVec)
 //    {
@@ -48,7 +66,7 @@ std::vector<std::string> FileStationAPI::respParser(boost::property_tree::ptree 
 //            try {
 //                std::cout << s << " : {\n";
 //                for (Json::Value::const_iterator its=respData["data"][s].begin(); its!=respData["data"][s].end(); ++its) {
-//                    auto object = *its;
+//                    auto object = /*its;
 //                    auto nameObj = object["name"];
 //                    auto nameStr = nameObj.asString();
 //                    auto found = nameStr.find("vsmeta");

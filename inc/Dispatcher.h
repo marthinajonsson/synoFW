@@ -41,6 +41,7 @@ public:
         else if(request.find("fs") != std::string::npos) {
             return std::bind(&FileStationAPI::makeRequest, &fs, request);
         }
+        return [] () { };
     }
 };
 

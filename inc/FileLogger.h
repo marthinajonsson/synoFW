@@ -18,13 +18,14 @@
 
 #define GetCurrentDir getcwd
 
-static std::mutex readwrite;
+static std::mutex m_write;
 
 
 class FileLogger : public Observer {
 public:
 
     FileLogger() {
+
         logfile.open(getFilename(), std::ios::out | std::ios::app);
     }
 
@@ -36,6 +37,8 @@ public:
         std::string info = subject->getInfo();
         write(event, info);
     }
+
+
 
 private:
 
@@ -90,7 +93,7 @@ private:
     }
 
     void write(SeverityType level, std::string &output) {
-        std::lock_guard<std::mutex> lock(readwrite);
+        std::lock_guard<std::mutex> lock(m_write);
         std::string time = getTime();
         time = "[" + time + "]";
         logfile << time + output + "\n";

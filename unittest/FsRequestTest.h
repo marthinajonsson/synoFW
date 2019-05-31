@@ -41,4 +41,11 @@ TEST_F(FsRequestTest, fsList) {
     std::string input = "list";
     fs->makeRequest(input);
 }
+
+TEST_F(FsRequestTest, fsResp) {
+    std::string input = "SYNO.FileStation.Info";
+    std::string data = "data";
+    boost::property_tree::ptree test;
+    fs->respParser(test, input, data);
+}
 #endif //SYNOFW_FSREQUESTTEST_H

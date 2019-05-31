@@ -11,6 +11,7 @@
 
 #include "Logger.h"
 #include "EventLogger.h"
+#include "FileLogger.h"
 #include "ActiveObject.h"
 #include <RequestHandler.h>
 #include <CacheMgr.h>
@@ -21,21 +22,9 @@
 
 std::shared_ptr pLog = std::make_shared<Logger>();
 
-
-static bool parseImdb(std::string title, std::shared_ptr<Logger> &logger) {
+static bool parseImdb(std::string title) {
     CacheMgr::getInstance().validate(title);
     DatabaseObject obj = CacheMgr::getInstance().get(title);
-    logger->writeLog(SeverityType::GENERAL, obj.m_title);
-    logger->writeLog(SeverityType::GENERAL, obj.m_titleId);
-    logger->writeLog(SeverityType::GENERAL, obj.m_titleType);
-    logger->writeLog(SeverityType::GENERAL, obj.m_genre);
-    logger->writeLog(SeverityType::GENERAL, obj.m_language);
-    logger->writeLog(SeverityType::GENERAL, obj.m_runtimeMinutes);
-    logger->writeLog(SeverityType::GENERAL, obj.m_directors);
-    logger->writeLog(SeverityType::GENERAL, obj.m_writers);
-    logger->writeLog(SeverityType::GENERAL, obj.m_startYear);
-    logger->writeLog(SeverityType::GENERAL, obj.m_endYear);
-    logger->writeLog(SeverityType::GENERAL, obj.m_region);
     return true;
 }
 
@@ -80,7 +69,7 @@ int process()
     active.stop();
 
     if(active.stillRunning()) {
-        pLog->writeLog(SeverityType::ERROR, "Active thread still running");
+       pLog->writeLog(SeverityType::ERROR, "Active thread still running");
     }
     return -1;
 }
@@ -90,6 +79,7 @@ int main(int argc, char* argv [])
 {
     ::testing::InitGoogleMock(&argc, argv);
     return RUN_ALL_TESTS();
+
 //
 //    EventLogger *pElog = new EventLogger();
 //    pLog->registerObserver(SeverityType::GENERAL, pElog);
