@@ -59,14 +59,9 @@ namespace GENERIC {
         }
 
         int code = node.get<int>("code");
-        std::cout << "Request failed - " << code;
-//        auto errArray = response["error"]["errors"];
-//        for(auto a : errArray) {
-//            for (Json::Value::const_iterator it=a.begin(); it!=a.end(); ++it) {
-//                auto fault = it->asString();
-//                std::cout << "\n" << fault << std::endl;
-//            }
-//        }
+        node = node.get_child("errors");
+        int innerCode = node.get<int>("code");
+        std::cout << "Request failed - " << code << ", FS code: " << innerCode;
     }
 }
 #endif //SYNOFW_ERRORCODES_H

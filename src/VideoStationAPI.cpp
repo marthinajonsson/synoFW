@@ -22,7 +22,6 @@ std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boos
     std::string fullRespStr;
     ParamHandling param(testing);
     boost::property_tree::ptree pData, tmp;
-    boost::property_tree::read_json("../api/RequestResponse.json", respData);
     pData = respData.get_child("data");
     pData = pData.get_child("movie");
 
@@ -34,16 +33,6 @@ std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boos
     result.emplace_back(std::make_pair("path", path));
     result.emplace_back(std::make_pair("fileId", id));
     std::cout << "[" << id << "] " << title << std::endl;
-
-   // BOOST_FOREACH(boost::property_tree::ptree::value_type& root, pData) {
-//        auto root = v.second.get_child("");
-//        BOOST_ASSERT(!root.empty());
-//
-//        if (root.get<std::string>("type").find("folder") != std::string::npos) {
-//            continue;
-//        }
-
-   // }
     return result;
 }
 
@@ -107,19 +96,19 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     /*
      * info, folder, movie, tvshow, library
      * */
-    auto API = loadAPI(__FILE__, parsed);
+    auto API = loadAPI(apiFile, parsed);
     int index = 0;
-    auto method = loadMethod(__FILE__, API, index);
+    auto method = loadMethod(apiFile, API, index);
     /*
      * get, list
      * */
-    auto path = loadPath(__FILE__, API);
+    auto path = loadPath(apiFile, API);
     requestUrl+=info_s.server;
     requestUrl+="/webapi/"+path;
     requestUrl+="?api="+API;
 
-    auto version = loadVersion(__FILE__, API);
-    auto params = loadParams(__FILE__, API, index);
+    auto version = loadVersion(apiFile, API);
+    auto params = loadParams(apiFile, API, index);
     requestUrl+="&version="+version;
     requestUrl+="&method="+method;
     auto compiledParam = paramParser(API, params);
@@ -128,5 +117,5 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     removeEndOfLines(requestUrl);
 
     std::cout << requestUrl << std::endl;
-    auto responseObject = RequestHandler::getInstance().make(requestUrl, __FILE__, info_s.username, info_s.password, info_s.server);
+    auto responseObject = RequestHandler::getInstance().make(requestUrl, "VideoStation");
 }

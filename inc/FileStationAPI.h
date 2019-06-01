@@ -26,6 +26,7 @@ public:
 private:
     std::string search_id;
     std::string delete_id;
+    const std::string apiFile = "../api/API_FS";
 };
 
 

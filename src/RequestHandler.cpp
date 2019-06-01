@@ -54,12 +54,12 @@ void RequestHandler::sendHttpGetRequest(boost::property_tree::ptree &jsonData, c
     boost::property_tree::read_json(response, jsonData);
 }
 
-void RequestHandler::login(const std::string &session, const std::string& user, const std::string& pwd, const std::string& server) {
+void RequestHandler::login(const std::string &session) {
 
     std::cout << "LOGIN.. " << std::endl;
     boost::property_tree::ptree jsonData;
-    std::string url = server;
-    url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+user+"&passwd="+pwd+"&session="+session+"&format=sid");
+    std::string url = info_s.server;
+    url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+info_s.username+"&passwd="+info_s.password+"&session="+session+"&format=sid");
     removeEndOfLines(url);
 
     std::cout << "Sending HTTP request to URL: " << url << std::endl;
@@ -78,10 +78,10 @@ void RequestHandler::login(const std::string &session, const std::string& user, 
     sid = jsonData.get<std::string>("sid");
 }
 
-void RequestHandler::logoff(const std::string &session, const std::string &server) {
+void RequestHandler::logoff(const std::string &session) {
     std::cout << "LOGOUT.." << std::endl;
     boost::property_tree::ptree jsonData;
-    std::string url = server;
+    std::string url = info_s.server;
     url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session="+session);
     removeEndOfLines(url);
     sendHttpGetRequest(jsonData, url);
@@ -113,8 +113,6 @@ boost::property_tree::ptree RequestHandler::send(std::string &url) {
     removeEndOfLines(url);
     std::cout << "Sending HTTP request to URL: " << url << std::endl;
     sendHttpGetRequest(jsonData, url);
-
-    // TODO how to collaborate with CacheMgr?
     boost::property_tree::json_parser::write_json("../api/RequestResponse.json", jsonData);
     return jsonData;
 }

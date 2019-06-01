@@ -6,12 +6,10 @@
 #include "API.h"
 #include <cstring>
 
-std::string API::loadAPI(const char* file, std::string &api)
+std::string API::loadAPI(const std::string &file, std::string &api)
 {
-    std::string path = "../api/";
-    strcmp("FileStation", file) != 0 ? path.append("API_FS") :  strcmp("VideoStation", file) != 0  ? path.append("API_VS") : "";
     boost::property_tree::ptree root;
-    boost::property_tree::read_json(path, root);
+    boost::property_tree::read_json(file, root);
 
     for(auto it : root) {
         auto key = it.first;
@@ -23,12 +21,10 @@ std::string API::loadAPI(const char* file, std::string &api)
     throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_API_DOES_NOT_EXISTS, "No API found");
 }
 
-std::string API::loadMethod(const char* file, std::string& api, int&val)
+std::string API::loadMethod(const std::string &file, std::string& api, int&val)
 {
-    std::string path = "../api/";
-    strcmp("FileStation", file) != 0 ? path.append("API_FS") :  strcmp("VideoStation", file) != 0  ? path.append("API_VS") : "";
     boost::property_tree::ptree root;
-    boost::property_tree::read_json(path, root);
+    boost::property_tree::read_json(file, root);
     boost::property_tree::ptree node;
     val = 0;
 
@@ -62,11 +58,9 @@ std::string API::loadMethod(const char* file, std::string& api, int&val)
 
 }
 
-std::string API::loadParams(const char *file, std::string &api, int &val) {
-    std::string path = "../api/";
-    strcmp("FileStation", file) != 0 ? path.append("API_FS") :  strcmp("VideoStation", file) != 0  ? path.append("API_VS") : "";
+std::string API::loadParams(const std::string &file, std::string &api, int &val) {
     boost::property_tree::ptree root;
-    boost::property_tree::read_json(path, root);
+    boost::property_tree::read_json(file, root);
     boost::property_tree::ptree node;
     val = 0;
 
@@ -90,12 +84,9 @@ std::string API::loadParams(const char *file, std::string &api, int &val) {
 }
 
 
-std::string API::loadPath(const char* file, std::string& api) {
-
-    std::string path = "../api/";
-    strcmp("FileStation", file) != 0 ? path.append("API_FS") :  strcmp("VideoStation", file) != 0  ? path.append("API_VS") : "";
+std::string API::loadPath(const std::string &file, std::string& api) {
     boost::property_tree::ptree root;
-    boost::property_tree::read_json(path, root);
+    boost::property_tree::read_json(file, root);
     boost::property_tree::ptree node;
 
     auto nodeIt = root.find(api);
@@ -109,11 +100,9 @@ std::string API::loadPath(const char* file, std::string& api) {
     return result;
 }
 
-std::string API::loadVersion(const char* file, std::string& api) {
-    std::string path = "../api/";
-    strcmp("FileStation", file) != 0 ? path.append("API_FS") :  strcmp("VideoStation", file) != 0  ? path.append("API_VS") : "";
+std::string API::loadVersion(const std::string &file, std::string& api) {
     boost::property_tree::ptree root;
-    boost::property_tree::read_json(path, root);
+    boost::property_tree::read_json(file, root);
     boost::property_tree::ptree node;
 
     auto nodeIt = root.find(api);
@@ -127,11 +116,9 @@ std::string API::loadVersion(const char* file, std::string& api) {
     return result;
 }
 
-std::string API::loadResponse(const char* file, std::string &api, int &val) {
-    std::string path = "../api/";
-    strcmp("FileStation", file) != 0 ? path.append("API_FS") :  strcmp("VideoStation", file) != 0  ? path.append("API_VS") : "";
+std::string API::loadResponse(const std::string &file, std::string &api, int &val) {
     boost::property_tree::ptree root;
-    boost::property_tree::read_json(path, root);
+    boost::property_tree::read_json(file, root);
     boost::property_tree::ptree node;
     val = 0;
 

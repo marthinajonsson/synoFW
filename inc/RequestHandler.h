@@ -16,17 +16,31 @@
 #include <memory>
 #include <mutex>
 
-
+#include "ConfigHelper.h"
 
 class RequestHandler {
 private:
-    RequestHandler() = default;
+    struct ConfigInfoS {
+        std::string username;
+        std::string password;
+        std::string server;
+    }info_s;
+
+    ConfigHelper m_configHelper;
+
+    RequestHandler() {
+        auto config = m_configHelper.getConfig();
+        info_s.username = config.username;
+        info_s.password = config.password;
+        info_s.server = config.server;
+    };
+
     ~RequestHandler() = default;
 
-    void sendHttpGetRequest(boost::property_tree::ptree &jsonData, const std::string &url);
+    void login(const std::string&);
+    void logoff(const std::string&);
     boost::property_tree::ptree send(std::string &url);
-    void login(const std::string&, const std::string&, const std::string&, const std::string&);
-    void logoff(const std::string&, const std::string&);
+    void sendHttpGetRequest(boost::property_tree::ptree &jsonData, const std::string &url);
 
 public:
 
@@ -34,12 +48,11 @@ public:
     RequestHandler(RequestHandler const&) = delete;
     void operator=(RequestHandler const&) = delete;
 
-    boost::property_tree::ptree make(std::string &url, const char* file, const std::string& user, const std::string& pwd, const std::string& server)
+    boost::property_tree::ptree make(std::string &url, std::string&& session)
     {
-        std::string session = strcmp(file, "VideoStation") != 0 ? "VideoStation" : strcmp(file, "FileStation") != 0 ? "FileStation" : "VideoStation";
-        login(session, user, pwd, server);
+        login(session);
         auto rsp = send(url);
-        logoff(session, server);
+        logoff(session);
         return rsp;
     }
 };

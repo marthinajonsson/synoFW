@@ -19,24 +19,71 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
     ParamHandling param(testing);
     boost::property_tree::ptree pData, tmp;
     boost::property_tree::read_json("../api/RequestResponse.json", respData);
-    pData = respData.get_child("data");
-    pData = pData.get_child("object");
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type& v, pData) {
-        auto root = v.second.get_child("");
-        BOOST_ASSERT(!root.empty());
-
-        if (root.get<std::string>("type").find("folder") != std::string::npos) {
-            continue;
-        }
-        auto title = root.get<std::string>("title");
-        auto path = root.get<std::string>("path");
-        auto id = root.get<std::string>("id");
-        result.emplace_back(std::make_pair("title", title));
-        result.emplace_back(std::make_pair("path", path));
-        result.emplace_back(std::make_pair("fileId", id));
-        std::cout << "[" << id << "] " << title << std::endl;
+    auto pDataIt = respData.find("data");
+    if(respData.not_found() != pDataIt) {
+        pData = (*pDataIt).second;
     }
+
+    if(api.find("SYNO.FileStation.Info") != std::string::npos) {
+        boost::property_tree::write_json(std::cout, respData);
+    }else if(api.find("SYNO.FileStation.CreateFolder") != std::string::npos)
+    {
+        pData = respData.get_child(respVec.front());
+        BOOST_ASSERT(!pData.empty());
+        boost::property_tree::write_json(std::cout, pData);
+
+    }else if(api.find("SYNO.FileStation.Upload") != std::string::npos) {
+        std::cout << "Upload complete" << std::endl;
+
+    }else if(api.find("SYNO.FileStation.Download") != std::string::npos) {
+        std::cout << "Download complete" << std::endl;
+
+    }else if(api.find("SYNO.FileStation.Search") != std::string::npos) {
+        for(auto &p : respVec){
+            try {
+                auto s = respData.get<std::string>(p);
+                std::cout << s << std::endl;
+            }
+            catch(std::exception ex) {
+                std::cerr << __FILE__ << " - " << __LINE__ << ": " << ex.what() << std::endl;
+            }
+        }
+
+    }else if(api.find("SYNO.FileStation.Delete") != std::string::npos) {
+        if(respVec.empty()) {
+            std::cout << "Delete complete" << std::endl;
+        }else {
+            for(auto &p : respVec) {
+                auto s = respData.get<std::string>(p);
+                std::cout << s << std::endl;
+            }
+        }
+    } else if(api.find("SYNO.FileStation.List") != std::string::npos) {
+
+        for(std::string &p : respVec) {
+            try{
+                auto val = pData.get<std::string>(p);
+                if(val.empty()) {
+                    pData = pData.get_child(p);
+                    auto pDataIt = pData.find("");
+                    if(pData.not_found() != pDataIt) {
+                        pData = (*pDataIt).second;
+                    }
+                    continue;
+                }
+                result.emplace_back(std::make_pair(p, val));
+            }
+            catch (std::exception ex) {
+                std::cerr << __FILE__ << " - " << __LINE__ << ": " << ex.what() << std::endl;
+            }
+        }
+        auto name = pData.get<std::string>("name");
+        auto path = pData.get<std::string>("path");
+        result.emplace_back(std::make_pair("name", name));
+        result.emplace_back(std::make_pair("path", path));
+    }
+
     return result;
 }
 
@@ -139,23 +186,21 @@ void FileStationAPI::makeRequest(std::string& parsed) {
      * info, list, search, create, upload, download, delete
      * */
     int indexedMethod = 0;
-    std::string serverUrl = info_s.server;
-
-    auto api = loadAPI(__FILE__, parsed);
-    auto method = loadMethod(__FILE__, api, indexedMethod);
-    auto path = loadPath(__FILE__, api);
-    auto version = loadVersion(__FILE__, api);
-    auto params = loadParams(__FILE__, api, indexedMethod);
+    auto api = loadAPI(apiFile, parsed);
+    auto method = loadMethod(apiFile, api, indexedMethod);
+    auto path = loadPath(apiFile, api);
+    auto version = loadVersion(apiFile, api);
+    auto params = loadParams(apiFile, api, indexedMethod);
     auto resultParams = paramParser(api, params);
 
-    RequestUrlBuilder urlBuilder (serverUrl, path, api, version, method, resultParams);
+    RequestUrlBuilder urlBuilder (info_s.server, path, api, version, method, resultParams);
     auto url = urlBuilder.getResult();
 
 #if DEBUG
     std::cout << url << std::endl;
 #endif
-    auto responseObject = RequestHandler::getInstance().make(url, __FILE__, info_s.username, info_s.password, info_s.server);
-    std::string responses = loadResponse(__FILE__, api, indexedMethod);
+    auto responseObject = RequestHandler::getInstance().make(url, "FileStation");
+    std::string responses = loadResponse(apiFile, api, indexedMethod);
     respParser(responseObject, api, responses);
 }
 

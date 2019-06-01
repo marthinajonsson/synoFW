@@ -42,10 +42,33 @@ TEST_F(FsRequestTest, fsList) {
     fs->makeRequest(input);
 }
 
-TEST_F(FsRequestTest, fsResp) {
-    std::string input = "SYNO.FileStation.Info";
-    std::string data = "data";
+TEST_F(FsRequestTest, fsRespListShare) {
+    std::string input = "SYNO.FileStation.List";
+    std::string data = "offset:total:shares";
     boost::property_tree::ptree test;
-    fs->respParser(test, input, data);
+    auto vec = fs->respParser(test, input, data);
+    auto it = std::find(vec.begin(), vec.end(), "offset");
+    ASSERT_TRUE(it != vec.end());
+    it = std::find(vec.begin(), vec.end(), "total");
+    ASSERT_TRUE(it != vec.end());
+    it = std::find(vec.begin(), vec.end(), "name");
+    ASSERT_TRUE(it != vec.end());
+    it = std::find(vec.begin(), vec.end(), "path");
+    ASSERT_TRUE(it != vec.end());
+}
+
+TEST_F(FsRequestTest, fsRespList) {
+    std::string input = "SYNO.FileStation.List";
+    std::string data = "offset:total:files";
+    boost::property_tree::ptree test;
+    auto vec = fs->respParser(test, input, data);
+    auto it = std::find(vec.begin(), vec.end(), "offset");
+    ASSERT_TRUE(it != vec.end());
+    it = std::find(vec.begin(), vec.end(), "total");
+    ASSERT_TRUE(it != vec.end());
+    it = std::find(vec.begin(), vec.end(), "name");
+    ASSERT_TRUE(it != vec.end());
+    it = std::find(vec.begin(), vec.end(), "path");
+    ASSERT_TRUE(it != vec.end());
 }
 #endif //SYNOFW_FSREQUESTTEST_H
