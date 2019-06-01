@@ -29,7 +29,7 @@ public:
     std::string loadResponse(const char*, std::string&, int&);
 
     virtual std::string paramParser(std::string &,std::string&) = 0;
-    virtual std::vector<std::string> respParser(boost::property_tree::ptree &, std::string &,std::string&) = 0;
+    virtual std::vector<std::pair<std::string,std::string>> respParser(boost::property_tree::ptree &, std::string &,std::string&) = 0;
     virtual void makeRequest(std::string&) = 0;
 
 protected:

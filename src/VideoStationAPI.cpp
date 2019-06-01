@@ -15,9 +15,36 @@
 #include "ErrorCodes.h"
 
 
-std::vector<std::string> VideoStationAPI::respParser(boost::property_tree::ptree &respData, std::string &, std::string &) {
+std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response) {
 
-    return {""};
+    std::vector<std::string> respVec = split(response, ':');
+    std::vector<std::pair<std::string,std::string>> result;
+    std::string fullRespStr;
+    ParamHandling param(testing);
+    boost::property_tree::ptree pData, tmp;
+    boost::property_tree::read_json("../api/RequestResponse.json", respData);
+    pData = respData.get_child("data");
+    pData = pData.get_child("movie");
+
+    auto title = pData.get<std::string>("title");
+    auto path = pData.get<std::string>("path");
+    auto id = pData.get<std::string>("id");
+    auto mId = pData.get<std::string>("mapper_id");
+    result.emplace_back(std::make_pair("title", title));
+    result.emplace_back(std::make_pair("path", path));
+    result.emplace_back(std::make_pair("fileId", id));
+    std::cout << "[" << id << "] " << title << std::endl;
+
+   // BOOST_FOREACH(boost::property_tree::ptree::value_type& root, pData) {
+//        auto root = v.second.get_child("");
+//        BOOST_ASSERT(!root.empty());
+//
+//        if (root.get<std::string>("type").find("folder") != std::string::npos) {
+//            continue;
+//        }
+
+   // }
+    return result;
 }
 
 std::string VideoStationAPI::paramParser(std::string &api, std::string& params) {

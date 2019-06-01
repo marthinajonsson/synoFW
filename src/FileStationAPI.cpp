@@ -11,9 +11,10 @@
 #include "ParamHandling.h"
 #include "ErrorCodes.h"
 
-std::vector<std::string> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response) {
+std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response) {
 
     std::vector<std::string> respVec = split(response, ':');
+    std::vector<std::pair<std::string,std::string>> result;
     std::string fullRespStr;
     ParamHandling param(testing);
     boost::property_tree::ptree pData, tmp;
@@ -22,71 +23,21 @@ std::vector<std::string> FileStationAPI::respParser(boost::property_tree::ptree 
     pData = pData.get_child("object");
 
     BOOST_FOREACH(boost::property_tree::ptree::value_type& v, pData) {
-        auto p = v.second.get_child("");
-        auto t = p.get<std::string>("title");
-        auto ps = p.get<std::string>("path");
-        BOOST_ASSERT(!p.empty());
-        //boost::property_tree::write_json(std::cout, p);
-        std::cout << "TITLE " << t << std::endl;
-        std::cout << "PATH " << ps << std::endl;
+        auto root = v.second.get_child("");
+        BOOST_ASSERT(!root.empty());
+
+        if (root.get<std::string>("type").find("folder") != std::string::npos) {
+            continue;
+        }
+        auto title = root.get<std::string>("title");
+        auto path = root.get<std::string>("path");
+        auto id = root.get<std::string>("id");
+        result.emplace_back(std::make_pair("title", title));
+        result.emplace_back(std::make_pair("path", path));
+        result.emplace_back(std::make_pair("fileId", id));
+        std::cout << "[" << id << "] " << title << std::endl;
     }
-  //  std::stringstream ss;
-    //boost::property_tree::write_json(std::cout, pData);
-//
-//    for(const std::string &s:respVec)
-//    {
-//        if(s == "taskid"){
-//            if(api.find("Search")) {
-//                search_id = s;
-//            }else if(api.find("Delete")) {
-//                delete_id = s;
-//            }
-//        }
-//        else if(s == "total" || s == "offset" || s == "finished" || s == "progress" ||
-//        s == "processing_path" || s == "path")
-//        {
-//            try {
-//                std::cout << s << " : " << respData["data"][s].asString() << std::endl;
-//            }
-//            catch (Json::Exception &ex) {
-//                std::cerr << "Printing string" << ex.what() << std::endl;
-//            }
-//        }
-//        else if(s == "shares" || s == "folders")
-//        {
-//            try {
-//                std::cout << s << " : {\n"  << respData["data"][s] << "\n}" << std::endl;
-//            }
-//            catch (Json::Exception &ex) {
-//                std::cerr << "Printing object" << ex.what() << std::endl;
-//            }
-//        }
-//        else if(s == "files")
-//        {
-//            try {
-//                std::cout << s << " : {\n";
-//                for (Json::Value::const_iterator its=respData["data"][s].begin(); its!=respData["data"][s].end(); ++its) {
-//                    auto object = /*its;
-//                    auto nameObj = object["name"];
-//                    auto nameStr = nameObj.asString();
-//                    auto found = nameStr.find("vsmeta");
-//                    if(found != std::string::npos) {
-//                        continue;
-//                    }
-//                    found = nameStr.find(".srt");
-//                    if(found != std::string::npos){
-//                        continue;
-//                    }
-//                }
-//                std::cout << " \n}";
-//            }
-//            catch (Json::Exception &ex) {
-//                std::cerr << "Printing object" << ex.what() << std::endl;
-//            }
-//        }
-//
-//    }
-    return {""};
+    return result;
 }
 
 std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
