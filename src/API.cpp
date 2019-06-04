@@ -71,11 +71,16 @@ std::string API::loadParams(const std::string &file, std::string &api, int &val)
     auto methods = node.get_child("method");
     std::string result;
 
+    auto count = 0;
     BOOST_FOREACH( boost::property_tree::ptree::value_type& v, methods) {
-                    auto p = v.second.get<std::string>("param");
-                    auto o = v.second.get<std::string>("optional");
-                    result.append(p.append(":").append(o).append(":"));
-                }
+        if(count == val){
+            auto p = v.second.get<std::string>("param");
+            auto o = v.second.get<std::string>("optional");
+            result.append(p.append(":").append(o));
+            break;
+        }
+        count++;
+    }
 
     if(result.empty()) {
         throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter of API method");

@@ -42,33 +42,33 @@ TEST_F(FsRequestTest, fsList) {
     fs->makeRequest(input);
 }
 
+
 TEST_F(FsRequestTest, fsRespListShare) {
     std::string input = "SYNO.FileStation.List";
     std::string data = "offset:total:shares";
     boost::property_tree::ptree test;
-    auto vec = fs->respParser(test, input, data);
-    auto it = std::find(vec.begin(), vec.end(), "offset");
-    ASSERT_TRUE(it != vec.end());
-    it = std::find(vec.begin(), vec.end(), "total");
-    ASSERT_TRUE(it != vec.end());
-    it = std::find(vec.begin(), vec.end(), "name");
-    ASSERT_TRUE(it != vec.end());
-    it = std::find(vec.begin(), vec.end(), "path");
-    ASSERT_TRUE(it != vec.end());
+    auto vecPair = fs->respParser(test, input, data);
+    int num = 0;
+    for(auto &pair : vecPair) {
+
+        num = pair.first.find("offset") != std::string::npos || pair.first.find("total") != std::string::npos ||
+                pair.first.find("name") != std::string::npos || pair.first.find("path") != std::string::npos ? ++num : num;
+    }
+    ASSERT_TRUE(num == 4);
+    
 }
 
 TEST_F(FsRequestTest, fsRespList) {
     std::string input = "SYNO.FileStation.List";
     std::string data = "offset:total:files";
     boost::property_tree::ptree test;
-    auto vec = fs->respParser(test, input, data);
-    auto it = std::find(vec.begin(), vec.end(), "offset");
-    ASSERT_TRUE(it != vec.end());
-    it = std::find(vec.begin(), vec.end(), "total");
-    ASSERT_TRUE(it != vec.end());
-    it = std::find(vec.begin(), vec.end(), "name");
-    ASSERT_TRUE(it != vec.end());
-    it = std::find(vec.begin(), vec.end(), "path");
-    ASSERT_TRUE(it != vec.end());
+    auto vecPair = fs->respParser(test, input, data);
+    int num = 0;
+    for(auto &pair : vecPair) {
+
+        num = pair.first.find("offset") != std::string::npos || pair.first.find("total") != std::string::npos ||
+              pair.first.find("name") != std::string::npos || pair.first.find("path") != std::string::npos ? ++num : num;
+    }
+    ASSERT_TRUE(num == 4);
 }
 #endif //SYNOFW_FSREQUESTTEST_H

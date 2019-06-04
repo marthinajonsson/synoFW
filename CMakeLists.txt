@@ -48,7 +48,7 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/ActiveObject.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Queue.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Dispatcher.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/FileMgr.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/FileMgr.h inc/ConfigHelper.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp

@@ -25,10 +25,11 @@ RequestHandler& RequestHandler::getInstance()
     return *instance;
 }
 
-std::size_t callback(const char* in, std::size_t size, std::size_t num, std::string* out)
+std::string buffer;
+static std::size_t callback(void* in, std::size_t size, std::size_t num, std::string* out)
 {
     const std::size_t totalBytes(size * num);
-    out->append(in, totalBytes);
+    buffer.append((char*)in, totalBytes);
     return totalBytes;
 }
 
@@ -44,14 +45,17 @@ void RequestHandler::sendHttpGetRequest(boost::property_tree::ptree &jsonData, c
 
 
     long int httpCode(0);
-    std::stringstream response;
+
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, callback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &buffer);
     curl_easy_perform(curl);
     curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &httpCode);
     curl_easy_cleanup(curl);
 
+    std::stringstream response(buffer);
     boost::property_tree::read_json(response, jsonData);
+    buffer = "";
 }
 
 void RequestHandler::login(const std::string &session) {
@@ -69,12 +73,8 @@ void RequestHandler::login(const std::string &session) {
     if(!val) {
         GENERIC::printError(jsonData);
     }
-
-    auto nodeIt = jsonData.find("data");
-    if(jsonData.not_found() != nodeIt) {
-        jsonData = (*nodeIt).second;
-    }
-
+    boost::property_tree::write_json(std::cout, jsonData);
+    jsonData = jsonData.get_child("data");
     sid = jsonData.get<std::string>("sid");
 }
 

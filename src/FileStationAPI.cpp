@@ -17,13 +17,10 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
     std::vector<std::pair<std::string,std::string>> result;
     std::string fullRespStr;
     ParamHandling param(testing);
-    boost::property_tree::ptree pData, tmp;
-    boost::property_tree::read_json("../api/RequestResponse.json", respData);
+    boost::property_tree::ptree pData;
+    //boost::property_tree::read_json("../api/RequestResponse.json", respData);
 
-    auto pDataIt = respData.find("data");
-    if(respData.not_found() != pDataIt) {
-        pData = (*pDataIt).second;
-    }
+    pData = respData.get_child("data");
 
     if(api.find("SYNO.FileStation.Info") != std::string::npos) {
         boost::property_tree::write_json(std::cout, respData);
@@ -60,7 +57,7 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
             }
         }
     } else if(api.find("SYNO.FileStation.List") != std::string::npos) {
-
+        boost::property_tree::write_json(std::cout, pData);
         for(std::string &p : respVec) {
             try{
                 auto val = pData.get<std::string>(p);
