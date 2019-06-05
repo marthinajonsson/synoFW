@@ -20,6 +20,8 @@
 #include <ErrorCodes.h>
 #include "Utilities.h"
 
+#define LOG(x) {std::cout << __FILE__ << ":" << __FUNCTION__ << "(" << __LINE__ << "): " << x << std::endl;}
+
 std::shared_ptr pLog = std::make_shared<Logger>();
 
 static bool parseImdb(std::string title) {

@@ -42,6 +42,16 @@ TEST_F(FsRequestTest, fsList) {
     fs->makeRequest(input);
 }
 
+TEST_F(FsRequestTest, fsCreate) {
+    std::string input = "create";
+    fs->makeRequest(input);
+}
+
+TEST_F(FsRequestTest, fsDelete) {
+    std::string input = "delete";
+    fs->makeRequest(input);
+}
+
 
 TEST_F(FsRequestTest, fsRespListShare) {
     std::string input = "SYNO.FileStation.List";

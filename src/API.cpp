@@ -6,13 +6,13 @@
 #include "API.h"
 #include <cstring>
 
-std::string API::loadAPI(const std::string &file, std::string &api)
+std::string API::loadAPI(const std::string &file, const std::string &api)
 {
     boost::property_tree::ptree root;
     boost::property_tree::read_json(file, root);
 
-    for(auto it : root) {
-        auto key = it.first;
+    for(auto node : root) {
+        auto key = node.first;
         auto tmp = boost::algorithm::to_lower_copy(key);
         if(tmp.find(api) != std::string::npos) {
             return key;
@@ -21,55 +21,53 @@ std::string API::loadAPI(const std::string &file, std::string &api)
     throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_API_DOES_NOT_EXISTS, "No API found");
 }
 
-std::string API::loadMethod(const std::string &file, std::string& api, int&val)
+std::string API::loadMethod(const std::string &file, const std::string& api, int& val)
 {
-    boost::property_tree::ptree root;
+    boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
-    boost::property_tree::ptree node;
+    std::vector<std::string> result;
     val = 0;
 
-    auto nodeIt = root.find(api);
-    if(root.not_found() != nodeIt) {
-        node = (*nodeIt).second;
+    auto nodeIterator = root.find(api);
+    if(root.not_found() != nodeIterator) {
+        node = (*nodeIterator).second;
     }
     auto methods = node.get_child("method");
-    std::vector<std::string> vec;
 
-    BOOST_FOREACH( boost::property_tree::ptree::value_type& v, methods) {
-        auto n = v.second.get<std::string>("name");
-        vec.push_back(n);
-    }
-    if(vec.size() == 1 || testing ) {
-        return vec.front();
+    BOOST_FOREACH( boost::property_tree::ptree::value_type& m, methods) {
+        auto name = m.second.get<std::string>("name");
+        result.push_back(name);
     }
 
-    for(auto &s : vec) {
+    if(result.size() == 1 || testing ) {
+        return result.front();
+    }
+
+    for(auto &s : result) {
         std::cout << val << ": " << s << std::endl;
     }
 
     std::cout << "Choose method: " << std::endl;
     std::cin >> val;
 
-    if(!vec.at(val).empty()) {
-        return vec.at(val);
+    if(result.at(val).empty()) {
+        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
     }
-
-    throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_METHOD_DOES_NOT_EXISTS, "No API methods found");
-
+    return result.at(val);
 }
 
-std::string API::loadParams(const std::string &file, std::string &api, int &val) {
-    boost::property_tree::ptree root;
+std::string API::loadParams(const std::string &file, const std::string &api, int &val) {
+    boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
-    boost::property_tree::ptree node;
+    std::string result;
     val = 0;
 
-    auto nodeIt = root.find(api);
-    if(root.not_found() != nodeIt) {
-        node = (*nodeIt).second;
+    auto nodeIterator = root.find(api);
+    if(root.not_found() != nodeIterator) {
+        node = (*nodeIterator).second;
     }
     auto methods = node.get_child("method");
-    std::string result;
+
 
     auto count = 0;
     BOOST_FOREACH( boost::property_tree::ptree::value_type& v, methods) {
@@ -89,30 +87,28 @@ std::string API::loadParams(const std::string &file, std::string &api, int &val)
 }
 
 
-std::string API::loadPath(const std::string &file, std::string& api) {
-    boost::property_tree::ptree root;
+std::string API::loadPath(const std::string &file, const std::string& api) {
+    boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
-    boost::property_tree::ptree node;
 
-    auto nodeIt = root.find(api);
-    if(root.not_found() != nodeIt) {
-        node = (*nodeIt).second;
+    auto nodeIterator = root.find(api);
+    if(root.not_found() != nodeIterator) {
+        node = (*nodeIterator).second;
     }
     auto result = node.get<std::string>("path");
     if(result.empty()) {
-        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter API path");
+        throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter path for this API");
     }
     return result;
 }
 
-std::string API::loadVersion(const std::string &file, std::string& api) {
-    boost::property_tree::ptree root;
+std::string API::loadVersion(const std::string &file, const std::string& api) {
+    boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
-    boost::property_tree::ptree node;
 
-    auto nodeIt = root.find(api);
-    if(root.not_found() != nodeIt) {
-        node = (*nodeIt).second;
+    auto nodeIterator = root.find(api);
+    if(root.not_found() != nodeIterator) {
+        node = (*nodeIterator).second;
     }
     auto result = node.get<std::string>("maxVersion");
     if(result.empty()) {
@@ -121,22 +117,23 @@ std::string API::loadVersion(const std::string &file, std::string& api) {
     return result;
 }
 
-std::string API::loadResponse(const std::string &file, std::string &api, int &val) {
-    boost::property_tree::ptree root;
+std::string API::loadResponse(const std::string &file, const std::string &api, int &val) {
+    boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
-    boost::property_tree::ptree node;
     val = 0;
 
-    auto nodeIt = root.find(api);
-    if(root.not_found() != nodeIt) {
-        node = (*nodeIt).second;
+    auto nodeIterator = root.find(api);
+    if(root.not_found() != nodeIterator) {
+        node = (*nodeIterator).second;
     }
-    auto methods = node.get_child("method");
-    std::string result;
 
-    BOOST_FOREACH(boost::property_tree::ptree::value_type& v, methods) {
-        auto p = v.second.get<std::string>("response");
-        result.append(p.append(":"));
+    auto methods = node.get_child("method");
+    int count = 0;
+    BOOST_FOREACH(boost::property_tree::ptree::value_type& m, methods) {
+        if(val == count) {
+            return m.second.get<std::string>("response");
+        }
+        count++;
     }
-    return result;
+    throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_NO_PARAMETER, "No parameter Response for this API");
 }
