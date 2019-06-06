@@ -68,31 +68,31 @@ TEST_F(FileStationApiTest, method) {
     std::string api = "SYNO.FileStation.Info";
     int index = 0;
 
-    auto method = fs->loadMethod(file, api, index);
+    auto method = fs->loadMethod(file, api, index, false);
     ASSERT_TRUE(method.find("get") != std::string::npos);
 
     api = "SYNO.FileStation.List";
-    method = fs->loadMethod(file, api, index);
+    method = fs->loadMethod(file, api, index, false);
     ASSERT_TRUE(method.find("list_share") != std::string::npos);
 
     api = "SYNO.FileStation.Search";
-    method = fs->loadMethod(file, api, index);
+    method = fs->loadMethod(file, api, index, false);
     ASSERT_TRUE(method.find("start") != std::string::npos);
 
     api = "SYNO.FileStation.CreateFolder";
-    method = fs->loadMethod(file, api, index);
+    method = fs->loadMethod(file, api, index, false);
     ASSERT_TRUE(method.find("create") != std::string::npos);
 
     api = "SYNO.FileStation.Upload";
-    method = fs->loadMethod(file, api, index);
+    method = fs->loadMethod(file, api, index, false);
     ASSERT_TRUE(method.find("upload") != std::string::npos);
 
     api = "SYNO.FileStation.Download";
-    method = fs->loadMethod(file, api, index);
+    method = fs->loadMethod(file, api, index, false);
     ASSERT_TRUE(method.find("download") != std::string::npos);
 
     api = "SYNO.FileStation.Delete";
-    method = fs->loadMethod(file, api, index);
+    method = fs->loadMethod(file, api, index, false);
     ASSERT_TRUE(method.find("start") != std::string::npos);
 }
 

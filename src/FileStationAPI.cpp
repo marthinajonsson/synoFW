@@ -5,18 +5,20 @@
 #include <iostream>
 #include <algorithm>
 #include <boost/assert.hpp>
+#include <boost/chrono.hpp>
+#include <boost/thread/thread.hpp>
+
 
 #include "RequestUrlBuilder.h"
 #include "FileStationAPI.h"
 #include "ParamHandling.h"
 #include "ErrorCodes.h"
 
-std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response) {
-
+std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response)
+{
     std::vector<std::string> respVec = split(response, ':');
     std::vector<std::pair<std::string,std::string>> result;
     std::string fullRespStr;
-    ParamHandling param(testing);
     boost::property_tree::ptree pData;
 
     if(respData.empty()){
@@ -52,7 +54,7 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
         for(auto &p : respVec) {
             try {
                 if(p.find("files") != std::string::npos) {
-                    auto pData = respData.get_child(p);
+                    pData = respData.get_child(p);
                     BOOST_ASSERT(!pData.empty());
                     pData = pData.get_child("additional");
                     BOOST_ASSERT(!pData.empty());
@@ -118,8 +120,8 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
     return result;
 }
 
-std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
-
+std::string FileStationAPI::paramParser(std::string &api, std::string& params)
+{
     std::vector<std::string> paramVec = split(params, ':');
     std::string fullParamStr;
     ParamHandling handler(testing);
@@ -211,32 +213,89 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params) {
     return fullParamStr;
 }
 
-void FileStationAPI::makeRequest(std::string& parsed) {
-
-    /*
-     * info, list, search, create, upload, download, delete
-     * */
-    int indexedMethod = 0;
-    auto api = loadAPI(apiFile, parsed);
-    auto method = loadMethod(apiFile, api, indexedMethod);
+std::string FileStationAPI::compile(std::string &input, std::string api = "", int indexedMethod = 0, bool chooseMethod = true)
+{
+    api = loadAPI(apiFile, input);
+    auto method = loadMethod(apiFile, api, indexedMethod, std::move(chooseMethod));
     auto path = loadPath(apiFile, api);
     auto version = loadVersion(apiFile, api);
     auto params = loadParams(apiFile, api, indexedMethod);
     auto resultParams = paramParser(api, params);
 
     RequestUrlBuilder urlBuilder (info_s.server, path, api, version, method, resultParams);
-    auto url = urlBuilder.getResult();
+    return urlBuilder.getResult();
+}
 
-#if DEBUG
-    std::cout << url << std::endl;
-#endif
+void FileStationAPI::makeRequest(std::string& parsed)
+{
 
-    auto responseObject = RequestHandler::getInstance().make(url, "FileStation");
+    /*
+     * info, list, search, create, upload, download, delete
+     * */
 
-    std::string responses = loadResponse(apiFile, api, indexedMethod);
-    std::vector<std::pair<std::string, std::string>> relevant = respParser(responseObject, api, responses);
-    for(auto &r : relevant) {
-        std::cout << r.first << " : " <<r.second << std::endl;
+    std::string api;
+    if(parsed.find("search") != std::string::npos)
+    {
+        int val = 99;
+        if(testing) {
+            val = 0;
+
+        }else {
+            std::cout << "Start a a search (0) or clean cache (1)" << std::endl;
+            std::cin >> val;
+        }
+
+        if(val == 0) {
+            std::string urlStart = compile(parsed, api, 0, false);
+
+            auto responseObject = RequestHandler::getInstance().make(urlStart, "FileStation");
+            std::string responses = loadResponse(apiFile, api, 0);
+            auto result = respParser(responseObject, api, responses);
+            BOOST_ASSERT(!result.empty());
+            auto pair = result.front();
+            search_id = pair.second;
+
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
+
+            std::string urlStop = compile(parsed, api, 2, false);
+
+            RequestHandler::getInstance().make(urlStop, "FileStation");
+
+            std::string urlList = compile(parsed, api, 1, false);
+            responseObject = RequestHandler::getInstance().make(urlList, "FileStation");
+            responses = loadResponse(apiFile, api, 1);
+            result = respParser(responseObject, api, responses);
+            BOOST_ASSERT(!result.empty());
+            for(auto &res : result) {
+                std::cout << res.first << ": " << res.second << std::endl;
+            }
+        } else if(val == 1){
+            std::string urlClean = compile(parsed, api, 3, false);
+            RequestHandler::getInstance().make(urlClean, "FileStation");
+            search_id = "";
+        }
+
+
+    }else if(parsed.find("delete") != std::string::npos) {
+
+        std::string urlDelete = compile(parsed, api, 0, false);
+
+        auto responseObject = RequestHandler::getInstance().make(urlDelete, "FileStation");
+        std::string responses = loadResponse(apiFile, api, 3);
+        auto result = respParser(responseObject, api, responses);
+        BOOST_ASSERT(!result.empty());
+        auto pair = result.front();
+        std::cout << pair.first << ": " << pair.second << std::endl;
+    }
+    else {
+        int indexedMethod = 0;
+        std::string url = compile(parsed, api, indexedMethod, true);
+        auto responseObject = RequestHandler::getInstance().make(url, "FileStation");
+        std::string responses = loadResponse(apiFile, api, indexedMethod);
+        std::vector<std::pair<std::string, std::string>> relevant = respParser(responseObject, api, responses);
+        for(auto &r : relevant) {
+            std::cout << r.first << " : " <<r.second << std::endl;
+        }
     }
 }
 

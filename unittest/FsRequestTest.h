@@ -31,8 +31,10 @@ protected:
 
 TEST_F(FsRequestTest, search) {
 
+    //auto responseObject = RequestHandler::getInstance().make(url, "FileStation");
     std::string input = "search";
-    //fs->makeRequest(input);
+    fs->makeRequest(input);
+   // "http://192.168.0.107:5000/webapi/entry.cgi?api=SYNO.FileStation.Search&version=2&method=start&folder_path=/video/film&pattern=.mp4,.mkv,.avi&extension=&filetype=all&_sid="
 }
 
 #endif //SYNOFW_FSREQUESTTEST_H

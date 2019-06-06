@@ -24,7 +24,7 @@ public:
 
     bool testing = false;
     std::string loadAPI(const std::string &file, const std::string&);
-    std::string loadMethod(const std::string &file, const std::string&, int&);
+    std::string loadMethod(const std::string &file, const std::string&, int&, bool&&);
     std::string loadPath(const std::string &file, const std::string&);
     std::string loadVersion(const std::string &file, const std::string&);
     std::string loadParams(const std::string &file, const std::string&, int&);

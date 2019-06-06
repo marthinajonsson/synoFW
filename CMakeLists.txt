@@ -2,23 +2,36 @@ cmake_minimum_required(VERSION 3.12)
 project(synoFW)
 
 set(CMAKE_CXX_STANDARD 17)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/lib")
 
 find_package(OpenSSL)
+
+#find_package(Boost REQUIRED filesystem program_options regex timer chrono)
+#IF (Boost_FOUND)
+#    include_directories(${Boost_INCLUDE_DIR})
+#    ADD_DEFINITIONS( "-DHAS_BOOST" )
+#ENDIF()
+
+add_definitions("-DGTEST")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lboost_thread-mt")
 
 include_directories(inc)
 include_directories(ifc)
 include_directories(unittest)
-include_directories(external/gtest/googlemock)
+#include_directories(external/gtest/googlemock)
+
+#SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/share/boost-build")
 
 add_subdirectory(external/gtest/googlemock)
 
 set(Test
         ${CMAKE_CURRENT_LIST_DIR}/unittest/TestStartup.h
         ${CMAKE_CURRENT_LIST_DIR}/unittest/CacheTest.h
-        ${CMAKE_CURRENT_LIST_DIR}/unittest/FileStationTest.h
         ${CMAKE_CURRENT_LIST_DIR}/unittest/FsRequestTest.h
-        ${CMAKE_CURRENT_LIST_DIR}/unittest/VsRequestTest.h unittest/FsResponseTest.h unittest/FileStationApiTest.h)
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/VsRequestTest.h
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/FsResponseTest.h
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/FileStationApiTest.h)
 
 set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/Methods.h
@@ -48,7 +61,8 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/ActiveObject.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Queue.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Dispatcher.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/FileMgr.h inc/ConfigHelper.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/FileMgr.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ConfigHelper.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
@@ -70,4 +84,3 @@ add_executable(synoFW ${Sources} ${Includes} ${Test})
 target_link_libraries(synoFW curl)
 target_link_libraries(synoFW jsoncpp)
 target_link_libraries(synoFW gmock_main)
-target_link_libraries(synoFW /usr/share/boost-build)

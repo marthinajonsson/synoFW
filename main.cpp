@@ -86,6 +86,10 @@ int process()
 
 int main(int argc, char* argv [])
 {
+
+#ifdef GTEST
+    std::cout << "TEST DEFINED" << std::endl;
+#endif
     ::testing::InitGoogleMock(&argc, argv);
     return RUN_ALL_TESTS();
 

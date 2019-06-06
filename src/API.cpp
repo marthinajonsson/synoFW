@@ -21,12 +21,11 @@ std::string API::loadAPI(const std::string &file, const std::string &api)
     throw GENERIC::BadRequestException(GENERIC::ERROR_CODE_API_DOES_NOT_EXISTS, "No API found");
 }
 
-std::string API::loadMethod(const std::string &file, const std::string& api, int& val)
+std::string API::loadMethod(const std::string &file, const std::string& api, int& val, bool &&chooseMethod)
 {
     boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
     std::vector<std::string> result;
-    val = 0;
 
     auto nodeIterator = root.find(api);
     if(root.not_found() != nodeIterator) {
@@ -34,13 +33,14 @@ std::string API::loadMethod(const std::string &file, const std::string& api, int
     }
     auto methods = node.get_child("method");
 
+    int count = 0;
     BOOST_FOREACH( boost::property_tree::ptree::value_type& m, methods) {
         auto name = m.second.get<std::string>("name");
+        if(!chooseMethod && count == val) {
+            return name;
+        }
         result.push_back(name);
-    }
-
-    if(result.size() == 1 || testing ) {
-        return result.front();
+        count++;
     }
 
     for(auto &s : result) {

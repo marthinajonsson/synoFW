@@ -98,7 +98,7 @@ void VideoStationAPI::makeRequest(std::string& parsed)
      * */
     auto API = loadAPI(apiFile, parsed);
     int index = 0;
-    auto method = loadMethod(apiFile, API, index);
+    auto method = loadMethod(apiFile, API, index, true);
     /*
      * get, list
      * */

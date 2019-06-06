@@ -25,8 +25,6 @@
 
 class Dispatcher {
 private:
-    FileStationAPI fs;
-    VideoStationAPI vs;
     FileMgr fMgr;
 public:
 
@@ -36,9 +34,11 @@ public:
             return std::bind(&FileMgr::fetch, &fMgr);
         }
         else if(request.find("vs") != std::string::npos) {
+            VideoStationAPI vs;
             return std::bind(&VideoStationAPI::makeRequest, &vs, request);
         }
         else if(request.find("fs") != std::string::npos) {
+            FileStationAPI fs;
             return std::bind(&FileStationAPI::makeRequest, &fs, request);
         }
         return [] () { };
