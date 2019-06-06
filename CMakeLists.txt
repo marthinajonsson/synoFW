@@ -18,7 +18,7 @@ set(Test
         ${CMAKE_CURRENT_LIST_DIR}/unittest/CacheTest.h
         ${CMAKE_CURRENT_LIST_DIR}/unittest/FileStationTest.h
         ${CMAKE_CURRENT_LIST_DIR}/unittest/FsRequestTest.h
-        ${CMAKE_CURRENT_LIST_DIR}/unittest/VsRequestTest.h)
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/VsRequestTest.h unittest/FsResponseTest.h unittest/FileStationApiTest.h)
 
 set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/Methods.h

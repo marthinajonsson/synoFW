@@ -117,10 +117,9 @@ std::string API::loadVersion(const std::string &file, const std::string& api) {
     return result;
 }
 
-std::string API::loadResponse(const std::string &file, const std::string &api, int &val) {
+std::string API::loadResponse(const std::string &file, const std::string &api, const int& val) {
     boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
-    val = 0;
 
     auto nodeIterator = root.find(api);
     if(root.not_found() != nodeIterator) {

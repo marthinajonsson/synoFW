@@ -28,7 +28,7 @@ public:
     std::string loadPath(const std::string &file, const std::string&);
     std::string loadVersion(const std::string &file, const std::string&);
     std::string loadParams(const std::string &file, const std::string&, int&);
-    std::string loadResponse(const std::string &file, const std::string&, int&);
+    std::string loadResponse(const std::string &file, const std::string&, const int&);
 
     virtual void makeRequest(std::string&) = 0;
     virtual std::string paramParser(std::string &,std::string&) = 0;

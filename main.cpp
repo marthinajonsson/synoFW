@@ -5,8 +5,9 @@
 #include <include/gmock/gmock.h>
 
 #include "CacheTest.h"
-#include "FileStationTest.h"
+#include "FileStationApiTest.h"
 #include "FsRequestTest.h"
+#include "FsResponseTest.h"
 #include "VsRequestTest.h"
 
 #include "Logger.h"
@@ -43,6 +44,12 @@ void printOptions() {
     std::cout << bold_on << "FILE STATION" << bold_off << std::endl;
     std::cout << "fs:info" << "-- get info" << std::endl;
     std::cout << "fs:list" << "-- list shared folders or files" << std::endl;
+    std::cout << "fs:create" << "-- create folder" << std::endl;
+    std::cout << "fs:download" << "-- download file" << std::endl;
+    std::cout << "fs:upload" << "-- upload file" << std::endl;
+    std::cout << "fs:delete" << "-- delete file" << std::endl;
+    std::cout << "fs:search" << "-- search file" << std::endl;
+
 }
 
 

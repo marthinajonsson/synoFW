@@ -51,9 +51,9 @@ public:
     boost::property_tree::ptree make(std::string &url, std::string&& session)
     {
         login(session);
-        auto rsp = send(url);
+        auto rspObj = send(url);
         logoff(session);
-        return rsp;
+        return rspObj;
     }
 };
 

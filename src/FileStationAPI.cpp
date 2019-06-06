@@ -18,9 +18,17 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
     std::string fullRespStr;
     ParamHandling param(testing);
     boost::property_tree::ptree pData;
-    //boost::property_tree::read_json("../api/RequestResponse.json", respData);
+
+    if(respData.empty()){
+        boost::property_tree::read_json("../api/RequestResponse.json", respData);
+    }
 
     if(api.find("SYNO.FileStation.Info") != std::string::npos) {
+        pData = respData.get_child("data");
+        auto val = pData.get<std::string>("hostname");
+        result.emplace_back(std::make_pair("hostname", val));
+        val = pData.get<std::string>("support_sharing");
+        result.emplace_back(std::make_pair("support_sharing", val));
         boost::property_tree::write_json(std::cout, respData);
     }else if(api.find("SYNO.FileStation.CreateFolder") != std::string::npos)
     {
@@ -35,10 +43,10 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
         }
 
     }else if(api.find("SYNO.FileStation.Upload") != std::string::npos) {
-        std::cout << "Upload complete" << std::endl;
+        result.emplace_back(std::make_pair("Upload", "Complete"));
 
     }else if(api.find("SYNO.FileStation.Download") != std::string::npos) {
-        std::cout << "Download complete" << std::endl;
+        result.emplace_back(std::make_pair("Download", "Complete"));
 
     }else if(api.find("SYNO.FileStation.Search") != std::string::npos) {
         for(auto &p : respVec) {
@@ -63,7 +71,7 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
 
     }else if(api.find("SYNO.FileStation.Delete") != std::string::npos) {
         if(respVec.empty()) {
-            std::cout << "Delete complete" << std::endl;
+            result.emplace_back(std::make_pair("Delete", "Complete"));
         }else {
             for(auto &p : respVec) {
                 auto s = respData.get<std::string>(p);
@@ -74,7 +82,6 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
         pData = respData.get_child("data");
         for(std::string &p : respVec) {
             try{
-                auto val = pData.get<std::string>(p);
                 if(p.find("shares") != std::string::npos)
                 {
                     auto innerNode = pData.get_child("shares");
@@ -96,10 +103,12 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
                         result.emplace_back(std::make_pair("path", path));
                     }
                 }
-                else if(val.empty()) {
+                else if(pData.empty()) {
                     continue;
+                }else {
+                    auto val = pData.get<std::string>(p);
+                    result.emplace_back(std::make_pair(p, val));
                 }
-                result.emplace_back(std::make_pair(p, val));
             }
             catch (std::exception ex) {
                 std::cerr << __FILE__ << " - " << __LINE__ << ": " << ex.what() << std::endl;
@@ -221,7 +230,9 @@ void FileStationAPI::makeRequest(std::string& parsed) {
 #if DEBUG
     std::cout << url << std::endl;
 #endif
+
     auto responseObject = RequestHandler::getInstance().make(url, "FileStation");
+
     std::string responses = loadResponse(apiFile, api, indexedMethod);
     std::vector<std::pair<std::string, std::string>> relevant = respParser(responseObject, api, responses);
     for(auto &r : relevant) {

@@ -20,13 +20,14 @@ public:
         loadConfig();
     }
     ~FileStationAPI() = default;
+
+    const std::string apiFile = "../api/API_FS";
     void makeRequest(std::string&) override;
     std::string paramParser(std::string &, std::string&) override;
     std::vector<std::pair<std::string,std::string>> respParser(boost::property_tree::ptree &, std::string &,std::string&) override;
-private:
+protected:
     std::string search_id;
     std::string delete_id;
-    const std::string apiFile = "../api/API_FS";
 };
 
 
