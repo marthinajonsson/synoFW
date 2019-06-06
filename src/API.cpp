@@ -60,7 +60,6 @@ std::string API::loadParams(const std::string &file, const std::string &api, int
     boost::property_tree::ptree root, node;
     boost::property_tree::read_json(file, root);
     std::string result;
-    val = 0;
 
     auto nodeIterator = root.find(api);
     if(root.not_found() != nodeIterator) {
