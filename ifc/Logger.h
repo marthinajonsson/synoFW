@@ -8,10 +8,10 @@
 #include "Utilities.h"
 #include "Subject.h"
 
-#include <iostream>
-#include <map>
-#include <ctime>
 #include <functional>
+#include <iostream>
+#include <ctime>
+#include <map>
 
 class Logger : public Subject {
 public:

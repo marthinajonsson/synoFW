@@ -5,6 +5,8 @@
 #ifndef SYNOFW_ERRORCODES_H
 #define SYNOFW_ERRORCODES_H
 
+#include <boost/property_tree/ptree.hpp>
+#include <Utilities.h>
 
 #include <algorithm>
 #include <iostream>
@@ -13,8 +15,6 @@
 #include <mutex>
 #include <map>
 
-#include <Utilities.h>
-#include <boost/property_tree/ptree.hpp>
 
 
 namespace GENERIC {
@@ -61,7 +61,7 @@ namespace GENERIC {
         int code = node.get<int>("code");
         node = node.get_child("errors");
         int innerCode = node.get<int>("code");
-        std::cout << "Request failed - " << code << ", FS code: " << innerCode;
+        std::cout << "Request failed - " << code << ", code: " << innerCode;
     }
 }
 #endif //SYNOFW_ERRORCODES_H

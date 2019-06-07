@@ -26,10 +26,10 @@ private:
         std::string server;
     }info_s;
 
-    ConfigHelper m_configHelper;
+    ConfigHelper _configHelper;
 
     RequestHandler() {
-        auto config = m_configHelper.getConfig();
+        auto config = _configHelper.getConfig();
         info_s.username = config.username;
         info_s.password = config.password;
         info_s.server = config.server;
@@ -48,7 +48,7 @@ public:
     RequestHandler(RequestHandler const&) = delete;
     void operator=(RequestHandler const&) = delete;
 
-    boost::property_tree::ptree make(std::string &url, std::string&& session)
+    boost::property_tree::ptree make(std::string &url, const std::string& session)
     {
         login(session);
         auto rspObj = send(url);

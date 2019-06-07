@@ -5,13 +5,13 @@
 #ifndef SYNOFW_FILENAMESTRUCTURE_H
 #define SYNOFW_FILENAMESTRUCTURE_H
 
+#include <boost/assert.hpp>
 #include <string>
 #include <vector>
 #include <sstream>
 #include <iostream>
 #include <algorithm>
 #include <iterator>
-#include <assert.h>
 
 class FilenameStructure {
 private:
@@ -29,7 +29,7 @@ public:
         std::vector<std::string> parts;
         std::string temp;
 
-        assert(!filename.empty());
+        BOOST_ASSERT(!filename.empty());
         std::stringstream s(filename);
         while (getline(s, temp, '.')) {
             parts.emplace_back(temp);

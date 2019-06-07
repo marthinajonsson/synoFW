@@ -4,15 +4,14 @@
 
 #include "Subject.h"
 #include "Observer.h"
-//class Subject;
-//class Observer;
+
 
 void Subject::registerObserver(SeverityType event, Observer *observer) {
-    registryMap[event].push_back(observer);
+    _registryMap[event].push_back(observer);
 }
 
 void Subject::removeObserver(Observer *observer) {
-    for (auto &it : registryMap) {
+    for (auto &it : _registryMap) {
         auto vecIt = std::find(it.second.begin(), it.second.end(), observer);
         if(vecIt != it.second.end())
         {
@@ -23,8 +22,8 @@ void Subject::removeObserver(Observer *observer) {
 }
 
 void Subject::notifyObservers(SeverityType event) {
-    auto it = registryMap.find(event);
-    if(it != registryMap.end())
+    auto it = _registryMap.find(event);
+    if(it != _registryMap.end())
     {
         for(auto vecIt = it->second.begin(); vecIt != it->second.end(); vecIt++)
         {

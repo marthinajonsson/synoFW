@@ -2,15 +2,17 @@
 // Created by mjonsson on 1/27/19.
 //
 
+#include <boost/thread/thread.hpp>
+#include <boost/assert.hpp>
+#include <boost/chrono.hpp>
 #include <iostream>
 #include <algorithm>
-#include <boost/assert.hpp>
-#include <thread>
-#include <chrono>
+
 #include "RequestUrlBuilder.h"
 #include "FileStationAPI.h"
 #include "ParamHandling.h"
 #include "ErrorCodes.h"
+#include <HttpRequests.h>
 
 std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response)
 {
@@ -213,11 +215,11 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params)
 
 std::string FileStationAPI::compile(std::string &input, std::string api = "", int indexedMethod = 0, bool chooseMethod = true)
 {
-    api = loadAPI(apiFile, input);
-    auto method = loadMethod(apiFile, api, indexedMethod, std::move(chooseMethod));
-    auto path = loadPath(apiFile, api);
-    auto version = loadVersion(apiFile, api);
-    auto params = loadParams(apiFile, api, indexedMethod);
+    api = loadAPI(_apiFile, input);
+    auto method = loadMethod(_apiFile, api, indexedMethod, std::move(chooseMethod));
+    auto path = loadPath(_apiFile, api);
+    auto version = loadVersion(_apiFile, api);
+    auto params = loadParams(_apiFile, api, indexedMethod);
     auto resultParams = paramParser(api, params);
 
     RequestUrlBuilder urlBuilder (info_s.server, path, api, version, method, resultParams);
@@ -251,21 +253,21 @@ void FileStationAPI::makeRequest(std::string& parsed)
         if(val == 0) {
             std::string urlStart = compile(parsed, api, 0, false);
 
-            auto responseObject = RequestHandler::getInstance().make(urlStart, "FileStation");
-            std::string responses = loadResponse(apiFile, api, 0);
+            auto responseObject = RequestHandler::getInstance().make(urlStart, FileStation::session);
+            std::string responses = loadResponse(_apiFile, api, 0);
             auto result = respParser(responseObject, api, responses);
             BOOST_ASSERT(!result.empty());
             auto pair = result.front();
             search_id = pair.second;
 
-            std::this_thread::sleep_for(std::chrono_literals::operator""s(2));
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(2000));
             std::string urlStop = compile(parsed, api, 2, false);
 
-            RequestHandler::getInstance().make(urlStop, "FileStation");
+            RequestHandler::getInstance().make(urlStop, FileStation::session);
 
             std::string urlList = compile(parsed, api, 1, false);
-            responseObject = RequestHandler::getInstance().make(urlList, "FileStation");
-            responses = loadResponse(apiFile, api, 1);
+            responseObject = RequestHandler::getInstance().make(urlList, FileStation::session);
+            responses = loadResponse(_apiFile, api, 1);
             result = respParser(responseObject, api, responses);
             BOOST_ASSERT(!result.empty());
             for(auto &res : result) {
@@ -273,7 +275,7 @@ void FileStationAPI::makeRequest(std::string& parsed)
             }
         } else if(val == 1){
             std::string urlClean = compile(parsed, api, 3, false);
-            RequestHandler::getInstance().make(urlClean, "FileStation");
+            RequestHandler::getInstance().make(urlClean, FileStation::session);
             search_id = "";
         }
 
@@ -282,8 +284,8 @@ void FileStationAPI::makeRequest(std::string& parsed)
 
         std::string urlDelete = compile(parsed, api, 0, false);
 
-        auto responseObject = RequestHandler::getInstance().make(urlDelete, "FileStation");
-        std::string responses = loadResponse(apiFile, api, 3);
+        auto responseObject = RequestHandler::getInstance().make(urlDelete, FileStation::session);
+        std::string responses = loadResponse(_apiFile, api, 3);
         auto result = respParser(responseObject, api, responses);
         BOOST_ASSERT(!result.empty());
         auto pair = result.front();
@@ -292,8 +294,8 @@ void FileStationAPI::makeRequest(std::string& parsed)
     else {
         int indexedMethod = 0;
         std::string url = compile(parsed, api, indexedMethod, true);
-        auto responseObject = RequestHandler::getInstance().make(url, "FileStation");
-        std::string responses = loadResponse(apiFile, api, indexedMethod);
+        auto responseObject = RequestHandler::getInstance().make(url, FileStation::session);
+        std::string responses = loadResponse(_apiFile, api, indexedMethod);
         std::vector<std::pair<std::string, std::string>> relevant = respParser(responseObject, api, responses);
         for(auto &r : relevant) {
             std::cout << r.first << " : " <<r.second << std::endl;

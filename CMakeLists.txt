@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.14)
 project(synoFW)
 
 find_package(OpenSSL)
@@ -7,12 +7,23 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/lib")
 
+
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_RUNTIME OFF)
+
+find_package(Boost 1.69.0 COMPONENTS thread chrono filesystem)
+
+
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+endif()
+
 include_directories(inc)
 include_directories(ifc)
 include_directories(unittest)
-include_directories(/usr/local/include/boost)
-include_directories(external/gtest/googlemock)
 
+include_directories(external/gtest/googlemock)
 add_subdirectory(external/gtest/googlemock)
 
 set(Test
@@ -73,5 +84,5 @@ add_executable(synoFW ${Sources} ${Includes} ${Test})
 
 
 target_link_libraries(synoFW curl)
-target_link_libraries(synoFW jsoncpp)
 target_link_libraries(synoFW gmock)
+target_link_libraries(synoFW ${Boost_LIBRARIES})

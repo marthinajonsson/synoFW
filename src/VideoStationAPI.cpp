@@ -13,7 +13,7 @@
 #include "ParamHandling.h"
 #include "Utilities.h"
 #include "ErrorCodes.h"
-
+#include "HttpRequests.h"
 
 std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response) {
 
@@ -117,5 +117,5 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     removeEndOfLines(requestUrl);
 
     std::cout << requestUrl << std::endl;
-    auto responseObject = RequestHandler::getInstance().make(requestUrl, "VideoStation");
+    auto responseObject = RequestHandler::getInstance().make(requestUrl, VideoStation::session);
 }

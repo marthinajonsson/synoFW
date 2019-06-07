@@ -8,8 +8,8 @@
 #include "Utilities.h"
 
 #include <algorithm>
-#include <map>
 #include <vector>
+#include <map>
 
 class Observer;
 
@@ -17,7 +17,7 @@ class Subject
 {
 private:
     std::string info;
-    std::map<int , std::vector<Observer *> > registryMap;
+    std::map<int , std::vector<Observer *> > _registryMap;
 public:
 
     void setInfo(std::string &value) { info = value; }

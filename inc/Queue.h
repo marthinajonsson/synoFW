@@ -8,11 +8,8 @@
 
 #include "Dispatcher.h"
 
-#include <thread>
 #include <queue>
 #include <mutex>
-#include <future>
-#include <iostream>
 
 typedef std::function<void()> Request;
 

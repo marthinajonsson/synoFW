@@ -10,7 +10,7 @@ typedef boost::property_tree::ptree ptree;
 void JsonStreamer::writeStream(DatabaseObject &obj) {
 
     ptree root;
-    boost::property_tree::read_json(m_path, root);
+    boost::property_tree::read_json(_path, root);
 
     long size = root.size();
     std::string index = std::to_string(size);
@@ -33,12 +33,12 @@ void JsonStreamer::writeStream(DatabaseObject &obj) {
     parent.put_child("metadata", child);
 
     root.push_back(std::make_pair(index, parent));
-    boost::property_tree::json_parser::write_json(m_path, root);
+    boost::property_tree::json_parser::write_json(_path, root);
 }
 
 boost::property_tree::ptree JsonStreamer::readStream(std::string& searchTitle) {
     ptree root, empty;
-    boost::property_tree::read_json(m_path, root);
+    boost::property_tree::read_json(_path, root);
 
     for(auto it : root) {
         auto key = it.first;

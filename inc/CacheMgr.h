@@ -16,12 +16,13 @@
 #include "ImdbName.h"
 #include "JsonStreamer.h"
 
+
+#include <boost/assert.hpp>
 #include <vector>
 #include <string>
 #include <fstream>
 #include <sstream>
 #include <map>
-#include <assert.h>
 #include <mutex>
 
 class Logger;

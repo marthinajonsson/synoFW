@@ -34,7 +34,7 @@ void CacheMgr::validate(std::string& result) {
 
 bool CacheMgr::update(std::string& title)
 {
-    assert(!title.empty());
+    BOOST_ASSERT(!title.empty());
 
     DatabaseObject obj;
 
@@ -45,43 +45,43 @@ bool CacheMgr::update(std::string& title)
     ImdbName n;
 
     std::map<std::string, std::string> result = a.parse({akasS.title, title}, {{akasS.titleId, ""}});
-    assert(result.size() > 1);
+    BOOST_ASSERT(!result.empty());
 
     obj.m_title = result.at("title");
     obj.m_titleId = result.at("titleId");
 
     result = a.parse({akasS.title, title}, {{akasS.language, ""}});
-    assert(result.size() > 1);
+    BOOST_ASSERT(!result.empty());
     obj.m_language = result.at("language");
 
     result = a.parse({akasS.title, title}, {{akasS.region, ""}});
-    assert(result.size() > 1);
+    BOOST_ASSERT(!result.empty());
     obj.m_region = result.at("region");
 
     result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.titletype, ""}});
-    assert(result.size() > 1);
+    BOOST_ASSERT(!result.empty());
     obj.m_titleType = result.at("titleType");
 
     if(obj.m_titleType == "series") {
         result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.endYear, ""}});
-        assert(result.size() > 1);
+        BOOST_ASSERT(!result.empty());
         obj.m_endYear = result.at("endYear");
 
         result = e.parse({episodeS.parentTconst, obj.m_titleId}, {{episodeS.season, ""}, {episodeS.episode, ""}});
-        assert(result.size() > 1);
+        BOOST_ASSERT(!result.empty());
         obj.m_season = result.at("season");
         obj.m_episode = result.at("episode");
     }
 
     result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.startYear, ""}});
-    assert(result.size() > 1);
+    BOOST_ASSERT(!result.empty());
     obj.m_startYear = result.at("startYear");
     result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.runtimeMinutes, ""}});
-    assert(result.size() > 1);
+    BOOST_ASSERT(!result.empty());
     obj.m_runtimeMinutes = result.at("runtimeMinutes");
 
     result = b.parse({basicsS.titleId, obj.m_titleId}, {{basicsS.genre, ""}});
-    assert(!result.empty());
+    BOOST_ASSERT(!result.empty());
     obj.m_genre = result.at("genre");
 
     result = c.parse({crewS.titleId, obj.m_titleId}, {{crewS.directors, ""}, {crewS.writers, ""}});

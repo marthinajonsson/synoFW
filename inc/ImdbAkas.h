@@ -13,22 +13,22 @@ class Logger;
 
 class ImdbAkas : Imdb {
 private:
-    std::string imdbFilename = "title.akas.tsv";
-    long currentFilePos;
-    long headerSize;
+    std::string _imdbFilename = "title.akas.tsv";
+    long _currentFilePos;
+    long _headerSize;
 
-    std::map<unsigned short, std::string> mapAkas {
+    std::map<unsigned short, std::string> _mapAkas {
             {0, "titleId"}, {1, "ordering"}, {2, "title"}, {3, "region"}, {4, "language"}
     };
 
 public:
     ImdbAkas() {
         std::fstream file;
-        file.open(imdbFilename, std::ios::in);
-        currentFilePos = file.tellg();
+        file.open(_imdbFilename, std::ios::in);
+        _currentFilePos = file.tellg();
         std::string tmp;
         getline(file, tmp);
-        headerSize = file.tellg();
+        _headerSize = file.tellg();
         file.seekg (0, file.beg);
         file.close();
     };
@@ -43,7 +43,7 @@ public:
         std::lock_guard<std::mutex> lock(akasLck);
 
         std::fstream file;
-        file.open(imdbFilename, std::ios::in);
+        file.open(_imdbFilename, std::ios::in);
 
         if(!file.is_open()) {
             std::cerr << typeid(this).name() << " - File is not open and cannot be parsed" << std::endl;
@@ -55,14 +55,14 @@ public:
         unsigned short matchColumnIndex = match.first;
         std::string matchColumnValue = match.second;
 
-        auto columnStructure = mapAkas;
+        auto columnStructure = _mapAkas;
       //file.seekg(currentFilePos, file.beg);
 
-        file.seekg(currentFilePos, file.beg); // -header
+        file.seekg(_currentFilePos, file.beg); // -header
 
         long pos = file.tellg();
         std::sort(find.begin(), find.end());
-        if(currentFilePos == 0) {
+        if(_currentFilePos == 0) {
             getline(file, line); // ignore header
         }
 
@@ -87,8 +87,8 @@ public:
              * */
             auto found = std::find(columnsValue.begin(), columnsValue.end(), matchColumnValue);
             if(found != columnsValue.end()) {
-                currentFilePos = file.tellg(); // save current position in file so we don't need to parse the entire file for next property
-                currentFilePos -= headerSize;
+                _currentFilePos = file.tellg(); // save current position in file so we don't need to parse the entire file for next property
+                _currentFilePos -= _headerSize;
                 std::string matching = *found;
 
                 // make pair of i.e. columnIndex (match.first) and our matching property

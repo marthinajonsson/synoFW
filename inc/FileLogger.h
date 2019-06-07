@@ -5,18 +5,17 @@
 #ifndef SYNOFW_FILELOGGER_H
 #define SYNOFW_FILELOGGER_H
 
+
+#include <boost/filesystem.hpp>
 #include "Utilities.h"
 #include "Subject.h"
 #include "Observer.h"
 
 #include <fstream>
 #include <iostream>
-#include <chrono>
-#include <unistd.h>
 #include <mutex>
 #include <map>
 
-#define GetCurrentDir getcwd
 
 static std::mutex m_write;
 
@@ -50,18 +49,10 @@ private:
         filename.append("-");
         filename.append(date);
         filename.append(".log");
-        auto dir = GetCurrentWorkingDir();
-        filename = dir + "/logs/" + filename;
+        boost::filesystem::path cwd(boost::filesystem::current_path());
+        filename = cwd.string() + "/logs/" + filename;
         return filename;
     }
-
-    std::string GetCurrentWorkingDir() {
-        char buff[FILENAME_MAX];
-        GetCurrentDir(buff, FILENAME_MAX);
-        std::string current_working_dir(buff);
-        return current_working_dir;
-    }
-
 
     std::string getDate() {
         time_t now = time(0);

@@ -5,26 +5,21 @@
 #ifndef SYNOFW_ACTIVEOBJECT_H
 #define SYNOFW_ACTIVEOBJECT_H
 
-#include "json/json.h"
 #include "Queue.h"
+#include <boost/atomic.hpp>
+#include <boost/thread.hpp>
 #include <string>
-#include <thread>
-#include <queue>
-#include <mutex>
-//#include <future>
-#include <iostream>
-
 
 class ActiveObject {
 private:
 
     Queue queue;
-    std::atomic<bool> done;
-    std::thread *runnable;
+    boost::atomic_bool done;
+    boost::thread *runnable;
 
 public:
     ActiveObject() : done(false) {
-        runnable = new std::thread(&ActiveObject::run, this);
+        runnable = new boost::thread(&ActiveObject::run, this);
     }
     ~ActiveObject() { runnable->join(); }
 

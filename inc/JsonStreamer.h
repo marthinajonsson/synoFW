@@ -14,8 +14,8 @@
 
 class JsonStreamer {
 private:
-    std::string m_filename;
-    std::string m_path;
+    std::string _filename;
+    std::string _path;
 
     void writeStream(DatabaseObject &obj);
     boost::property_tree::ptree readStream(std::string&);
@@ -23,14 +23,14 @@ public:
 
     JsonStreamer() = default;
 
-    explicit JsonStreamer(const std::string&f) : m_filename(f) {
-        m_path = "../data/";
-        m_path.append(f);
+    explicit JsonStreamer(const std::string&f) : _filename(f) {
+        _path = "../data/";
+        _path.append(f);
     }
 
     void setFile(std::string&&f) {
-        m_path = "../data/";
-        m_path.append(f);
+        _path = "../data/";
+        _path.append(f);
     }
     ~JsonStreamer() = default;
 
