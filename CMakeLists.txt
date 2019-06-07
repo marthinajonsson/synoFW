@@ -1,27 +1,17 @@
 cmake_minimum_required(VERSION 3.12)
 project(synoFW)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/lib")
-
 find_package(OpenSSL)
 
-#find_package(Boost REQUIRED filesystem program_options regex timer chrono)
-#IF (Boost_FOUND)
-#    include_directories(${Boost_INCLUDE_DIR})
-#    ADD_DEFINITIONS( "-DHAS_BOOST" )
-#ENDIF()
-
-add_definitions("-DGTEST")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread -lboost_thread-mt")
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} "/usr/local/lib")
 
 include_directories(inc)
 include_directories(ifc)
 include_directories(unittest)
-#include_directories(external/gtest/googlemock)
-
-#SET(CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} "/usr/share/boost-build")
+include_directories(/usr/local/include/boost)
+include_directories(external/gtest/googlemock)
 
 add_subdirectory(external/gtest/googlemock)
 
@@ -78,9 +68,10 @@ set(Sources
 
 
 enable_testing()
+
 add_executable(synoFW ${Sources} ${Includes} ${Test})
 
 
 target_link_libraries(synoFW curl)
 target_link_libraries(synoFW jsoncpp)
-target_link_libraries(synoFW gmock_main)
+target_link_libraries(synoFW gmock)

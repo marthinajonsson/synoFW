@@ -1,8 +1,8 @@
+#include <include/gmock/gmock.h>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <future>
-#include <include/gmock/gmock.h>
 
 #include "CacheTest.h"
 #include "FileStationApiTest.h"
@@ -86,10 +86,6 @@ int process()
 
 int main(int argc, char* argv [])
 {
-
-#ifdef GTEST
-    std::cout << "TEST DEFINED" << std::endl;
-#endif
     ::testing::InitGoogleMock(&argc, argv);
     return RUN_ALL_TESTS();
 

@@ -5,10 +5,8 @@
 #include <iostream>
 #include <algorithm>
 #include <boost/assert.hpp>
-#include <boost/chrono.hpp>
-#include <boost/thread/thread.hpp>
-
-
+#include <thread>
+#include <chrono>
 #include "RequestUrlBuilder.h"
 #include "FileStationAPI.h"
 #include "ParamHandling.h"
@@ -233,6 +231,11 @@ void FileStationAPI::makeRequest(std::string& parsed)
      * info, list, search, create, upload, download, delete
      * */
 
+
+#ifdef TEST_RUNNING
+    std::cout << "TEST DEFINED" << std::endl;
+#endif
+
     std::string api;
     if(parsed.find("search") != std::string::npos)
     {
@@ -255,8 +258,7 @@ void FileStationAPI::makeRequest(std::string& parsed)
             auto pair = result.front();
             search_id = pair.second;
 
-            boost::this_thread::sleep_for(boost::chrono::milliseconds(1000));
-
+            std::this_thread::sleep_for(std::chrono_literals::operator""s(2));
             std::string urlStop = compile(parsed, api, 2, false);
 
             RequestHandler::getInstance().make(urlStop, "FileStation");

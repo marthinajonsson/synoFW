@@ -95,8 +95,12 @@ private:
     void write(SeverityType level, std::string &output) {
         std::lock_guard<std::mutex> lock(m_write);
         std::string time = getTime();
-        time = "[" + time + "]";
-        logfile << time + output + "\n";
+        std::string extras =  __FILE__;
+        extras.append(":");
+        extras.append(std::to_string(__LINE__));
+        extras.append("] ");
+        time = "[" + time + ", ";
+        logfile << time +  __FILE__ + ":" + std::to_string(__LINE__) + "] " + output + "\n";
     }
 };
 #endif //SYNOFW_FILELOGGER_H
