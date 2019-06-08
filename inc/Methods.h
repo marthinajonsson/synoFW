@@ -52,7 +52,7 @@ namespace VS {
     }
 
     namespace folder {
-        std::string list = "list"
+        std::string list = "list";
     }
 }
 

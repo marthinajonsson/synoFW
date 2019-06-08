@@ -15,15 +15,15 @@ class Logger;
 
 class ImdbName : Subject, Imdb {
 private:
-    std::string m_imdbFilename = "name.basics.tsv";
-    long currentFilePos;
+    std::string _imdbFilename = "name.basics.tsv";
+    long _currentFilePos;
 
-    std::map<unsigned short, std::string> mapNames {
+    std::map<unsigned short, std::string> _mapNames {
             {0, "nameId"}, {1, "primaryName"}
     };
 
 public:
-    ImdbName() : currentFilePos(0){}
+    ImdbName() : _currentFilePos(0){}
     ~ImdbName() = default;
 
     std::map<std::string, std::string> parse(std::pair<unsigned short, std::string> &&match, std::vector<std::pair<unsigned short, std::string>> &&find) override
@@ -35,7 +35,7 @@ public:
         std::lock_guard<std::mutex> lock(nameLck);
 
         std::fstream file;
-        file.open(m_imdbFilename, std::ios::in);
+        file.open(_imdbFilename, std::ios::in);
 
         if(!file.is_open()) {
             std::cerr << typeid(this).name() << " - File is not open and cannot be parsed" << std::endl;
@@ -47,8 +47,8 @@ public:
         unsigned short matchColumnIndex = match.first;
         std::string matchColumnValue = match.second;
 
-        auto columnStructure = mapNames;
-        file.seekg(currentFilePos, file.beg);
+        auto columnStructure = _mapNames;
+        file.seekg(_currentFilePos, file.beg);
 
         std::sort(find.begin(), find.end());
         getline(file, line); // ignore header
@@ -73,7 +73,7 @@ public:
              * */
             auto found = std::find(columnsValue.begin(), columnsValue.end(), matchColumnValue);
             if(found != columnsValue.end()) {
-                currentFilePos = file.tellg(); // save current position in file so we don't need to parse the entire file for next property
+                _currentFilePos = file.tellg(); // save current position in file so we don't need to parse the entire file for next property
                 std::string matching = *found;
 
                 // make pair of i.e. columnIndex (match.first) and our matching property

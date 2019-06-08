@@ -96,26 +96,26 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     /*
      * info, folder, movie, tvshow, library
      * */
-    auto API = loadAPI(apiFile, parsed);
+    auto API = loadAPI(_apiFile, parsed);
     int index = 0;
-    auto method = loadMethod(apiFile, API, index, true);
+    auto method = loadMethod(_apiFile, API, index, true);
     /*
      * get, list
      * */
-    auto path = loadPath(apiFile, API);
-    requestUrl+=info_s.server;
-    requestUrl+="/webapi/"+path;
-    requestUrl+="?api="+API;
+    auto path = loadPath(_apiFile, API);
+    _requestUrl+=info_s.server;
+    _requestUrl+="/webapi/"+path;
+    _requestUrl+="?api="+API;
 
-    auto version = loadVersion(apiFile, API);
-    auto params = loadParams(apiFile, API, index);
-    requestUrl+="&version="+version;
-    requestUrl+="&method="+method;
+    auto version = loadVersion(_apiFile, API);
+    auto params = loadParams(_apiFile, API, index);
+    _requestUrl+="&version="+version;
+    _requestUrl+="&method="+method;
     auto compiledParam = paramParser(API, params);
-    requestUrl+=compiledParam;
-    requestUrl+="&_sid=";
-    removeEndOfLines(requestUrl);
+    _requestUrl+=compiledParam;
+    _requestUrl+="&_sid=";
+    removeEndOfLines(_requestUrl);
 
-    std::cout << requestUrl << std::endl;
-    auto responseObject = RequestHandler::getInstance().make(requestUrl, VideoStation::session);
+    std::cout << _requestUrl << std::endl;
+    auto responseObject = RequestHandler::getInstance().make(_requestUrl, VideoStation::session);
 }

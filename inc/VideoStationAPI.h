@@ -25,8 +25,8 @@ public:
     std::string paramParser(std::string &,std::string&) override;
     std::vector<std::pair<std::string,std::string>> respParser(boost::property_tree::ptree &, std::string &,std::string&) override;
 private:
-    std::string requestUrl;
-    const std::string apiFile = "../api/API_VS";
+    std::string _requestUrl;
+    const std::string _apiFile = "../api/API_VS";
 };
 
 
