@@ -28,7 +28,7 @@ public:
 protected:
     std::string search_id;
     std::string delete_id;
-    std::string compile(std::string&, std::string, int, bool);
+    std::string compile(std::string&, std::string&, int, bool);
 };
 
 

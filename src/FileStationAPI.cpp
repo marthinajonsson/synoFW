@@ -14,6 +14,19 @@
 #include "ErrorCodes.h"
 #include <HttpRequests.h>
 #include <TablePrinter.h>
+#include <CacheMgr.h>
+
+
+bool operator==( const std::pair<std::string, std::string>& lhs,
+                 const std::pair<std::string, std::string>& rhs ) {
+    if(lhs.second.find("name") != std::string::npos) {
+        return true;
+    }
+    else if(rhs.second.find("name") != std::string::npos) {
+        return true;
+    }
+    return false;
+}
 
 std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response)
 {
@@ -52,18 +65,24 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
         result.emplace_back(std::make_pair("Download", "Complete"));
 
     }else if(api.find("SYNO.FileStation.Search") != std::string::npos) {
+        pData = respData.get_child("data");
         for(auto &p : respVec) {
             try {
                 if(p.find("files") != std::string::npos) {
-                    pData = respData.get_child(p);
-                    BOOST_ASSERT(!pData.empty());
-                    pData = pData.get_child("additional");
-                    BOOST_ASSERT(!pData.empty());
-                    auto path = pData.get<std::string>("real_path");
-                    result.emplace_back(std::make_pair("real_path", path));
+                    pData = pData.get_child(p);
+                    if(pData.empty()){
+                        boost::property_tree::write_json(std::cout, pData);
+                        continue;
+                    }
+                    BOOST_FOREACH(boost::property_tree::ptree::value_type& val , pData) {
+                            auto name = val.second.get<std::string>("name");
+                            auto path = val.second.get<std::string>("path");
+                            result.emplace_back(std::make_pair("name", name));
+                            result.emplace_back(std::make_pair("path", path));
+                    }
                 }
                 else {
-                    auto s = respData.get<std::string>(p);
+                    auto s = pData.get<std::string>(p);
                     result.emplace_back(std::make_pair(p, s));
                 }
             }
@@ -147,22 +166,22 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params)
             fullParamStr+=val;
         }
         else if(s == "path") {
-            std::string val = handler.setParam("path", "film");
+            std::string val = handler.setParam("path", "Rom");
             std::string path = handler.getPath(val);
             std::cout << "Path set to: " << path << std::endl;
             fullParamStr+=path;
         }
         else if(s == "folder_path") {
-            std::string val = handler.setParam("folder_path", "film");
+            std::string val = handler.setParam("folder_path", "Rom");
             auto result = handler.getPathFolder(val);
             fullParamStr+=result;
         }
         else if(s == "pattern"){
-            std::string extensions = ".mp4,.mkv,.avi";
-            std::string val = handler.setParam("pattern", "");
+            //std::string extensions = ".mp4,.mkv,.avi";
+            std::string val = handler.setParam("pattern", "The");
             std::cout << "Pattern set: " << val << std::endl;
-            if(!val.empty()) { val = "," + val; }
-            fullParamStr+=extensions+val;
+            //if(!val.empty()) { val = "," + val; }
+            fullParamStr+=val;
         }
         else if(s == "filetype"){
             std::string val = handler.setParam("filetype", "all");
@@ -170,6 +189,7 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params)
         }
         else if(s == "extension") {
             std::string val = handler.setParam("extension", "mp4");
+            fullParamStr+=val;
         }
         else if(s == "filename") {
             std::string val = handler.setParam("filename", "");
@@ -214,7 +234,7 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params)
     return fullParamStr;
 }
 
-std::string FileStationAPI::compile(std::string &input, std::string api = "", int indexedMethod = 0, bool chooseMethod = true)
+std::string FileStationAPI::compile(std::string &input, std::string &api, int indexedMethod = 0, bool chooseMethod = true)
 {
     api = loadAPI(_apiFile, input);
     auto method = loadMethod(_apiFile, api, indexedMethod, std::move(chooseMethod));
@@ -238,6 +258,7 @@ void FileStationAPI::makeRequest(std::string& parsed)
 #ifdef TEST_RUNNING
     std::cout << "TEST DEFINED" << std::endl;
 #endif
+    std::vector<std::pair<std::string,std::string>> result;
 
     std::string api;
     if(parsed.find("search") != std::string::npos)
@@ -256,7 +277,7 @@ void FileStationAPI::makeRequest(std::string& parsed)
 
             auto responseObject = RequestHandler::getInstance().make(urlStart, FileStation::session);
             std::string responses = loadResponse(_apiFile, api, 0);
-            auto result = respParser(responseObject, api, responses);
+            result = respParser(responseObject, api, responses);
             BOOST_ASSERT(!result.empty());
             auto pair = result.front();
             search_id = pair.second;
@@ -268,6 +289,7 @@ void FileStationAPI::makeRequest(std::string& parsed)
 
             std::string urlList = compile(parsed, api, 1, false);
             responseObject = RequestHandler::getInstance().make(urlList, FileStation::session);
+            boost::property_tree::write_json(std::cout, responseObject);
             responses = loadResponse(_apiFile, api, 1);
             result = respParser(responseObject, api, responses);
             BOOST_ASSERT(!result.empty());
@@ -287,7 +309,7 @@ void FileStationAPI::makeRequest(std::string& parsed)
 
         auto responseObject = RequestHandler::getInstance().make(urlDelete, FileStation::session);
         std::string responses = loadResponse(_apiFile, api, 3);
-        auto result = respParser(responseObject, api, responses);
+        result = respParser(responseObject, api, responses);
         BOOST_ASSERT(!result.empty());
         auto pair = result.front();
         std::cout << pair.first << ": " << pair.second << std::endl;
@@ -297,19 +319,27 @@ void FileStationAPI::makeRequest(std::string& parsed)
         std::string url = compile(parsed, api, indexedMethod, true);
         auto responseObject = RequestHandler::getInstance().make(url, FileStation::session);
         std::string responses = loadResponse(_apiFile, api, indexedMethod);
-        std::vector<std::pair<std::string, std::string>> relevant = respParser(responseObject, api, responses);
-        for(auto &r : relevant) {
-            std::cout << r.first << " : " <<r.second << std::endl;
-        }
+        result = respParser(responseObject, api, responses);
     }
-
 
     TablePrinter tablePrinter(6);
     tablePrinter.setRowColor("bold");
     tablePrinter.addHeader({"Index","Title", "Genre", "Duration", "Directors", "Actors"});
     tablePrinter.setRowColor("");
-    tablePrinter.addRow({"A title that is this long", "Drama, Comedy", "121", "Nancy Meyers", "Marthina, Marthina, Marthina, Marthina"});
-    tablePrinter.addRow({"A shorter title", "Horror", "110", "Spielberg", "Scary people, Scary people, Scary people, Scary people"});
+
+    auto it = std::find(result.begin(), result.end(), [](std::pair<std::string, std::string> &p) {
+        return p.first.find("name") != std::string::npos;
+    });
+
+    while(it != result.end()) {
+        CacheMgr::getInstance().validate(it->second);
+        DatabaseObject obj = CacheMgr::getInstance().get(it->second);
+        tablePrinter.addRow({obj.m_title, obj.m_genre, obj.m_runtimeMinutes, obj.m_directors, obj.m_writers});
+        it++;
+    }
+
+   // tablePrinter.addRow({"A title that is this long", "Drama, Comedy", "121", "Nancy Meyers", "Marthina, Marthina, Marthina, Marthina"});
+   // tablePrinter.addRow({"A shorter title", "Horror", "110", "Spielberg", "Scary people, Scary people, Scary people, Scary people"});
     tablePrinter.write();
 }
 

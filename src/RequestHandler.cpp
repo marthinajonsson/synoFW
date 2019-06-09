@@ -73,7 +73,6 @@ void RequestHandler::login(const std::string &session) {
     if(!val) {
         GENERIC::printError(jsonData);
     }
-    boost::property_tree::write_json(std::cout, jsonData);
     jsonData = jsonData.get_child("data");
     sid = jsonData.get<std::string>("sid");
 }
