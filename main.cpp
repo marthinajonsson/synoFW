@@ -4,22 +4,23 @@
 #include <algorithm>
 #include <future>
 
-#include "CacheTest.h"
 #include "FileStationApiTest.h"
-#include "FsRequestTest.h"
 #include "FsResponseTest.h"
+#include "FsRequestTest.h"
 #include "VsRequestTest.h"
+#include "CacheTest.h"
 
-#include "Logger.h"
+#include "VideoStationAPI.h"
+#include "RequestHandler.h"
+#include "FileStationAPI.h"
+#include "ActiveObject.h"
 #include "EventLogger.h"
 #include "FileLogger.h"
-#include "ActiveObject.h"
-#include <RequestHandler.h>
-#include <CacheMgr.h>
-#include <FileStationAPI.h>
-#include <VideoStationAPI.h>
-#include <ErrorCodes.h>
+#include "ErrorCodes.h"
 #include "Utilities.h"
+#include "CacheMgr.h"
+#include "Logger.h"
+
 
 #define LOG(x) {std::cout << __FILE__ << ":" << __FUNCTION__ << "(" << __LINE__ << "): " << x << std::endl;}
 
@@ -49,7 +50,6 @@ void printOptions() {
     std::cout << "fs:upload" << "-- upload file" << std::endl;
     std::cout << "fs:delete" << "-- delete file" << std::endl;
     std::cout << "fs:search" << "-- search file" << std::endl;
-
 }
 
 
@@ -89,22 +89,22 @@ int main(int argc, char* argv [])
     ::testing::InitGoogleMock(&argc, argv);
     return RUN_ALL_TESTS();
 
-//
-//    EventLogger *pElog = new EventLogger();
-//    pLog->registerObserver(SeverityType::GENERAL, pElog);
-//    pLog->registerObserver(SeverityType::WARNING, pElog);
-//    pLog->registerObserver(SeverityType::ERROR, pElog);
-//
-//    int result = process();
-//
-//    if(result == -1) {
-//        pLog->removeObserver(pElog);
-//        delete pElog;
-//        return result;
-//    }
-//
-//    std::string test = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
-//
-//    delete pElog;
+
+    EventLogger *pElog = new EventLogger();
+    pLog->registerObserver(SeverityType::GENERAL, pElog);
+    pLog->registerObserver(SeverityType::WARNING, pElog);
+    pLog->registerObserver(SeverityType::ERROR, pElog);
+
+    int result = process();
+
+    if(result == -1) {
+        pLog->removeObserver(pElog);
+        delete pElog;
+        return result;
+    }
+
+    std::string test = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
+
+    delete pElog;
     return 0;
 }

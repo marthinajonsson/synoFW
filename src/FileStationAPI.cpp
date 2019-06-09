@@ -13,6 +13,7 @@
 #include "ParamHandling.h"
 #include "ErrorCodes.h"
 #include <HttpRequests.h>
+#include <TablePrinter.h>
 
 std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response)
 {
@@ -301,5 +302,14 @@ void FileStationAPI::makeRequest(std::string& parsed)
             std::cout << r.first << " : " <<r.second << std::endl;
         }
     }
+
+
+    TablePrinter tablePrinter(6);
+    tablePrinter.setRowColor("bold");
+    tablePrinter.addHeader({"Index","Title", "Genre", "Duration", "Directors", "Actors"});
+    tablePrinter.setRowColor("");
+    tablePrinter.addRow({"A title that is this long", "Drama, Comedy", "121", "Nancy Meyers", "Marthina, Marthina, Marthina, Marthina"});
+    tablePrinter.addRow({"A shorter title", "Horror", "110", "Spielberg", "Scary people, Scary people, Scary people, Scary people"});
+    tablePrinter.write();
 }
 

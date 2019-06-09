@@ -63,7 +63,8 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/Queue.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Dispatcher.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/FileMgr.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ConfigHelper.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/ConfigHelper.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/TablePrinter.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
@@ -74,7 +75,8 @@ set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/ifc/Subject.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/JsonStreamer.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/ParamHandling.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/API.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/src/API.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/TablePrinter.cpp)
 
 
 

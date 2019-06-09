@@ -22,6 +22,28 @@ typedef enum SeverityType
 }SeverityType;
 
 
+static std::ostream& red_on(std::ostream& os)
+{
+    return os << "\e[31m";
+}
+
+
+static std::ostream& red_off(std::ostream& os)
+{
+    return os << "\e[37m";
+}
+
+static std::ostream& green_on(std::ostream& os)
+{
+    return os << "\e[32m";
+}
+
+
+static std::ostream& green_off(std::ostream& os)
+{
+    return os << "\e[37m";
+}
+
 static std::ostream& bold_on(std::ostream& os)
 {
     return os << "\e[1m";
@@ -30,9 +52,14 @@ static std::ostream& bold_on(std::ostream& os)
 
 static std::ostream& bold_off(std::ostream& os)
 {
-    return os << "\e[0m";
+    return os << "\e[21m";
 }
 
+
+static std::ostream& reset(std::ostream& os)
+{
+    return os << "\e[0m";
+}
 
 static void removeEndOfLines(std::string &str) {
     std::string::size_type pos = 0;

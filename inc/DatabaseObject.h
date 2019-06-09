@@ -23,6 +23,8 @@ public:
     std::string m_parentTconst;
     std::string m_episode;
     std::string m_season;
+    std::string m_path;
+    std::string m_library_id;
 };
 
 #endif //SYNOFW_DATABASEOBJECT_H
