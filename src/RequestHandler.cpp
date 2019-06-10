@@ -13,7 +13,8 @@
 #include <fstream>
 
 std::mutex single;
-static std::string sid("undef");
+static std::string FS_sid("undef"); // TODO: handle this in a prettier way
+static std::string VS_sid("undef");
 
 static RequestHandler *instance;
 RequestHandler& RequestHandler::getInstance()
@@ -54,65 +55,96 @@ void RequestHandler::sendHttpGetRequest(boost::property_tree::ptree &jsonData, c
     curl_easy_cleanup(curl);
 
     std::stringstream response(buffer);
+    pLogger->writeLog(SeverityType::GENERAL, url);
+    pLogger->writeLog(SeverityType::GENERAL, std::to_string(httpCode));
     boost::property_tree::read_json(response, jsonData);
     buffer = "";
 }
 
-void RequestHandler::login(const std::string &session) {
-
-    std::cout << "LOGIN.. " << std::endl;
+void RequestHandler::login(const std::string &session)
+{
     boost::property_tree::ptree jsonData;
     std::string url = info_s.server;
     url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+info_s.username+"&passwd="+info_s.password+"&session="+session+"&format=sid");
     removeEndOfLines(url);
 
-    std::cout << "Sending HTTP request to URL: " << url << std::endl;
     sendHttpGetRequest(jsonData, url);
 
     auto val = jsonData.get<bool>("success");
     if(!val) {
+        boost::property_tree::write_json(std::cerr, jsonData);
+        std::string err = "Failed to login to ";
+        err.append(session+" with user: " + "{" + info_s.username + "} and pwd: {" + info_s.password + "}");
+        pLogger->writeLog(SeverityType::ERROR, err);
         GENERIC::printError(jsonData);
     }
     jsonData = jsonData.get_child("data");
-    sid = jsonData.get<std::string>("sid");
+    if(session.find("FileStation") != std::string::npos) {
+        FS_sid = jsonData.get<std::string>("sid");
+    }else if(session.find("VideoStation") != std::string::npos){
+        VS_sid = jsonData.get<std::string>("sid");
+    }
 }
 
-void RequestHandler::logoff(const std::string &session) {
-    std::cout << "LOGOUT.." << std::endl;
+void RequestHandler::logoff(const std::string &session)
+{
     boost::property_tree::ptree jsonData;
     std::string url = info_s.server;
     url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session="+session);
     removeEndOfLines(url);
     sendHttpGetRequest(jsonData, url);
 
-    sid = "undef";
+    if(session.find("FileStation") != std::string::npos) {
+        FS_sid = "undef";
+    }else if(session.find("VideoStation") != std::string::npos){
+        VS_sid = "undef";
+    }
 
     auto val = jsonData.get<bool>("success");
     if(!val) {
+        boost::property_tree::write_json(std::cerr, jsonData);
+        std::string err = "Failed to logoff from ";
+        err.append(session);
+        pLogger->writeLog(SeverityType::ERROR, err);
         GENERIC::printError(jsonData);
     }
 }
 
-boost::property_tree::ptree RequestHandler::send(std::string &url) {
-
+boost::property_tree::ptree RequestHandler::send(const std::string& session, std::string &url)
+{
     boost::property_tree::ptree jsonData;
+    std::string sid = FS_sid;
+    if(session.find("VideoStation") != std::string::npos){
+        sid = VS_sid;
+    }
 
     try {
-       if(sid == "undef" || sid.length() < 5) {
-           throw GENERIC::UnhandledRequestException();
-       }
+        if (sid == "undef" || sid.length() < 5) {
+            std::string err = "Sid is either undefined or corrupt: ";
+            err.append(url);
+            pLogger->writeLog(SeverityType::ERROR, err);
+            throw GENERIC::UnhandledRequestException();
+        } else {
+            url+=sid;
+            removeEndOfLines(url);
+            sendHttpGetRequest(jsonData, url);
+            auto val = jsonData.get<bool>("success");
+            if(!val) {
+                std::string err = "Failed to send HTTP request: ";
+                err.append(session + ", " + url);
+                pLogger->writeLog(SeverityType::WARNING, err);
+            }
+            boost::property_tree::json_parser::write_json("../api/RequestResponse.json", jsonData);
+            return jsonData;
+        }
     }
     catch (GENERIC::UnhandledRequestException &ex) {
-        std::cerr << ex.what() << std::endl;
-        auto val = jsonData.get<std::string>("success");
+        std::string err = "Failed to send HTTP request URL: ";
+        err.append(url + ", " + ex.what());
+        pLogger->writeLog(SeverityType::ERROR, err);
         return jsonData;
     }
 
-    url+=sid;
-    removeEndOfLines(url);
-    std::cout << "Sending HTTP request to URL: " << url << std::endl;
-    sendHttpGetRequest(jsonData, url);
-    boost::property_tree::json_parser::write_json("../api/RequestResponse.json", jsonData);
-    return jsonData;
+
 }
 

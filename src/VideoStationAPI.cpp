@@ -9,6 +9,7 @@
 #include <iostream>
 #include <algorithm>
 
+#include <RequestUrlBuilder.h>
 #include "VideoStationAPI.h"
 #include "ParamHandling.h"
 #include "Utilities.h"
@@ -23,16 +24,17 @@ std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boos
     ParamHandling param(testing);
     boost::property_tree::ptree pData, tmp;
     pData = respData.get_child("data");
-    pData = pData.get_child("movie");
-
-    auto title = pData.get<std::string>("title");
-    auto path = pData.get<std::string>("path");
-    auto id = pData.get<std::string>("id");
-    auto mId = pData.get<std::string>("mapper_id");
-    result.emplace_back(std::make_pair("title", title));
-    result.emplace_back(std::make_pair("path", path));
-    result.emplace_back(std::make_pair("fileId", id));
-    std::cout << "[" << id << "] " << title << std::endl;
+    boost::property_tree::write_json(std::cout, pData);
+//    pData = pData.get_child("movie");
+//
+//    auto title = pData.get<std::string>("title");
+//    auto path = pData.get<std::string>("path");
+//    auto id = pData.get<std::string>("id");
+//    auto mId = pData.get<std::string>("mapper_id");
+//    result.emplace_back(std::make_pair("title", title));
+//    result.emplace_back(std::make_pair("path", path));
+//    result.emplace_back(std::make_pair("fileId", id));
+//    std::cout << "[" << id << "] " << title << std::endl;
     return result;
 }
 
@@ -91,31 +93,31 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
     return fullParamStr;
 }
 
+std::string VideoStationAPI::compile(std::string &input, std::string &api, int indexedMethod = 0, bool chooseMethod = true)
+{
+    api = loadAPI(_apiFile, input);
+    chooseMethod = testing ? false : chooseMethod;
+    auto method = loadMethod(_apiFile, api, indexedMethod, std::move(chooseMethod));
+    auto path = loadPath(_apiFile, api);
+    auto version = loadVersion(_apiFile, api);
+    auto params = loadParams(_apiFile, api, indexedMethod);
+    auto resultParams = paramParser(api, params);
+
+    RequestUrlBuilder urlBuilder (info_s.server, path, api, version, method, resultParams);
+    return urlBuilder.getResult();
+}
+
+
 void VideoStationAPI::makeRequest(std::string& parsed)
 {
     /*
      * info, folder, movie, tvshow, library
      * */
-    auto API = loadAPI(_apiFile, parsed);
-    int index = 0;
-    auto method = loadMethod(_apiFile, API, index, true);
-    /*
-     * get, list
-     * */
-    auto path = loadPath(_apiFile, API);
-    _requestUrl+=info_s.server;
-    _requestUrl+="/webapi/"+path;
-    _requestUrl+="?api="+API;
-
-    auto version = loadVersion(_apiFile, API);
-    auto params = loadParams(_apiFile, API, index);
-    _requestUrl+="&version="+version;
-    _requestUrl+="&method="+method;
-    auto compiledParam = paramParser(API, params);
-    _requestUrl+=compiledParam;
-    _requestUrl+="&_sid=";
-    removeEndOfLines(_requestUrl);
-
-    std::cout << _requestUrl << std::endl;
-    auto responseObject = RequestHandler::getInstance().make(_requestUrl, VideoStation::session);
+    std::vector<std::pair<std::string,std::string>> result;
+    std::string api;
+    int indexedMethod = 0;
+    std::string url = compile(parsed, api, indexedMethod, true);
+    auto responseObject = RequestHandler::getInstance().make(url, VideoStation::session);
+    std::string responses = loadResponse(_apiFile, api, indexedMethod);
+    result = respParser(responseObject, api, responses);
 }

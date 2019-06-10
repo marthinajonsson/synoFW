@@ -18,13 +18,13 @@ protected:
     {
         vs = std::make_unique<VideoStationAPI>();
         vs->testing = true;
-        std::cout << bold_on << "VIDEO STATION" << bold_off << std::endl;
-        std::cout << "vs:info" << "-- get info" << std::endl;
-        std::cout << "vs:library" << "-- list all libraries" << std::endl;
-        std::cout << "vs:movie" << std::endl;
-        std::cout << "vs:tvshow" << std::endl;
-        std::cout << "vs:folder" << std::endl;
-        std::cout << "*vs:metadata TBD.." << std::endl;
+//        std::cout << bold_on << "VIDEO STATION" << bold_off << std::endl;
+//        std::cout << "vs:info" << "-- get info" << std::endl;
+//        std::cout << "vs:library" << "-- list all libraries" << std::endl;
+//        std::cout << "vs:movie" << std::endl;
+//        std::cout << "vs:tvshow" << std::endl;
+//        std::cout << "vs:folder" << std::endl;
+//        std::cout << "*vs:metadata TBD.." << std::endl;
     }
 
     void TearDown() override

@@ -35,23 +35,23 @@ public:
             notifyObservers(type);
         }
     }
-
-    void writeFile(SeverityType type, const char* file, const char* line, std::string info)
-    {
-        std::string f (file);
-        std::string l (line);
-        std::string log = "[";
-        log.append(file);
-        log.append(", line: ");
-        log.append(line);
-        log.append("] ");
-        log.append(info);
-        if(messageMap[type])
-        {
-            setInfo(log);
-            notifyObservers(type);
-        }
-    }
+//
+//    void writeFile(SeverityType type, const char* file, const char* line, std::string info)
+//    {
+//        std::string f (file);
+//        std::string l (line);
+//        std::string log = "[";
+//        log.append(file);
+//        log.append(", line: ");
+//        log.append(line);
+//        log.append("] ");
+//        log.append(info);
+//        if(messageMap[type])
+//        {
+//            setInfo(log);
+//            notifyObservers(type);
+//        }
+//    }
 
 
     void enableLoggingOfMessage(SeverityType type)

@@ -289,7 +289,6 @@ void FileStationAPI::makeRequest(std::string& parsed)
 
             std::string urlList = compile(parsed, api, 1, false);
             responseObject = RequestHandler::getInstance().make(urlList, FileStation::session);
-            boost::property_tree::write_json(std::cout, responseObject);
             responses = loadResponse(_apiFile, api, 1);
             result = respParser(responseObject, api, responses);
             BOOST_ASSERT(!result.empty());
@@ -327,15 +326,15 @@ void FileStationAPI::makeRequest(std::string& parsed)
     tablePrinter.addHeader({"Index","Title", "Genre", "Duration", "Directors", "Actors"});
     tablePrinter.setRowColor("");
 
-    auto it = std::find(result.begin(), result.end(), [](std::pair<std::string, std::string> &p) {
-        return p.first.find("name") != std::string::npos;
-    });
+    auto it = result.begin();
 
-    while(it != result.end()) {
+    for(;it != result.end(); it++) {
+        if(it->first.find("name") == std::string::npos){
+            continue;
+        }
         CacheMgr::getInstance().validate(it->second);
         DatabaseObject obj = CacheMgr::getInstance().get(it->second);
         tablePrinter.addRow({obj.m_title, obj.m_genre, obj.m_runtimeMinutes, obj.m_directors, obj.m_writers});
-        it++;
     }
 
    // tablePrinter.addRow({"A title that is this long", "Drama, Comedy", "121", "Nancy Meyers", "Marthina, Marthina, Marthina, Marthina"});
