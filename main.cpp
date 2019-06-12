@@ -86,10 +86,13 @@ int process()
 
 int main(int argc, char* argv [])
 {
+    LOG("This is a log entry");
+
     ::testing::InitGoogleMock(&argc, argv);
+    ::testing::GTEST_FLAG(filter) = "VsRequestTest*";
     return RUN_ALL_TESTS();
 
-
+    LOG("This is a log entry");
     EventLogger *pElog = new EventLogger();
     pLog->registerObserver(SeverityType::GENERAL, pElog);
     pLog->registerObserver(SeverityType::WARNING, pElog);

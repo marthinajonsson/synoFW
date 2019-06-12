@@ -43,7 +43,7 @@ private:
         pLogger = new Logger();
         pLogger->registerObserver(SeverityType::ERROR, pFileLogger);
         pLogger->registerObserver(SeverityType::WARNING, pFileLogger);
-#ifdef DEBUG
+#ifdef BOOST_PREPROCESSOR_DEBUG_ERROR_HPP
         std::cout << "DEBUGGING" << std::endl;
         pLogger->registerObserver(SeverityType::GENERAL, pFileLogger);
 #endif

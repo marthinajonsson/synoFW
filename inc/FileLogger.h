@@ -24,8 +24,8 @@ class FileLogger : public Observer {
 public:
 
     FileLogger() {
-
-        logfile.open(getFilename(), std::ios::out | std::ios::app);
+        std::string fName = getFilename();
+        logfile.open(fName, std::ios::out | std::ios::app);
     }
 
     ~FileLogger() {
@@ -45,53 +45,43 @@ private:
 
     std::string getFilename() {
         auto date = getDate();
-        std::string filename = typeid(FileLogger).name();
+        std::string filename = "FileLogger";
         filename.append("-");
         filename.append(date);
         filename.append(".log");
         boost::filesystem::path cwd(boost::filesystem::current_path());
         filename = cwd.string() + "/logs/" + filename;
+        boost::filesystem::path dir(cwd.string() + "/logs/");
+        if(!(boost::filesystem::exists(cwd.string() + "/logs/"))){
+            if (!boost::filesystem::create_directory(cwd.string() + "/logs/"))
+                std::cerr << "Failed to create log folder" << std::endl;
+        }
         return filename;
-    }
-
-    std::string getDate() {
-        time_t now = time(0);
-        tm *ltm = localtime(&now);
-        auto year = 1900 + ltm->tm_year;
-        auto month = 1 + ltm->tm_mon;
-        auto day = ltm->tm_mday;
-        std::string y = std::to_string(year);
-        std::string m = std::to_string(month);
-        std::string d = std::to_string(day);
-        y = y.append("-");
-        m = m.append("-");
-        return y + m + d;
-    }
-
-
-    std::string getTime() {
-        time_t now = time(0);
-        tm *ltm = localtime(&now);
-        int hour = 1 + ltm->tm_hour;
-        auto min = 1 + ltm->tm_min;
-        auto sec = 1 + ltm->tm_sec;
-        std::string h = std::to_string(hour);
-        std::string m = std::to_string(min);
-        std::string s = std::to_string(sec);
-        h = h.append(":");
-        m = m.append(":");
-        return h + m + s;
     }
 
     void write(SeverityType level, std::string &output) {
         std::lock_guard<std::mutex> lock(m_write);
+
+        if (!logfile.is_open()){
+            std::cerr << "Log file is not open\n";
+            return;
+        }
+
+        long begin = logfile.tellp();
+        logfile.seekp(0, std::ios::end);
+        long end = logfile.tellp();
+
+        if((end- begin) > 1024) {
+            logfile << std::flush;
+        }
+
         std::string time = getTime();
         std::string extras =  __FILE__;
         extras.append(":");
         extras.append(std::to_string(__LINE__));
         extras.append("] ");
-        time = "[" + time + ", ";
-        logfile << time +  __FILE__ + ":" + std::to_string(__LINE__) + "] " + output + "\n";
+        time = "[" + extras + " ";
+        logfile << time + output + "\n";
     }
 };
 #endif //SYNOFW_FILELOGGER_H

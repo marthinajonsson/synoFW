@@ -25,7 +25,7 @@
         "name": "list",
         "param": "limit:library_id",
         "optional": "offset:sort_by",
-        "response": ""
+        "response": "movie:title:mapper_id:library_id:id:total"
       }
     ]
   },
@@ -40,7 +40,7 @@
         "name": "list",
         "param": "limit:library_id",
         "optional": "offset:sort_by",
-        "response": ""
+        "response": "total:id:mapper_id:title:id:total_seasons"
       }
     ]
   },

@@ -84,6 +84,33 @@ static std::vector<std::string> split(std::string &input, char delim) {
 }
 
 
+static std::string getDate() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    auto year = 1900 + ltm->tm_year;
+    auto month = 1 + ltm->tm_mon;
+    std::string y = std::to_string(year);
+    std::string m = std::to_string(month);
+    y = y.append("-");
+    y = y.append(m);
+    return y;
+}
+
+
+static std::string getTime() {
+    time_t now = time(0);
+    tm *ltm = localtime(&now);
+    int hour = 1 + ltm->tm_hour;
+    auto min = 1 + ltm->tm_min;
+    auto sec = 1 + ltm->tm_sec;
+    std::string h = std::to_string(hour);
+    std::string m = std::to_string(min);
+    std::string s = std::to_string(sec);
+    h = h.append(":");
+    m = m.append(":");
+    return h + m + s;
+}
+
 template<typename T>
 void pop_front(std::vector<T>& vec)
 {

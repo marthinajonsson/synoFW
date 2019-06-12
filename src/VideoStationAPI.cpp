@@ -23,8 +23,9 @@ std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boos
     std::string fullRespStr;
     ParamHandling param(testing);
     boost::property_tree::ptree pData, tmp;
-    pData = respData.get_child("data");
-    boost::property_tree::write_json(std::cout, pData);
+    //sort_by=name not working
+//    pData = respData.get_child("data");
+    boost::property_tree::write_json(std::cout, respData);
 //    pData = pData.get_child("movie");
 //
 //    auto title = pData.get<std::string>("title");
@@ -67,7 +68,7 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
             fullParamStr+="0";
         }
         else if(s == "sort_by") {
-            fullParamStr+="name";
+            fullParamStr+="title";
         }
         else if(s == "offset") {
             int val;
