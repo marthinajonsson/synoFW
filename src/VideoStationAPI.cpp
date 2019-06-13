@@ -23,19 +23,86 @@ std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boos
     std::string fullRespStr;
     ParamHandling param(testing);
     boost::property_tree::ptree pData, tmp;
-    //sort_by=name not working
-//    pData = respData.get_child("data");
-    boost::property_tree::write_json(std::cout, respData);
-//    pData = pData.get_child("movie");
-//
-//    auto title = pData.get<std::string>("title");
-//    auto path = pData.get<std::string>("path");
-//    auto id = pData.get<std::string>("id");
-//    auto mId = pData.get<std::string>("mapper_id");
-//    result.emplace_back(std::make_pair("title", title));
-//    result.emplace_back(std::make_pair("path", path));
-//    result.emplace_back(std::make_pair("fileId", id));
-//    std::cout << "[" << id << "] " << title << std::endl;
+
+    if(respData.empty()){
+        boost::property_tree::read_json("../api/RequestResponse.json", respData);
+    }
+
+    if(api.find("SYNO.VideoStation2.Info") != std::string::npos) {
+        pData = respData.get_child("data");
+        auto val = pData.get<std::string>("is_subtitle_search_enabled");
+        result.emplace_back(std::make_pair("is_subtitle_search_enabled", val));
+        val = pData.get<std::string>("version_string");
+        result.emplace_back(std::make_pair("version_string", val));
+    }
+    else if(api.find("SYNO.VideoStation2.Movie") != std::string::npos) {
+        pData = respData.get_child("data");
+        for (std::string &p : respVec) {
+            try {
+                if (p.find("movie") != std::string::npos) {
+                    auto innerNode = pData.get_child("movie");
+                    BOOST_ASSERT(!innerNode.empty());
+                    BOOST_FOREACH(boost::property_tree::ptree::value_type &val, innerNode) {
+                                    auto title = val.second.get<std::string>("title");
+                                    auto tagline = val.second.get<std::string>("tagline");
+                                    auto id = val.second.get<std::string>("id");
+                                    auto library_id = val.second.get<std::string>("library_id");
+                                    auto mapper_id = val.second.get<std::string>("mapper_id");
+                                    result.emplace_back(std::make_pair("title", title));
+                                    result.emplace_back(std::make_pair("tagline", tagline));
+                                    result.emplace_back(std::make_pair("id", id));
+                                    result.emplace_back(std::make_pair("library_id", library_id));
+                                    result.emplace_back(std::make_pair("mapper_id", mapper_id));
+                                }
+                } else if (pData.empty()) {
+                    continue;
+                } else {
+                    auto val = pData.get<std::string>(p);
+                    result.emplace_back(std::make_pair(p, val));
+                }
+            }
+            catch (std::exception ex) {
+                std::cerr << __FILE__ << " - " << __LINE__ << ": " << ex.what() << std::endl;
+            }
+        }
+    }else  if(api.find("SYNO.VideoStation2.TVShow") != std::string::npos) {
+        pData = respData.get_child("data");
+        for (std::string &p : respVec) {
+            try {
+                if (p.find("tvshow") != std::string::npos) {
+                    auto innerNode = pData.get_child("tvshow");
+                    BOOST_ASSERT(!innerNode.empty());
+                    BOOST_FOREACH(boost::property_tree::ptree::value_type &val, innerNode) {
+                                    auto title = val.second.get<std::string>("title");
+                                    auto id = val.second.get<std::string>("id");
+                                    auto library_id = val.second.get<std::string>("library_id");
+                                    auto mapper_id = val.second.get<std::string>("mapper_id");
+                                    result.emplace_back(std::make_pair("title", title));
+                                    result.emplace_back(std::make_pair("id", id));
+                                    result.emplace_back(std::make_pair("library_id", library_id));
+                                    result.emplace_back(std::make_pair("mapper_id", mapper_id));
+                                    auto additional = val.second.get_child("additional");
+                                    BOOST_ASSERT(!additional.empty());
+                                    auto season = additional.get<std::string>("total_seasons");
+                                    result.emplace_back(std::make_pair("total_seasons", season));
+
+                                }
+                } else if (pData.empty()) {
+                    continue;
+                } else {
+                    auto val = pData.get<std::string>(p);
+                    result.emplace_back(std::make_pair(p, val));
+                }
+            }
+            catch (std::exception ex) {
+                std::cerr << __FILE__ << " - " << __LINE__ << ": " << ex.what() << std::endl;
+            }
+        }
+    }
+    else {
+        boost::property_tree::write_json(std::cout, respData);
+    }
+
     return result;
 }
 
@@ -43,6 +110,7 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
 
     std::vector<std::string> paramVec = split(params, ':');
     std::string fullParamStr;
+    ParamHandling handler(testing);
 
     for(const std::string &s:paramVec) {
         if(!s.empty()) {
@@ -51,17 +119,10 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
             fullParamStr += "=";
         }
         if(s == "limit") {
-            int val;
-            std::cout << "Set limit (int): " << std::endl;
-            std::cin >> val;
-            std::cout << "Limit set to: " << val << std::endl;
-            auto valStr = std::to_string(val);
-            fullParamStr+=valStr;
+            std::string val = handler.setParam("limit", "5");
+            fullParamStr+=val;
         }else if(s == "type") {
-            std::string val;
-            std::cout << "Set type movie or tvshow (string): " << std::endl;
-            std::cin >> val;
-            std::cout << "Type set to: " << val << std::endl;
+            std::string val = handler.setParam("type", "movie");
             fullParamStr+=val;
         }
         else if(s == "library_id") {
@@ -71,23 +132,12 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
             fullParamStr+="title";
         }
         else if(s == "offset") {
-            int val;
-            std::cout << "Set offset (int): " << std::endl;
-            std::cin >> val;
-            std::cout << "Offset set to: " << val << std::endl;
-            if(!val) {
-                val = 0;
-            }
-            auto valStr = std::to_string(val);
-            fullParamStr+=valStr;
+            std::string val = handler.setParam("offset", "0");
+            fullParamStr+=val;
         }
         else if(s == "path") {
-            std::string val;
-            std::cout << "Choose path" << std::endl;
-            std::cin >> val;
-            ParamHandling param(testing);
-            std::string path = param.getPath(val);
-            std::cout << "Path set to: " << path << std::endl;
+            std::string val = handler.setParam("path", "Rom");
+            std::string path = handler.getPath(val);
             fullParamStr+=path;
         }
     }
@@ -121,4 +171,8 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     auto responseObject = RequestHandler::getInstance().make(url, VideoStation::session);
     std::string responses = loadResponse(_apiFile, api, indexedMethod);
     result = respParser(responseObject, api, responses);
+
+    for(auto &p : result) {
+        std::cout << p.first << ":" << p.second << std::endl;
+    }
 }
