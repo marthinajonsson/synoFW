@@ -7,6 +7,7 @@
 
 #include <string>
 #include <functional>
+
 #include "FileMgr.h"
 #include "FileStationAPI.h"
 #include "VideoStationAPI.h"
@@ -24,25 +25,26 @@
  */
 
 class Dispatcher {
-private:
-    FileMgr fMgr;
 public:
 
-    std::function<void()> set(std::string &request)
+    std::function<void()> set (std::string &request)
     {
-        if(request == "update"){
+        if (request == "update") {
             return std::bind(&FileMgr::fetch, &fMgr);
         }
-        else if(request.find("vs") != std::string::npos) {
+        else if (request.find("vs") != std::string::npos) {
             VideoStationAPI vs;
             return std::bind(&VideoStationAPI::makeRequest, &vs, request);
         }
-        else if(request.find("fs") != std::string::npos) {
+        else if (request.find("fs") != std::string::npos) {
             FileStationAPI fs;
             return std::bind(&FileStationAPI::makeRequest, &fs, request);
         }
         return [] () { };
     }
+
+private:
+    FileMgr fMgr;
 };
 
 

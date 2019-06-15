@@ -10,19 +10,17 @@
 #include <string>
 
 class ParamHandling {
-
 public:
-    bool m_testing;
-    ParamHandling() = default;
-    ~ParamHandling() = default;
+    bool m_testing = false;
+    ParamHandling (bool testing) : m_testing(testing) {};
+    ParamHandling () = default;
+    ~ParamHandling () = default;
 
-    ParamHandling(bool _testing) : m_testing(_testing){}
+    std::string setParam (std::string &&param, std::string &&defaultvalue);
 
-    std::string setParam(std::string &&param, std::string &&defaultvalue);
+    std::string getPathFolder (std::string& pattern);
 
-    std::string getPathFolder(std::string& pattern);
-
-    std::string getPath(std::string& pattern);
+    std::string getPath (std::string& pattern);
 };
 
 

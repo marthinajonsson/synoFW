@@ -14,18 +14,12 @@
 #include <iterator>
 
 class FilenameStructure {
-private:
-    std::string title;
-    std::string year;
-    std::string resolution;
-    std::string extension;
-
 public:
 
-    std::string getTitle () { return title; }
-    std::string getYear () { return year; }
+    std::string getTitle () { return _title; }
+    std::string getYear () { return _year; }
 
-    void parse(std::string &&filename) {
+    void parse (std::string &&filename) {
         std::vector<std::string> parts;
         std::string temp;
 
@@ -38,10 +32,10 @@ public:
         auto resolutionIt = std::find_if(parts.begin(), parts.end(), [](const std::string& s) { return s == "720p" || s == "1080p"; });
         if (resolutionIt != parts.end())
         {
-            resolution = *resolutionIt;
+            _resolution = *resolutionIt;
 
             auto yearIt = resolutionIt-1;
-            year = *yearIt;
+            _year = *yearIt;
 
             std::ostringstream s;
 
@@ -51,12 +45,18 @@ public:
 
             auto titleIt = yearIt-1;
             s << *titleIt;
-            title = s.str();
+            _title = s.str();
 
-            extension = parts.back();
+            _extension = parts.back();
 
         }
     }
+private:
+    std::string _title;
+    std::string _year;
+    std::string _resolution;
+    std::string _extension;
+
 };
 
 

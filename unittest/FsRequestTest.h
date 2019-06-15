@@ -18,12 +18,10 @@ protected:
     void SetUp() override
     {
         fs = std::make_unique<FileStationAPI>();
-        fs->testing = true;
     }
 
     void TearDown() override
     {
-        fs->testing = false;
     }
 };
 

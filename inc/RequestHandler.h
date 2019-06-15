@@ -22,22 +22,35 @@
 #include "Utilities.h"
 
 class RequestHandler {
+public:
+
+    static RequestHandler& getInstance();
+    RequestHandler(RequestHandler const&) = delete;
+    void operator=(RequestHandler const&) = delete;
+
+    boost::property_tree::ptree make(std::string& url, const std::string& session)
+    {
+        login(session);
+        auto rspObj = send(url, session);
+        logoff(session);
+        return rspObj;
+    }
 private:
-    struct ConfigInfoS {
+    struct ConfigInfo {
         std::string username;
         std::string password;
         std::string server;
-    }info_s;
+    }info;
 
     ConfigHelper _configHelper;
     Logger * pLogger;
     FileLogger * pFileLogger;
 
-    RequestHandler() {
-        auto config = _configHelper.getConfig();
-        info_s.username = config.username;
-        info_s.password = config.password;
-        info_s.server = config.server;
+    RequestHandler () {
+        auto config = _configHelper.info;
+        info.username = config.username;
+        info.password = config.password;
+        info.server = config.server;
 
         pFileLogger = new FileLogger();
         pLogger = new Logger();
@@ -49,30 +62,16 @@ private:
 #endif
     };
 
-    ~RequestHandler() {
+    ~RequestHandler () {
         pLogger->removeObserver(pFileLogger);
         delete pFileLogger;
         delete pLogger;
     }
 
-    void login(const std::string&);
-    void logoff(const std::string&);
-    boost::property_tree::ptree send(const std::string&, std::string &url);
-    void sendHttpGetRequest(boost::property_tree::ptree &jsonData, const std::string &url);
-
-public:
-
-    static RequestHandler& getInstance();
-    RequestHandler(RequestHandler const&) = delete;
-    void operator=(RequestHandler const&) = delete;
-
-    boost::property_tree::ptree make(std::string &url, const std::string& session)
-    {
-        login(session);
-        auto rspObj = send(session, url);
-        logoff(session);
-        return rspObj;
-    }
+    void login (const std::string&);
+    void logoff (const std::string&);
+    boost::property_tree::ptree send (std::string&, const std::string &);
+    void sendHttpGetRequest (boost::property_tree::ptree &jsonData, const std::string &url);
 };
 
 

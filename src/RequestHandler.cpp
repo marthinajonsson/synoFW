@@ -64,8 +64,8 @@ void RequestHandler::sendHttpGetRequest(boost::property_tree::ptree &jsonData, c
 void RequestHandler::login(const std::string &session)
 {
     boost::property_tree::ptree jsonData;
-    std::string url = info_s.server;
-    url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+info_s.username+"&passwd="+info_s.password+"&session="+session+"&format=sid");
+    std::string url = info.server;
+    url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=6&method=login&account="+info.username+"&passwd="+info.password+"&session="+session+"&format=sid");
     removeEndOfLines(url);
 
     sendHttpGetRequest(jsonData, url);
@@ -74,7 +74,7 @@ void RequestHandler::login(const std::string &session)
     if(!val) {
         boost::property_tree::write_json(std::cerr, jsonData);
         std::string err = "Failed to login to ";
-        err.append(session+" with user: " + "{" + info_s.username + "} and pwd: {" + info_s.password + "}");
+        err.append(session+" with user: " + "{" + info.username + "} and pwd: {" + info.password + "}");
         pLogger->writeLog(SeverityType::ERROR, err);
         GENERIC::printError(jsonData);
     }
@@ -89,7 +89,7 @@ void RequestHandler::login(const std::string &session)
 void RequestHandler::logoff(const std::string &session)
 {
     boost::property_tree::ptree jsonData;
-    std::string url = info_s.server;
+    std::string url = info.server;
     url.append("/webapi/auth.cgi?api=SYNO.API.Auth&version=1&method=logout&session="+session);
     removeEndOfLines(url);
     sendHttpGetRequest(jsonData, url);
@@ -110,7 +110,7 @@ void RequestHandler::logoff(const std::string &session)
     }
 }
 
-boost::property_tree::ptree RequestHandler::send(const std::string& session, std::string &url)
+boost::property_tree::ptree RequestHandler::send(std::string& url, const std::string &session)
 {
     boost::property_tree::ptree jsonData;
     std::string sid = FS_sid;

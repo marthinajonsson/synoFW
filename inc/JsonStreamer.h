@@ -17,7 +17,7 @@ private:
     std::string _filename;
     std::string _path;
 
-    void writeStream(DatabaseObject &obj);
+    void writeStream(database &obj);
     boost::property_tree::ptree readStream(std::string&);
 public:
 
@@ -34,8 +34,8 @@ public:
     }
     ~JsonStreamer() = default;
 
-    DatabaseObject find(std::string&);
-    void update(DatabaseObject &obj);
+    database find(std::string&);
+    void update(database &obj);
     bool checkForNull(std::string&);
 };
 

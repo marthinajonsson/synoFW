@@ -16,19 +16,18 @@
 
 class VideoStationAPI : public API{
 public:
-    VideoStationAPI() {
+    VideoStationAPI () {
         loadConfig();
     };
-    ~VideoStationAPI() = default;
+    ~VideoStationAPI () = default;
 
-    bool testing = false;
-    void makeRequest(std::string&) override;
-    std::string paramParser(std::string &,std::string&) override;
-    std::vector<std::pair<std::string,std::string>> respParser(boost::property_tree::ptree &, std::string &,std::string&) override;
+    void makeRequest (std::string&) override;
+    std::string paramParser (std::string &,std::string&) override;
+    std::vector<std::pair<std::string,std::string>> respParser (boost::property_tree::ptree &, std::string &,std::string&) override;
 private:
     std::string _requestUrl;
     const std::string _apiFile = "../api/API_VS";
-    std::string compile(std::string&, std::string&, int, bool);
+    std::string compile (std::string&, std::string&, int, bool);
 };
 
 

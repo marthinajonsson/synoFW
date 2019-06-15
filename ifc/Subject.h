@@ -15,9 +15,6 @@ class Observer;
 
 class Subject
 {
-private:
-    std::string info;
-    std::map<int , std::vector<Observer *> > _registryMap;
 public:
 
     void setInfo(std::string &value) { info = value; }
@@ -26,6 +23,10 @@ public:
     void registerObserver(SeverityType event, Observer *observer);
     void removeObserver(Observer *observer);
     void notifyObservers(SeverityType event);
+
+private:
+    std::string info;
+    std::map<int , std::vector<Observer *> > _registryMap;
 };
 
 

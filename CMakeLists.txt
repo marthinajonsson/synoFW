@@ -32,7 +32,7 @@ set(Test
         ${CMAKE_CURRENT_LIST_DIR}/unittest/FsRequestTest.h
         ${CMAKE_CURRENT_LIST_DIR}/unittest/VsRequestTest.h
         ${CMAKE_CURRENT_LIST_DIR}/unittest/FsResponseTest.h
-        ${CMAKE_CURRENT_LIST_DIR}/unittest/FileStationApiTest.h)
+        ${CMAKE_CURRENT_LIST_DIR}/unittest/FileStationApiTest.h unittest/MockAPI.h)
 
 set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/Methods.h
@@ -53,18 +53,13 @@ set(Includes
         ${CMAKE_CURRENT_LIST_DIR}/inc/FileLogger.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/DatabaseObject.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/JsonStreamer.h
-        ${CMAKE_CURRENT_LIST_DIR}/ifc/Imdb.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbBasics.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbAkas.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbCrew.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbName.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/ImdbEpisode.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/ActiveObject.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Queue.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/Dispatcher.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/FileMgr.h
         ${CMAKE_CURRENT_LIST_DIR}/inc/ConfigHelper.h
-        ${CMAKE_CURRENT_LIST_DIR}/inc/TablePrinter.h)
+        ${CMAKE_CURRENT_LIST_DIR}/inc/TablePrinter.h
+        ${CMAKE_CURRENT_LIST_DIR}/inc/Imdb.h)
 
 set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/main.cpp
@@ -76,7 +71,8 @@ set(Sources
         ${CMAKE_CURRENT_LIST_DIR}/src/JsonStreamer.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/ParamHandling.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/API.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/TablePrinter.cpp)
+        ${CMAKE_CURRENT_LIST_DIR}/src/TablePrinter.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/Imdb.cpp)
 
 
 

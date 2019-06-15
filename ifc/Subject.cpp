@@ -6,6 +6,7 @@
 #include "Observer.h"
 
 
+
 void Subject::registerObserver(SeverityType event, Observer *observer) {
     _registryMap[event].push_back(observer);
 }
@@ -25,9 +26,9 @@ void Subject::notifyObservers(SeverityType event) {
     auto it = _registryMap.find(event);
     if(it != _registryMap.end())
     {
-        for(auto vecIt = it->second.begin(); vecIt != it->second.end(); vecIt++)
+        for(auto & vecIt : it->second)
         {
-            (*vecIt)->update(event, this);
+            vecIt->update(event, this);
         }
     }
 }

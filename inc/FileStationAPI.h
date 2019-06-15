@@ -22,13 +22,13 @@ public:
     ~FileStationAPI() = default;
 
     const std::string _apiFile = "../api/API_FS";
-    void makeRequest(std::string&) override;
-    std::string paramParser(std::string &, std::string&) override;
-    std::vector<std::pair<std::string,std::string>> respParser(boost::property_tree::ptree &, std::string &,std::string&) override;
+    void makeRequest (std::string&) override;
+    std::string paramParser (std::string &, std::string&) override;
+    std::vector<std::pair<std::string,std::string>> respParser (boost::property_tree::ptree &, std::string &,std::string&) override;
 protected:
     std::string search_id;
     std::string delete_id;
-    std::string compile(std::string&, std::string&, int, bool);
+    std::string compile (std::string&, std::string&, int, bool);
 };
 
 

@@ -16,26 +16,26 @@
 #include "ErrorCodes.h"
 #include "HttpRequests.h"
 
-std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response) {
-
-    std::vector<std::string> respVec = split(response, ':');
+std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser (boost::property_tree::ptree &respData, std::string &api, std::string &response)
+{
+    boost::property_tree::ptree pData;
+    boost::property_tree::ptree tmp;
+    std::vector<std::string> respVec = split (response, ':');
     std::vector<std::pair<std::string,std::string>> result;
     std::string fullRespStr;
-    ParamHandling param(testing);
-    boost::property_tree::ptree pData, tmp;
+    ParamHandling param(true);
 
-    if(respData.empty()){
+    if (respData.empty())
         boost::property_tree::read_json("../api/RequestResponse.json", respData);
-    }
 
-    if(api.find("SYNO.VideoStation2.Info") != std::string::npos) {
+    if (api.find("SYNO.VideoStation2.Info") != std::string::npos) {
         pData = respData.get_child("data");
         auto val = pData.get<std::string>("is_subtitle_search_enabled");
         result.emplace_back(std::make_pair("is_subtitle_search_enabled", val));
         val = pData.get<std::string>("version_string");
         result.emplace_back(std::make_pair("version_string", val));
     }
-    else if(api.find("SYNO.VideoStation2.Movie") != std::string::npos) {
+    else if (api.find("SYNO.VideoStation2.Movie") != std::string::npos) {
         pData = respData.get_child("data");
         for (std::string &p : respVec) {
             try {
@@ -65,7 +65,7 @@ std::vector<std::pair<std::string,std::string>> VideoStationAPI::respParser(boos
                 std::cerr << __FILE__ << " - " << __LINE__ << ": " << ex.what() << std::endl;
             }
         }
-    }else  if(api.find("SYNO.VideoStation2.TVShow") != std::string::npos) {
+    }else  if (api.find("SYNO.VideoStation2.TVShow") != std::string::npos) {
         pData = respData.get_child("data");
         for (std::string &p : respVec) {
             try {
@@ -110,7 +110,7 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
 
     std::vector<std::string> paramVec = split(params, ':');
     std::string fullParamStr;
-    ParamHandling handler(testing);
+    ParamHandling handler(true);
 
     for(const std::string &s:paramVec) {
         if(!s.empty()) {
@@ -147,14 +147,20 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
 std::string VideoStationAPI::compile(std::string &input, std::string &api, int indexedMethod = 0, bool chooseMethod = true)
 {
     api = loadAPI(_apiFile, input);
-    chooseMethod = testing ? false : chooseMethod;
-    auto method = loadMethod(_apiFile, api, indexedMethod, std::move(chooseMethod));
+    std::string method;
+
+    if(!chooseMethod)
+        method = loadMethod(_apiFile, api, indexedMethod);
+    else
+        method = loadMethods(_apiFile, api, indexedMethod);
+
+
     auto path = loadPath(_apiFile, api);
     auto version = loadVersion(_apiFile, api);
     auto params = loadParams(_apiFile, api, indexedMethod);
     auto resultParams = paramParser(api, params);
 
-    RequestUrlBuilder urlBuilder (info_s.server, path, api, version, method, resultParams);
+    RequestUrlBuilder urlBuilder (info.server, path, api, version, method, resultParams);
     return urlBuilder.getResult();
 }
 

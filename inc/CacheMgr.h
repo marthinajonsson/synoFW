@@ -5,38 +5,29 @@
 #ifndef SYNOFW_CACHEMGR_H
 #define SYNOFW_CACHEMGR_H
 
-#include "Logger.h"
-#include "Imdb.h"
 #include "Subject.h"
-#include "Utilities.h"
-#include "ImdbAkas.h"
-#include "ImdbBasics.h"
-#include "ImdbCrew.h"
-#include "ImdbEpisode.h"
-#include "ImdbName.h"
 #include "JsonStreamer.h"
 
-
-#include <boost/assert.hpp>
-#include <vector>
 #include <string>
-#include <fstream>
-#include <sstream>
-#include <map>
-#include <mutex>
 
 class Logger;
 
 
 class CacheMgr : Subject{
+public:
+    static CacheMgr& getInstance();
+    CacheMgr(CacheMgr const&) = delete;
+    void operator=(CacheMgr const&) = delete;
+
+    void validate(std::string&);
+    struct database get(std::string&);
+    void edit (database&);
 private:
     CacheMgr() {
         streamer.setFile("db_cache.json");
     };
     ~CacheMgr() = default;
     JsonStreamer streamer;
-
-    bool update(std::string&);
 
     struct TitleAkasS {
         const unsigned short titleId = 0;
@@ -74,13 +65,7 @@ private:
     }nameS;
 
 
-public:
-    static CacheMgr& getInstance();
-    CacheMgr(CacheMgr const&) = delete;
-    void operator=(CacheMgr const&) = delete;
-
-    void validate(std::string&);
-    DatabaseObject get(std::string&);
+    bool update(std::string&, std::string&);
 };
 
 

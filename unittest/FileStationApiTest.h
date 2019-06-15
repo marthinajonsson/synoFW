@@ -5,10 +5,7 @@
 #ifndef SYNOFW_FILESTATIONAPITEST_H
 #define SYNOFW_FILESTATIONAPITEST_H
 
-
-#include "include/gmock/gmock.h"
 #include "FileStationAPI.h"
-
 
 class FileStationApiTest : public ::testing::Test
 {
@@ -16,17 +13,17 @@ protected:
 
     std::unique_ptr<FileStationAPI> fs;
     std::string file = "../api/API_FS";
+
     void SetUp() override
     {
         fs = std::make_unique<FileStationAPI>();
-        fs->testing = true;
     }
 
     void TearDown() override
     {
-        fs->testing = false;
     }
 };
+
 
 /*
  * info, list, search, create, upload, download, delete
@@ -68,31 +65,31 @@ TEST_F(FileStationApiTest, method) {
     std::string api = "SYNO.FileStation.Info";
     int index = 0;
 
-    auto method = fs->loadMethod(file, api, index, false);
+    auto method = fs->loadMethod(file, api, index);
     ASSERT_TRUE(method.find("get") != std::string::npos);
 
     api = "SYNO.FileStation.List";
-    method = fs->loadMethod(file, api, index, false);
+    method = fs->loadMethod(file, api, index);
     ASSERT_TRUE(method.find("list_share") != std::string::npos);
 
     api = "SYNO.FileStation.Search";
-    method = fs->loadMethod(file, api, index, false);
+    method = fs->loadMethod(file, api, index);
     ASSERT_TRUE(method.find("start") != std::string::npos);
 
     api = "SYNO.FileStation.CreateFolder";
-    method = fs->loadMethod(file, api, index, false);
+    method = fs->loadMethod(file, api, index);
     ASSERT_TRUE(method.find("create") != std::string::npos);
 
     api = "SYNO.FileStation.Upload";
-    method = fs->loadMethod(file, api, index, false);
+    method = fs->loadMethod(file, api, index);
     ASSERT_TRUE(method.find("upload") != std::string::npos);
 
     api = "SYNO.FileStation.Download";
-    method = fs->loadMethod(file, api, index, false);
+    method = fs->loadMethod(file, api, index);
     ASSERT_TRUE(method.find("download") != std::string::npos);
 
     api = "SYNO.FileStation.Delete";
-    method = fs->loadMethod(file, api, index, false);
+    method = fs->loadMethod(file, api, index);
     ASSERT_TRUE(method.find("start") != std::string::npos);
 }
 
@@ -131,9 +128,10 @@ TEST_F(FileStationApiTest, path) {
 TEST_F(FileStationApiTest, param) {
     std::string input = "SYNO.FileStation.Info";
     int method = 0;
-    auto param = fs->loadParams(file, input, method);
 
-    ASSERT_TRUE(param.find("") != std::string::npos);
+    auto param = fs->loadParams (file, input, method);
+
+    ASSERT_TRUE (param.find("") != std::string::npos);
 
     input = "SYNO.FileStation.List";
     method = 1;
@@ -161,7 +159,5 @@ TEST_F(FileStationApiTest, param) {
     param = fs->loadParams(file, input, method);
     ASSERT_TRUE(param.find("path") != std::string::npos);
 }
-
-
 
 #endif //SYNOFW_FILESTATIONAPITEST_H

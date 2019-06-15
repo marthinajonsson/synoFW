@@ -50,4 +50,18 @@ TEST_F(CacheTest, test2) {
     ASSERT_FALSE(db.m_titleType.find("series") != std::string::npos);
 }
 
+TEST_F(CacheTest, test3) {
+
+    std::string testFile = "Enemy.Of.the.State.1998.1080p.BrRip.x264.BOKUTOX.YIFY.mp4";
+    CacheMgr::getInstance().validate(testFile);
+    auto db = CacheMgr::getInstance().get(testFile);
+    ASSERT_TRUE(db.m_title.find("Enemy of the State") != std::string::npos);
+    ASSERT_TRUE(db.m_titleId.find("tt0120660") != std::string::npos);
+    ASSERT_TRUE(db.m_genre.find("Action") != std::string::npos);
+    ASSERT_TRUE(db.m_directors.find("Tony Scott") != std::string::npos);
+    ASSERT_FALSE(db.m_runtimeMinutes.find("102") != std::string::npos);
+    ASSERT_FALSE(db.m_titleType.find("series") != std::string::npos);
+}
+
+
 #endif //SYNOFW_CACHETEST_H

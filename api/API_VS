@@ -25,7 +25,7 @@
         "name": "list",
         "param": "limit:library_id",
         "optional": "offset:sort_by",
-        "response": "movie:title:mapper_id:library_id:id:total"
+        "response": "movie:total:offset"
       }
     ]
   },
@@ -40,7 +40,7 @@
         "name": "list",
         "param": "limit:library_id",
         "optional": "offset:sort_by",
-        "response": "total:id:mapper_id:title:id:total_seasons"
+        "response": "tvshow:total:offset"
       }
     ]
   },
@@ -55,7 +55,7 @@
         "name": "list",
         "param": "limit:library_id:type",
         "optional": "offset:path",
-        "response": ""
+        "response": "object:id:path:title:type"
       }
     ]
   },
@@ -70,19 +70,7 @@
         "name": "list",
         "param": "limit",
         "optional": "offset:sort_by",
-        "response": ""
-      },
-      {
-        "name": "test",
-        "param": "limit",
-        "optional": "offset:sort_by",
-        "response": ""
-      },
-      {
-        "name": "test2",
-        "param": "limit",
-        "optional": "offset:sort_by",
-        "response": ""
+        "response": "offset:total:library"
       }
     ]
   }

@@ -28,7 +28,7 @@ bool operator==( const std::pair<std::string, std::string>& lhs,
     return false;
 }
 
-std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost::property_tree::ptree &respData, std::string &api, std::string &response)
+std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser (boost::property_tree::ptree &respData, std::string &api, std::string &response)
 {
     std::vector<std::string> respVec = split(response, ':');
     std::vector<std::pair<std::string,std::string>> result;
@@ -140,13 +140,13 @@ std::vector<std::pair<std::string,std::string>> FileStationAPI::respParser(boost
     return result;
 }
 
-std::string FileStationAPI::paramParser(std::string &api, std::string& params)
+std::string FileStationAPI::paramParser (std::string &api, std::string& params)
 {
-    std::vector<std::string> paramVec = split(params, ':');
+    std::vector<std::string> paramVec = split (params, ':');
     std::string fullParamStr;
-    ParamHandling handler(testing);
+    ParamHandling handler (true);
 
-    for(const std::string &s:paramVec) {
+    for (const std::string &s:paramVec) {
         if(s.empty()) {
             continue;
         }
@@ -234,20 +234,25 @@ std::string FileStationAPI::paramParser(std::string &api, std::string& params)
     return fullParamStr;
 }
 
-std::string FileStationAPI::compile(std::string &input, std::string &api, int indexedMethod = 0, bool chooseMethod = true)
+std::string FileStationAPI::compile (std::string &input, std::string &api, int indexedMethod = 0, bool chooseMethod = true)
 {
-    api = loadAPI(_apiFile, input);
-    auto method = loadMethod(_apiFile, api, indexedMethod, std::move(chooseMethod));
-    auto path = loadPath(_apiFile, api);
-    auto version = loadVersion(_apiFile, api);
-    auto params = loadParams(_apiFile, api, indexedMethod);
-    auto resultParams = paramParser(api, params);
+    api = loadAPI (_apiFile, input);
 
-    RequestUrlBuilder urlBuilder (info_s.server, path, api, version, method, resultParams);
+    std::string method;
+    if (!chooseMethod)
+        method = loadMethod (_apiFile, api, indexedMethod);
+    else
+        method = loadMethods (_apiFile, api, indexedMethod);
+    auto path = loadPath (_apiFile, api);
+    auto version = loadVersion (_apiFile, api);
+    auto params = loadParams (_apiFile, api, indexedMethod);
+    auto resultParams = paramParser (api, params);
+
+    RequestUrlBuilder urlBuilder (info.server, path, api, version, method, resultParams);
     return urlBuilder.getResult();
 }
 
-void FileStationAPI::makeRequest(std::string& parsed)
+void FileStationAPI::makeRequest (std::string& parsed)
 {
 
     /*
@@ -261,18 +266,14 @@ void FileStationAPI::makeRequest(std::string& parsed)
     std::vector<std::pair<std::string,std::string>> result;
 
     std::string api;
-    if(parsed.find("search") != std::string::npos)
+    if (parsed.find("search") != std::string::npos)
     {
-        int val = 99;
-        if(testing) {
-            val = 0;
+        int val = 0;
 
-        }else {
-            std::cout << "Start a a search (0) or clean cache (1)" << std::endl;
-            std::cin >> val;
-        }
+        std::cout << "Start a a search (0) or clean cache (1)" << std::endl;
+        std::cin >> val;
 
-        if(val == 0) {
+        if (val == 0) {
             std::string urlStart = compile(parsed, api, 0, false);
 
             auto responseObject = RequestHandler::getInstance().make(urlStart, FileStation::session);
@@ -295,14 +296,14 @@ void FileStationAPI::makeRequest(std::string& parsed)
             for(auto &res : result) {
                 std::cout << res.first << ": " << res.second << std::endl;
             }
-        } else if(val == 1){
+        } else if (val == 1) {
             std::string urlClean = compile(parsed, api, 3, false);
             RequestHandler::getInstance().make(urlClean, FileStation::session);
             search_id = "";
         }
 
 
-    }else if(parsed.find("delete") != std::string::npos) {
+    }else if (parsed.find("delete") != std::string::npos) {
 
         std::string urlDelete = compile(parsed, api, 0, false);
 
@@ -327,18 +328,21 @@ void FileStationAPI::makeRequest(std::string& parsed)
     tablePrinter.setRowColor("");
 
     auto it = result.begin();
+    database obj;
 
-    for(;it != result.end(); it++) {
-        if(it->first.find("name") == std::string::npos){
-            continue;
+    for (;it != result.end(); it++) {
+        if (it->first.find("name") != std::string::npos) {
+            CacheMgr::getInstance().validate(it->second);
+            obj = CacheMgr::getInstance().get(it->second);
         }
-        CacheMgr::getInstance().validate(it->second);
-        DatabaseObject obj = CacheMgr::getInstance().get(it->second);
+
+        if (it->first.find("path") != std::string::npos)
+            obj.m_path = it->second;
+
+        CacheMgr::getInstance().edit(obj);
         tablePrinter.addRow({obj.m_title, obj.m_genre, obj.m_runtimeMinutes, obj.m_directors, obj.m_writers});
     }
 
-   // tablePrinter.addRow({"A title that is this long", "Drama, Comedy", "121", "Nancy Meyers", "Marthina, Marthina, Marthina, Marthina"});
-   // tablePrinter.addRow({"A shorter title", "Horror", "110", "Spielberg", "Scary people, Scary people, Scary people, Scary people"});
     tablePrinter.write();
 }
 

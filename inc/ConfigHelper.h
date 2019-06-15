@@ -9,23 +9,20 @@
 
 class ConfigHelper {
 private:
-
-    struct InfoS {
+    struct Info {
         std::string username;
         std::string password;
         std::string server;
-    }info_s;
-
+    };
 public:
-
+    Info info;
     ConfigHelper() {
         boost::property_tree::ptree root;
         boost::property_tree::read_json("../config.json", root);
-        info_s.username = root.get<std::string>("username");
-        info_s.password = root.get<std::string>("password");
-        info_s.server = root.get<std::string>("server");
+        info.username = root.get<std::string>("username");
+        info.password = root.get<std::string>("password");
+        info.server = root.get<std::string>("server");
     }
     ~ConfigHelper() = default;
-    InfoS getConfig() { return info_s; }
 };
 #endif //SYNOFW_CONFIGHELPER_H

@@ -11,35 +11,34 @@
 #include <string>
 
 class ActiveObject {
-private:
-
-    Queue queue;
-    boost::atomic_bool done;
-    boost::thread *runnable;
-
 public:
-    ActiveObject() : done(false) {
-        runnable = new boost::thread(&ActiveObject::run, this);
+    ActiveObject () : _done(false) {
+        _runnable = new boost::thread(&ActiveObject::run, this);
     }
-    ~ActiveObject() { runnable->join(); }
+    ~ActiveObject () { _runnable->join(); }
 
-    bool stillRunning() {
-        return runnable->joinable();
-    }
-
-    void stop() {
-        done = false;
+    bool stillRunning () {
+        return _runnable->joinable();
     }
 
-    void registerRequest(std::string choice) {
-        queue.put(choice);
+    void stop () {
+        _done = false;
     }
 
-    void run() {
-        while (!done) {
-            queue.take();
-        }
+    void registerRequest (std::string choice) {
+        _queue.put(choice);
     }
+
+    void run () {
+        while (!_done)
+            _queue.take();
+    }
+
+private:
+    Queue _queue;
+    boost::atomic_bool _done;
+    boost::thread *_runnable;
+
 };
 
 

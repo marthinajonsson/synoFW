@@ -14,27 +14,28 @@
 typedef std::function<void()> Request;
 
 class Queue {
-private:
-    std::mutex queueLck;
-    std::queue<Request> queue;
-    std::condition_variable empty;
-    Dispatcher dispatcher;
 public:
 
-    void put(std::string &val) {
-        std::lock_guard<std::mutex> guard(queueLck);
-        Request request = dispatcher.set(val);
-        queue.push(request);
-        empty.notify_one();
+    void put (std::string &val) {
+        std::lock_guard<std::mutex> guard(_lck);
+        Request request = _dispatcher.set(val);
+        _queue.push(request);
+        _empty.notify_one();
     }
 
     Request take() {
-        std::unique_lock<std::mutex> lock(queueLck);
-        empty.wait(lock, [&]{ return !queue.empty(); });
-        Request request = queue.front();
-        queue.pop();
+        std::unique_lock<std::mutex> lock(_lck);
+        _empty.wait(lock, [&]{ return !_queue.empty(); });
+        Request request = _queue.front();
+        _queue.pop();
         return request;
     }
+
+private:
+    std::mutex _lck;
+    std::queue<Request> _queue;
+    std::condition_variable _empty;
+    Dispatcher _dispatcher;
 };
 
 

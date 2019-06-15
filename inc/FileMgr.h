@@ -65,7 +65,7 @@ public:
         return checkList;
     }
 
-    std::string unpackFile(std::string&& file) {
+    std::string unpackFile( std::string&& file) {
 
         std::string errStr;
         std::string chmodCmd = "chmod a+x " + file;
@@ -79,7 +79,7 @@ public:
         return errStr;
     }
 
-    std::string getDataFiles(std::string&& file) {
+    std::string getDataFiles (std::string&& file) {
 
         CURL *curl = NULL;
         FILE *fp;
@@ -124,7 +124,7 @@ public:
     }
 
 
-    void fetch()
+    void fetch ()
     {
         auto files = {"title.akas.tsv.gz", "title.basics.tsv.gz", "title.crew.tsv.gz", "title.episode.tsv.gz", "name.basics.tsv.gz"};
 

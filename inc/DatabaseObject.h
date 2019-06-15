@@ -7,8 +7,7 @@
 
 #include <string>
 
-class DatabaseObject {
-public:
+struct database {
     std::string m_title;
     std::string m_titleId;
     std::string m_titleType;
@@ -25,6 +24,7 @@ public:
     std::string m_season;
     std::string m_path;
     std::string m_library_id;
+    std::string m_filename;
 };
 
 #endif //SYNOFW_DATABASEOBJECT_H

@@ -28,7 +28,7 @@ std::shared_ptr pLog = std::make_shared<Logger>();
 
 static bool parseImdb(std::string title) {
     CacheMgr::getInstance().validate(title);
-    DatabaseObject obj = CacheMgr::getInstance().get(title);
+    database obj = CacheMgr::getInstance().get(title);
     return true;
 }
 
@@ -89,7 +89,7 @@ int main(int argc, char* argv [])
     LOG("This is a log entry");
 
     ::testing::InitGoogleMock(&argc, argv);
-    ::testing::GTEST_FLAG(filter) = "VsRequestTest*";
+    ::testing::GTEST_FLAG(filter) = "FileStationApiTest*";
     return RUN_ALL_TESTS();
 
     LOG("This is a log entry");
