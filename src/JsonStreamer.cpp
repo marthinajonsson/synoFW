@@ -10,43 +10,42 @@ typedef boost::property_tree::ptree ptree;
 void JsonStreamer::writeStream(database &obj) {
 
     ptree root;
-    boost::property_tree::read_json(_path, root);
+    ptree parent;
+    ptree child;
 
+    boost::property_tree::read_json(_path, root);
     long size = root.size();
-    std::string index = std::to_string(size);
-    ptree parent, child;
-    parent.put("title", obj.m_title);
-    child.put("titleId", obj.m_titleId);
-    child.put("titleType", obj.m_titleType);
-    child.put("genre", obj.m_genre);
-    child.put("actors", "Ryan Reynolds");
-    child.put("startYear", obj.m_startYear);
-    child.put("endYear", !obj.m_endYear.empty() ? obj.m_endYear : "0");
-    child.put("runtimeMinutes", !obj.m_runtimeMinutes.empty() ? obj.m_runtimeMinutes : "0");
-    child.put("directors", obj.m_directors);
-    child.put("writers", obj.m_writers);
-    child.put("region", !obj.m_region.empty() ? obj.m_language : "N");
-    child.put("language", !obj.m_language.empty() ? obj.m_language : "0");
-    child.put("season", !obj.m_season.empty() ? obj.m_season : "0");
-    child.put("episode", !obj.m_episode.empty() ? obj.m_episode : "0");
-    child.put("parentTconst", !obj.m_parentTconst.empty() ? obj.m_parentTconst : "0");
-    child.put("libraryId", !obj.m_library_id.empty() ? obj.m_library_id : "0");
-    child.put("filename", !obj.m_filename.empty() ? obj.m_filename : "0");
-    child.put("path", !obj.m_path.empty() ? obj.m_path : "0");
-    parent.put_child("metadata", child);
+    auto index = std::to_string(size);
+
+    auto parentKey = _propertyMap.at(TITLE_P);
+    auto parentValue = *getBegin(&obj);
+
+    parent.put(parentKey, parentValue);
+    int propertyInt = TITLE_ID_P;
+    for (std::string* p = getBegin(&obj) + 1; p < getEnd(&obj); propertyInt++, p++) {
+        auto property = static_cast<PROPERTY >(propertyInt);
+        if (propertyInt > FILENAME_P)
+            break;
+        auto val = *p;
+        auto key = _propertyMap.at(property);
+        child.put(key, val);
+    }
+
+    parent.put_child("additional", child);
 
     root.push_back(std::make_pair(index, parent));
     boost::property_tree::json_parser::write_json(_path, root);
 }
 
 boost::property_tree::ptree JsonStreamer::readStream(std::string& searchTitle) {
-    ptree root, empty;
+    ptree root;
+    ptree empty;
     boost::property_tree::read_json(_path, root);
 
-    for(auto it : root) {
+    for(auto &it : root) {
         auto key = it.first;
         auto val = it.second;
-        auto found = val.get<std::string>("title");
+        auto found = val.get<std::string>(TITLE);
         if(found.find(searchTitle) != std::string::npos) {
             return val;
         }
@@ -57,8 +56,7 @@ boost::property_tree::ptree JsonStreamer::readStream(std::string& searchTitle) {
 
 bool JsonStreamer::checkForNull(std::string &searchTitle) {
     auto item = readStream(searchTitle);
-    if(item.empty()) { return true; }
-    return false;
+    return item.empty();
 }
 
 void JsonStreamer::update(database &obj) {
@@ -68,8 +66,15 @@ void JsonStreamer::update(database &obj) {
 database JsonStreamer::find(std::string &searchTitle) {
     auto item = readStream(searchTitle);
     database obj;
+    std::string* p = getBegin(&obj);
+    auto key = _propertyMap.at(TITLE_P);
+    *p = item.get<std::string>(key);
+
+    auto test = obj.m_title;
+    auto test2 = *p;
+
     obj.m_title = item.get<std::string>("title");
-    auto child = item.get_child("metadata");
+    auto child = item.get_child("additional");
 
     obj.m_titleId = child.get<std::string>("titleId");
     obj.m_titleType = child.get<std::string>("titleType");

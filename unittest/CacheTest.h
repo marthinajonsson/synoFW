@@ -25,6 +25,24 @@ protected:
 };
 
 
+TEST_F(CacheTest, json1) {
+    database obj;
+    obj.m_title = "Test";
+    obj.m_titleId = "tt11223344";
+    obj.m_writers = "dfsdf";
+    obj.m_directors = "fdsfd";
+    obj.m_actors = "fsdfsdf";
+    obj.m_library_id = "1";
+    obj.m_startYear = "1989";
+    obj.m_runtimeMinutes = "132";
+    obj.m_genre = "romance";
+    obj.m_language = "SV";
+    obj.m_filename = "fname";
+    JsonStreamer streamer("db_cache.json");
+    streamer.update(obj);
+}
+
+
 TEST_F(CacheTest, test1) {
     std::string testFile = "Woman.in.Gold.2015.1080p.BluRay.x264.YIFY.mp4";
     CacheMgr::getInstance().validate(testFile);

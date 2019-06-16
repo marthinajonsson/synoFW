@@ -1,7 +1,6 @@
 #include "FilenameStructure.h"
 #include "CacheMgr.h"
 #include "FileMgr.h"
-#include "Logger.h"
 #include "Imdb.h"
 
 #include <boost/assert.hpp>
@@ -20,15 +19,15 @@ CacheMgr& CacheMgr::getInstance ()
     return *instance;
 }
 
-void CacheMgr::edit (database obj) {
-    streamer.update(obj);
+void CacheMgr::edit (database& obj) {
+    stream_ptr->update(obj);
 }
 
 struct database CacheMgr::get (std::string& result) {
     FilenameStructure fn;
     fn.parse(std::move(result));
     auto title = fn.getTitle();
-    return streamer.find(title);
+    return stream_ptr->find(title);
 }
 
 void CacheMgr::validate (std::string& result) {
@@ -36,7 +35,7 @@ void CacheMgr::validate (std::string& result) {
     fn.parse(std::move(result));
     auto title = fn.getTitle();
     auto year = fn.getYear();
-    if(streamer.checkForNull(title)) {
+    if(stream_ptr->checkForNull(title)) {
         this->update(title, year);
     }
 }
@@ -52,86 +51,139 @@ bool CacheMgr::update (std::string& title, std::string& year)
 
     obj.m_title = title;
 
-    auto mMap = imdb.parse <std::multimap<std::string, std::string>> ({akasS.title, title}, {{akasS.titleId, ""}});
+//    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 0 of 7 update stages completed");
+//    auto mMap = imdb.parse <std::multimap<std::string, std::string>> ({akasS.title, title}, {{akasS.titleId, ""}});
+//    BOOST_ASSERT(!mMap.empty());
+//    auto equals = mMap.equal_range("titleId");
+//
+//    imdb.loadfile("title.basics.tsv");
+//    std::multimap<std::string,std::string>::const_iterator it;
+//    for (it = equals.first; it != equals.second; it++) {
+//        obj.m_titleId = it->second;
+//        auto uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, it->second}, {{basicsS.startYear, ""}});
+//        BOOST_ASSERT(uniqueMap.count("startYear") == 1);
+//        obj.m_startYear = uniqueMap.at("startYear");
+//        if (obj.m_startYear.find(year) != std::string::npos)
+//            break;
+//    }
+//    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 1 of 7 update stages completed");
+//
+//    auto uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.titletype, ""}});
+//    BOOST_ASSERT(!uniqueMap.empty());
+//    obj.m_titleType = uniqueMap.at("titleType");
+//
+//    uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.runtimeMinutes, ""}});
+//    BOOST_ASSERT(!uniqueMap.empty());
+//    obj.m_runtimeMinutes = uniqueMap.at("runtimeMinutes");
+//
+//    uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.genre, ""}});
+//    BOOST_ASSERT(!uniqueMap.empty());
+//    obj.m_genre = uniqueMap.at("genre");
+//
+//    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 2 of 7 update stages completed");
+//
+//    if(obj.m_titleType == "series") {
+//        uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.endYear, ""}});
+//        BOOST_ASSERT(!uniqueMap.empty());
+//        obj.m_endYear = uniqueMap.at("endYear");
+//
+//        imdb.loadfile("title.episode.tsv");
+//        uniqueMap = imdb.parse <std::map<std::string, std::string>> ({episodeS.parentTconst, obj.m_titleId}, {{episodeS.season, ""}, {episodeS.episode, ""}});
+//        BOOST_ASSERT(!uniqueMap.empty());
+//        obj.m_season = uniqueMap.at("season");
+//        obj.m_episode = uniqueMap.at("episode");
+//    }
+//
+//    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 3 of 7 update stages completed");
+
+    obj.m_title = "Woman in Gold";
+    obj.m_titleId = "tt2404425";
+
+    std::map<std::string,std::string> testMap;
+    auto mapType = typeid(testMap).name();
+
+    imdb.loadfile("title.principals.tsv");
+    auto mMap = imdb.parse <std::multimap<std::string, std::string>> ({crewS.titleId, obj.m_titleId}, {{crewS.nconst, ""}, {crewS.category, ""}});
     BOOST_ASSERT(!mMap.empty());
-    auto equals = mMap.equal_range("titleId");
+    log_ptr->writeLog(SeverityType::GENERAL, "First");
+    auto categoryIt = mMap.equal_range("category"); //actor, producer, writer, actress
+    auto nameIdIt = mMap.equal_range("nconst"); // nmxxxxx
 
-    std::multimap<std::string,std::string>::const_iterator it;
-    for (it = equals.first; it != equals.second; it++) {
-        obj.m_titleId = it->second;
-        imdb.loadfile("title.basics.tsv");
-        auto uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, it->second}, {{basicsS.startYear, ""}});
-        BOOST_ASSERT(uniqueMap.count("startYear") == 1);
-        obj.m_startYear = uniqueMap.at("startYear");
-        if (obj.m_startYear.find(year) != std::string::npos)
-            break;
+    std::multimap<std::string, std::string> crew;
+    auto it2 = nameIdIt.first;
+    for (auto it = categoryIt.first; it != categoryIt.second && it2 != nameIdIt.second; it++, it2++) {
+        auto category = it->second;
+        if (category == "producer")
+            continue;
+        crew.insert(std::make_pair(it->second, it2->second));
     }
 
-    imdb.loadfile("title.basics.tsv");
-    auto uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.titletype, ""}});
-    BOOST_ASSERT(!uniqueMap.empty());
-    obj.m_titleType = uniqueMap.at("titleType");
+    auto directors = crew.equal_range("director");
+    auto writer = crew.equal_range("writer");
+    auto actor = crew.equal_range("actor");
+    auto actress = crew.equal_range("actress");
 
-    if(obj.m_titleType == "series") {
-        uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.endYear, ""}});
-        BOOST_ASSERT(!uniqueMap.empty());
-        obj.m_endYear = uniqueMap.at("endYear");
-
-        imdb.loadfile("title.episode.tsv");
-        uniqueMap = imdb.parse <std::map<std::string, std::string>> ({episodeS.parentTconst, obj.m_titleId}, {{episodeS.season, ""}, {episodeS.episode, ""}});
-        BOOST_ASSERT(!uniqueMap.empty());
-        obj.m_season = uniqueMap.at("season");
-        obj.m_episode = uniqueMap.at("episode");
-    }
-
-    imdb.loadfile("title.basics.tsv");
-    uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.runtimeMinutes, ""}});
-    BOOST_ASSERT(!uniqueMap.empty());
-    obj.m_runtimeMinutes = uniqueMap.at("runtimeMinutes");
-
-    uniqueMap = imdb.parse <std::map<std::string, std::string>> ({basicsS.titleId, obj.m_titleId}, {{basicsS.genre, ""}});
-    BOOST_ASSERT(!uniqueMap.empty());
-    obj.m_genre = uniqueMap.at("genre");
-
-    imdb.loadfile("title.crew.tsv");
-    uniqueMap = imdb.parse <std::map<std::string, std::string>> ({crewS.titleId, obj.m_titleId}, {{crewS.directors, ""}, {crewS.writers, ""}});
-    BOOST_ASSERT(!uniqueMap.empty());
-
-    std::string nameIds = uniqueMap.at("directors");
-    auto directors = split(nameIds, ',');
-    nameIds = uniqueMap.at("writers");
-    auto writers = split(nameIds, ',');
+    mMap.clear();
+    for (auto it = actor.first; it != actor.second; it++)
+        mMap.insert(std::make_pair(it->first, it->second));
+    for (auto it = actress.first; it != actress.second; it++)
+        mMap.insert(std::make_pair(it->first, it->second));
 
     imdb.loadfile("name.basics.tsv");
     std::string namesOfCrew;
-    for (auto &d : directors) {
-        auto tmp = imdb.parse <std::map<std::string, std::string>> ({nameS.nconst, d}, {{nameS.primaryName, ""}});
-        if (tmp.find("primaryName") != tmp.end()) {
-            std::string primaryName = tmp.at("primaryName");
-            namesOfCrew.append(primaryName);
-            namesOfCrew.append(", ");
+    for (auto it = mMap.begin(); it != mMap.end(); it++) {
+        auto val = it->second;
+        log_ptr->writeLog(SeverityType::GENERAL, "Second Loop");
+        auto uniqueMap = imdb.parse <std::map<std::string, std::string>> ({nameS.nconst, it->second}, {{nameS.primaryName, ""}});
+        if (uniqueMap.count("primaryName") == 1) {
+            auto tmp = uniqueMap.at("primaryName");
+            namesOfCrew.append(tmp + ", ");
         }
     }
     if(namesOfCrew.size() > 2) {
         namesOfCrew.erase (namesOfCrew.end()-2);
     }
-    obj.m_directors = !namesOfCrew.empty() ? namesOfCrew : "N";
+    obj.m_actors = namesOfCrew;
+
+    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 4 of 7 update stages completed");
+
     namesOfCrew = "";
-
-    for (auto &w : writers) {
-        auto tmp = imdb.parse <std::map<std::string, std::string>> ({nameS.nconst, w}, {{nameS.primaryName, ""}});
-        if (tmp.find("primaryName") != tmp.end()) {
-            std::string primaryName = tmp.at("primaryName");
-            namesOfCrew.append(primaryName);
-            namesOfCrew.append(", ");
+    for (auto it = directors.first; it != directors.second; it++) {
+        auto val = it->second;
+        log_ptr->writeLog(SeverityType::GENERAL, "Third loop");
+        auto uniqueMap = imdb.parse <std::map<std::string, std::string>> ({nameS.nconst, it->second}, {{nameS.primaryName, ""}});
+        if (uniqueMap.count("primaryName") == 1) {
+            auto tmp = uniqueMap.at("primaryName");
+            namesOfCrew.append(tmp + ", ");
         }
     }
+
     if(namesOfCrew.size() > 2) {
         namesOfCrew.erase (namesOfCrew.end()-2);
     }
-    obj.m_writers = !namesOfCrew.empty() ? namesOfCrew : "N";
+    obj.m_directors = namesOfCrew;
+    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 5 of 7 update stages completed");
 
-    streamer.update(obj);
+    namesOfCrew = "";
+    for (auto it = writer.first; it != writer.second; it++) {
+        auto val = it->second;
+        log_ptr->writeLog(SeverityType::GENERAL, "Fourth loop");
+        auto uniqueMap = imdb.parse <std::map<std::string, std::string>> ({nameS.nconst, it->second}, {{nameS.primaryName, ""}});
+        if (uniqueMap.count("primaryName") == 1) {
+            auto tmp = uniqueMap.at("primaryName");
+            namesOfCrew.append(tmp + ", ");
+        }
+    }
+
+    if(namesOfCrew.size() > 2) {
+        namesOfCrew.erase (namesOfCrew.end()-2);
+    }
+    obj.m_writers = namesOfCrew;
+
+
+    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 6 of 7 update stages completed");
+    stream_ptr->update(obj);
+    log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 7 of 7 update stages completed");
     return true;
 }
 

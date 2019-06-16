@@ -89,7 +89,7 @@ int main(int argc, char* argv [])
     LOG("This is a log entry");
 
     ::testing::InitGoogleMock(&argc, argv);
-    ::testing::GTEST_FLAG(filter) = "FileStationApiTest*";
+  //  ::testing::GTEST_FLAG(filter) = "FsResponseTest*";
     return RUN_ALL_TESTS();
 
     LOG("This is a log entry");

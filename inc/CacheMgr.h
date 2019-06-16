@@ -5,15 +5,14 @@
 #ifndef SYNOFW_CACHEMGR_H
 #define SYNOFW_CACHEMGR_H
 
-#include "Subject.h"
 #include "JsonStreamer.h"
+#include "EventLogger.h"
+#include "Logger.h"
 
 #include <string>
+#include <memory>
 
-class Logger;
-
-
-class CacheMgr : Subject{
+class CacheMgr{
 public:
     static CacheMgr& getInstance();
     CacheMgr(CacheMgr const&) = delete;
@@ -23,11 +22,19 @@ public:
     struct database get(std::string&);
     void edit (database&);
 private:
-    CacheMgr() {
-        streamer.setFile("db_cache.json");
+    std::unique_ptr<Logger> log_ptr = std::make_unique<Logger>();
+    EventLogger* elog_ptr;
+
+    CacheMgr () {
+        elog_ptr = new EventLogger();
+        log_ptr->registerObserver(SeverityType::GENERAL, elog_ptr);
     };
-    ~CacheMgr() = default;
-    JsonStreamer streamer;
+
+    ~CacheMgr () {
+        log_ptr->removeObserver(elog_ptr);
+        delete elog_ptr;
+    };
+    std::unique_ptr<JsonStreamer> stream_ptr = std::make_unique<JsonStreamer>("db_cache.json");
 
     struct TitleAkasS {
         const unsigned short titleId = 0;
@@ -47,9 +54,9 @@ private:
     }basicsS;
 
     struct TitleCrewS {
-        const unsigned short titleId = 0;
-        const unsigned short directors = 1; //array of string nconst
-        const unsigned short writers = 2; //array of string nconst
+        const unsigned short titleId = 0; // id of title
+        const unsigned short nconst = 2; //id of person
+        const unsigned short category = 3; //role of person
     }crewS;
 
     struct TitleEpisodeS {

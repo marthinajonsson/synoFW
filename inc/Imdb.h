@@ -40,8 +40,8 @@ public:
         else if (_imdbFilename.find("title.basics") != std::string::npos)
             return { {0, "titleId"}, {1, "titleType"}, {2, "primaryTitle"}, {3, "originalTitle"}, {5, "startYear"}, {6, "endYear"}, {7, "runtimeMinutes"}, {8, "genre"} };
 
-        else if (_imdbFilename.find("crew") != std::string::npos)
-            return { {0, "titleId"}, {1, "directors"}, {2, "writers"} };
+        else if (_imdbFilename.find("principals") != std::string::npos)
+            return { {0, "titleId"}, {2, "nconst"}, {3, "category"} };
 
         else if (_imdbFilename.find("epsiode") != std::string::npos)
             return { {0, "episodeId"}, {1, "parentTconst"}, {2, "season"}, {3, "episode"} };
@@ -88,8 +88,8 @@ public:
         long pos2 = file.tellg();
         while(getline(file, line))
         {
-            boost::algorithm::to_lower(line);
-            if(line.find(matchColumnValue) == std::string::npos) {
+            auto copy = boost::algorithm::to_lower_copy(line);
+            if(copy.find(matchColumnValue) == std::string::npos) {
                 continue;
             }
 
@@ -103,9 +103,9 @@ public:
             }
 
             /*
-             * Search among our columnns for our matching property i.e. title
+             * Search among our columnns for our matching property
              * */
-            auto found = std::find(columnsValue.begin(), columnsValue.end(), matchColumnValue);
+            auto found = std::find(columnsValue.begin(), columnsValue.end(), match.second);
             if(found != columnsValue.end()) {
                 _currentFilePos = file.tellg(); // save current position in file so we don't need to parse the entire file for next property
                 _currentFilePos -= _headerSize;

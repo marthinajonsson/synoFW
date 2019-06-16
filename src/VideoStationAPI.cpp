@@ -10,7 +10,10 @@
 #include <algorithm>
 
 #include <RequestUrlBuilder.h>
+#include <CacheMgr.h>
 #include "VideoStationAPI.h"
+#include "TablePrinter.h"
+#include "DatabaseObject.h"
 #include "ParamHandling.h"
 #include "Utilities.h"
 #include "ErrorCodes.h"
@@ -119,7 +122,7 @@ std::string VideoStationAPI::paramParser(std::string &api, std::string& params) 
             fullParamStr += "=";
         }
         if(s == "limit") {
-            std::string val = handler.setParam("limit", "5");
+            std::string val = handler.setParam("limit", "1");
             fullParamStr+=val;
         }else if(s == "type") {
             std::string val = handler.setParam("type", "movie");
@@ -173,12 +176,31 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     std::vector<std::pair<std::string,std::string>> result;
     std::string api;
     int indexedMethod = 0;
-    std::string url = compile(parsed, api, indexedMethod, true);
+    std::string url = compile(parsed, api, indexedMethod, false);
     auto responseObject = RequestHandler::getInstance().make(url, VideoStation::session);
     std::string responses = loadResponse(_apiFile, api, indexedMethod);
     result = respParser(responseObject, api, responses);
 
-    for(auto &p : result) {
-        std::cout << p.first << ":" << p.second << std::endl;
+    TablePrinter tablePrinter(6);
+    tablePrinter.setRowColor("bold");
+    tablePrinter.addHeader({"Index","Title", "Genre", "Duration", "Directors", "Actors"});
+    tablePrinter.setRowColor("");
+
+    auto it = result.begin();
+    database obj;
+
+    for (;it != result.end(); it++) {
+        if (it->first.find("title") != std::string::npos) {
+            CacheMgr::getInstance().validate(it->second);
+            obj = CacheMgr::getInstance().get(it->second);
+        }
+
+        if (it->first.find("mapper_id") != std::string::npos)
+            obj.m_library_id = it->second;
+
+        CacheMgr::getInstance().edit(obj);
+        tablePrinter.addRow({obj.m_title, obj.m_genre, obj.m_runtimeMinutes, obj.m_directors, obj.m_writers});
     }
+
+    tablePrinter.write();
 }
