@@ -187,7 +187,7 @@ void VideoStationAPI::makeRequest(std::string& parsed)
     tablePrinter.setRowColor("");
 
     auto it = result.begin();
-    database obj;
+    Database obj;
 
     for (;it != result.end(); it++) {
         if (it->first.find("title") != std::string::npos) {

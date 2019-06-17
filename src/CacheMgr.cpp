@@ -19,11 +19,11 @@ CacheMgr& CacheMgr::getInstance ()
     return *instance;
 }
 
-void CacheMgr::edit (database& obj) {
+void CacheMgr::edit (Database& obj) {
     stream_ptr->update(obj);
 }
 
-struct database CacheMgr::get (std::string& result) {
+struct Database CacheMgr::get (std::string& result) {
     FilenameStructure fn;
     fn.parse(std::move(result));
     auto title = fn.getTitle();
@@ -35,7 +35,7 @@ void CacheMgr::validate (std::string& result) {
     fn.parse(std::move(result));
     auto title = fn.getTitle();
     auto year = fn.getYear();
-    if(stream_ptr->checkForNull(title)) {
+    if(stream_ptr->exists(title)) {
         this->update(title, year);
     }
 }
@@ -44,7 +44,7 @@ bool CacheMgr::update (std::string& title, std::string& year)
 {
     BOOST_ASSERT(!title.empty());
 
-    database obj;
+    Database obj;
 
     Imdb imdb;
     imdb.loadfile("title.akas.tsv");
@@ -182,7 +182,9 @@ bool CacheMgr::update (std::string& title, std::string& year)
 
 
     log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 6 of 7 update stages completed");
+
     stream_ptr->update(obj);
+
     log_ptr->writeLog(SeverityType::GENERAL, "[" +title + "]" + " 7 of 7 update stages completed");
     return true;
 }

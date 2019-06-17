@@ -47,10 +47,12 @@ enum PROPERTY {
     SEASON_P,
     PATH_P,
     LIBRARY_ID_P,
-    FILENAME_P = 16
+    FILENAME_P = 17,
 };
 
-struct database {
+
+
+struct Database {
     std::string m_title;
     std::string m_titleId;
     std::string m_titleType = "UNDEF";

@@ -328,7 +328,7 @@ void FileStationAPI::makeRequest (std::string& parsed)
     tablePrinter.setRowColor("");
 
     auto it = result.begin();
-    database obj;
+    Database obj;
 
     for (;it != result.end(); it++) {
         if (it->first.find("name") != std::string::npos) {

@@ -139,14 +139,17 @@ template<typename T> map_init_helper<T> map_init(T& item)
 }
 
 
-template <typename S> std::string* getBegin(S *s)
+template <typename Ret, typename Elem>
+Ret* getBegin(Elem *e)
 {
-    return (std::string*)s;
+    return (Elem*)e;
 }
 
-template <typename S> std::string* getEnd(S *s)
+
+template <typename Ret, typename Elem>
+Ret* getEnd(Elem *e)
 {
-    return (std::string*)((std::string*)s+sizeof(*s));
+    return (Elem*)((Elem*)e+sizeof(*e));
 }
 
 #endif //SYNOFW_UTILITIES_H

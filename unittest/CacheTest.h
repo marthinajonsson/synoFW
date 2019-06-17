@@ -11,11 +11,30 @@
 class CacheTest : public ::testing::Test
 {
 protected:
-
+    std::map<PROPERTY, std::string> _propertyMap;
 
     void SetUp() override
     {
-        //
+        map_init(_propertyMap)
+                (PROPERTY::TITLE_P, TITLE)
+                (PROPERTY::TITLE_ID_P, TITLE_ID)
+                (PROPERTY::TITLE_TYPE_P, TITLE_TYPE)
+                (PROPERTY::GENRE_P, GENRE)
+                (PROPERTY::START_YEAR_P, START_YEAR)
+                (PROPERTY::END_YEAR_P, END_YEAR)
+                (PROPERTY::DIRECTORS_P, DIRECTORS)
+                (PROPERTY::WRITERS_P, WRITERS)
+                (PROPERTY::ACTORS_P, ACTORS)
+                (PROPERTY::RUNTIME_P, RUNTIME_MINUTES)
+                (PROPERTY::REGION_P, REGION)
+                (PROPERTY::LANGUAGE_P, LANGUAGE)
+                (PROPERTY::PARENT_CONST_P, PARENT_CONST)
+                (PROPERTY::EPISODE_P, EPISODE)
+                (PROPERTY::SEASON_P, SEASON)
+                (PROPERTY::PATH_P, PATH)
+                (PROPERTY::LIBRARY_ID_P, LIBRARY_ID)
+                (PROPERTY::FILENAME_P, FILENAME)
+                ;
     }
 
     void TearDown() override
@@ -26,7 +45,7 @@ protected:
 
 
 TEST_F(CacheTest, json1) {
-    database obj;
+    Database obj;
     obj.m_title = "Test";
     obj.m_titleId = "tt11223344";
     obj.m_writers = "dfsdf";
@@ -38,7 +57,7 @@ TEST_F(CacheTest, json1) {
     obj.m_genre = "romance";
     obj.m_language = "SV";
     obj.m_filename = "fname";
-    JsonStreamer streamer("db_cache.json");
+    JsonStreamer<Database, PROPERTY> streamer("db_cache.json", _propertyMap);
     streamer.update(obj);
 }
 

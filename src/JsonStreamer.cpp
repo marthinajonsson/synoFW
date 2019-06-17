@@ -2,32 +2,60 @@
 // Created by mjonsson on 5/20/19.
 //
 
+#include <boost/lexical_cast.hpp>
 #include <iostream>
+#include <fstream>
+
 #include "JsonStreamer.h"
+#include "Utilities.h"
 
-typedef boost::property_tree::ptree ptree;
+/*
+ * writes:
+ *
+ * {
+ *   0: {
+ *
+ *     parent : value
+ *     additional
+ *     {
+ *       child : value,
+ *       child : value
+ *     }
+ *   },
+ *   1: {
+ *     parent : value
+ *     additional
+ *     {
+ *       child : value,
+ *       child : value
+ *     }
+ *   }
+ * }
+ * */
 
-void JsonStreamer::writeStream(database &obj) {
+template <typename Type, typename Enum, class ValueType = std::string>
+void JsonStreamer::writeStream(Type &write_obj) {
 
-    ptree root;
-    ptree parent;
-    ptree child;
+    boost::property_tree::ptree root;
+    boost::property_tree::ptree parent;
+    boost::property_tree::ptree child;
+
+    int propertyInt = 0;
 
     boost::property_tree::read_json(_path, root);
     long size = root.size();
     auto index = std::to_string(size);
+    int sizeEnum = sizeof(Enum) / sizeof(Enum[0]);
 
-    auto parentKey = _propertyMap.at(TITLE_P);
-    auto parentValue = *getBegin(&obj);
-
+    auto property = static_cast<Enum>(propertyInt);
+    auto parentKey = _Keys.at(property);
+    ValueType parentValue = *getBegin(&write_obj);
     parent.put(parentKey, parentValue);
-    int propertyInt = TITLE_ID_P;
-    for (std::string* p = getBegin(&obj) + 1; p < getEnd(&obj); propertyInt++, p++) {
-        auto property = static_cast<PROPERTY >(propertyInt);
-        if (propertyInt > FILENAME_P)
-            break;
+
+    for (ValueType* p = getBegin(&write_obj) + 1; p < getEnd(&write_obj) && propertyInt < sizeEnum; propertyInt++, p++) {
+        auto property = static_cast<E>(propertyInt);
         auto val = *p;
-        auto key = _propertyMap.at(property);
+        auto key = keys.at(property);
         child.put(key, val);
     }
 
@@ -37,59 +65,51 @@ void JsonStreamer::writeStream(database &obj) {
     boost::property_tree::json_parser::write_json(_path, root);
 }
 
-boost::property_tree::ptree JsonStreamer::readStream(std::string& searchTitle) {
-    ptree root;
-    ptree empty;
+
+template <typename Type, typename Enum, typename ValueType = std::string>
+boost::property_tree::ptree JsonStreamer::readStream(ValueType& search_pattern)
+{
+    boost::property_tree::ptree root;
+    boost::property_tree::ptree empty;
     boost::property_tree::read_json(_path, root);
 
-    for(auto &it : root) {
-        auto key = it.first;
+    auto property = static_cast<Enum>(0);
+    auto parentKey = _Keys.at(property);
+
+    for (auto &it : root) {
         auto val = it.second;
-        auto found = val.get<std::string>(TITLE);
-        if(found.find(searchTitle) != std::string::npos) {
+        if (val.empty())
+            continue;
+        auto found = val.get<ValueType>(parentKey);
+        if (found.find(search_pattern) != std::string::npos)
             return val;
-        }
     }
     return empty;
 }
 
+template <typename Type, typename Enum, typename ValueType = std::string>
+Type JsonStreamer::find(ValueType &search_pattern)
+{
+    boost::property_tree::ptree item;
+    Type obj;
 
-bool JsonStreamer::checkForNull(std::string &searchTitle) {
-    auto item = readStream(searchTitle);
-    return item.empty();
-}
+    item = readStream(search_pattern);
 
-void JsonStreamer::update(database &obj) {
-    writeStream(obj);
-}
+    ValueType* p = getBegin<ValueType(&obj);
 
-database JsonStreamer::find(std::string &searchTitle) {
-    auto item = readStream(searchTitle);
-    database obj;
-    std::string* p = getBegin(&obj);
-    auto key = _propertyMap.at(TITLE_P);
-    *p = item.get<std::string>(key);
+    int propertyInt = 0;
+    auto property = static_cast<Enum>(propertyInt);
+    int sizeEnum = sizeof(Enum) / sizeof(Enum[0]);
+    auto parentKey = _Keys.at(property);
 
-    auto test = obj.m_title;
-    auto test2 = *p;
+    ValueType* parentValue = getBegin(&obj);
+    parentValue = item.get<ValueType>(parentKey);
 
-    obj.m_title = item.get<std::string>("title");
-    auto child = item.get_child("additional");
-
-    obj.m_titleId = child.get<std::string>("titleId");
-    obj.m_titleType = child.get<std::string>("titleType");
-    obj.m_genre = child.get<std::string>("genre");
-    obj.m_startYear = child.get<std::string>("startYear");
-    obj.m_endYear = child.get<std::string>("endYear");
-    obj.m_runtimeMinutes = child.get<std::string>("runtimeMinutes");
-    obj.m_directors = child.get<std::string>("directors");
-    obj.m_writers = child.get<std::string>("writers");
-    obj.m_path = child.get<std::string>("path");
-    obj.m_library_id = child.get<std::string>("filename");
-    if(obj.m_titleType == "series") {
-        obj.m_episode = child.get<std::string>("episode");
-        obj.m_season = child.get<std::string>("season");
-        obj.m_parentTconst = child.get<std::string>("parentTconst");
+    item = item.get_child("additional");
+    for (ValueType* p = getBegin(&obj) + 1; p < getEnd(&obj) && propertyInt < sizeEnum; propertyInt++, p++) {
+        auto property = static_cast<Enum>(propertyInt);
+        auto key = keys.at(property);
+        p = item.get<ValueType>(key);
     }
     return obj;
 }
